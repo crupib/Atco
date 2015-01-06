@@ -47,10 +47,10 @@ SUB DrawDemo (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
   GRAPHIC ATTACH hDlg, ID, REDRAW        ' Use faster, buffered draw
   GRAPHIC COLOR %RGB_BLUE, %RGB_WHITE    ' Blue line, white background
 
-  central_angle = 30
+ ' central_angle = 30
   centerX = 0 ' or any value you like
   centerY = 0
-  radius = 200
+'  radius = 200
 
   CALL  Calculate_Radis_Central_Angle()
    ' Calculate and draw circle based on center location of circle

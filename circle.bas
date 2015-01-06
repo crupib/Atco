@@ -103,10 +103,10 @@ CALLBACK FUNCTION EditControlCallback()
     radius = VAL(TXT$)
     CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
     central_angle = VAL(TXT$)
-    DrawDemo hDlg, %IDC_GRAPHIC1
+   ' DrawDemo hDlg, %IDC_GRAPHIC1
 END FUNCTION
  CALLBACK FUNCTION Calc_button()
-     MSGBOX STR$(radius)
+     DrawDemo hDlg, %IDC_GRAPHIC1
  END FUNCTION
  FUNCTION BUILDWINDOW() AS LONG
     DIALOG NEW PIXELS, 0, "Atco Circles",,, 1920, 1080,%WS_OVERLAPPEDWINDOW , 0 TO hDlg

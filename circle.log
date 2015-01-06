@@ -3,19 +3,19 @@ Copyright (c) 1996-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  D:\PBWin10\samples\Atco\circle.bas   {210 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\circle.bas   {210 total lines}
 Target compilation:  circle.EXE
 Compile time:  0.1 seconds, at 252000 lines/minute
 
-4592 bytes compiled code, 41308 bytes RTLibrary,
+4560 bytes compiled code, 40892 bytes RTLibrary,
 332 bytes string literals, and 3580 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 54272 bytes   Memory image: 45220 bytes.
+Disk image: 53760 bytes   Memory image: 44804 bytes.
 
 Component Files:
 ----------------
-D:\PBWin10\samples\Atco\circle.bas
-D:\PBWIN10\SAMPLES\ATCO\CIRCLE.INC
+C:\Users\Bill\Documents\GitHub\Atco\circle.bas
+C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\CIRCLE.INC
 
 
 Code Extracted:

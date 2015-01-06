@@ -40,8 +40,8 @@ FUNCTION Calculate_Radis_Central_Angle() AS LONG
   Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
   Segment_area =Sector_area - Triangle_area
 END FUNCTION
-SUB DrawDemo (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
-
+SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
+  LOCAL lResult AS LONG
   GRAPHIC CLEAR
   GRAPHIC WIDTH 3
   GRAPHIC ATTACH hDlg, ID, REDRAW        ' Use faster, buffered draw
@@ -51,8 +51,13 @@ SUB DrawDemo (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
   centerX = 0 ' or any value you like
   centerY = 0
 '  radius = 200
-
-  CALL  Calculate_Radis_Central_Angle()
+  CONTROL GET CHECK hDlg, %OPT1 TO lResult&
+  IF  lResult <> 0 THEN
+    CALL  Calculate_Radis_Central_Angle()
+  ELSE
+      central_angle = 40
+      radius = 300
+  END IF
    ' Calculate and draw circle based on center location of circle
   CALL  circle(centerX,centerY,radius)
 
@@ -106,7 +111,7 @@ CALLBACK FUNCTION EditControlCallback()
    ' DrawDemo hDlg, %IDC_GRAPHIC1
 END FUNCTION
  CALLBACK FUNCTION Calc_button()
-     DrawDemo hDlg, %IDC_GRAPHIC1
+     DrawSystem hDlg, %IDC_GRAPHIC1
  END FUNCTION
  FUNCTION BUILDWINDOW() AS LONG
     DIALOG NEW PIXELS, 0, "Atco Circles",,, 1920, 1080,%WS_OVERLAPPEDWINDOW , 0 TO hDlg

@@ -133,12 +133,165 @@ CALLBACK FUNCTION EditControlCallback()
     radius = VAL(TXT$)
     CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
     central_angle = VAL(TXT$)
-   ' DrawDemo hDlg, %IDC_GRAPHIC1
 END FUNCTION
- CALLBACK FUNCTION Calc_button()
+CALLBACK FUNCTION Calc_button()
      DrawSystem hDlg, %IDC_GRAPHIC1
- END FUNCTION
- FUNCTION BUILDWINDOW() AS LONG
+END FUNCTION
+CALLBACK FUNCTION Button_call()
+    LOCAL lResult AS LONG
+    CONTROL GET CHECK hDlg, %OPT1 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Radius"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Arc AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+    CONTROL GET CHECK hDlg, %OPT2 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Radius"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Arc AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+    CONTROL GET CHECK hDlg, %OPT3 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Radius"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Arc AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+    CONTROL GET CHECK hDlg, %OPT4 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Radius"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Arc AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+    CONTROL GET CHECK hDlg, %OPT5 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Radius"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = " ARC AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+    CONTROL GET CHECK hDlg, %OPT6 TO lResult&
+    IF  lResult <> 0 THEN
+        TXT$ = "Chord AB"
+        CONTROL SET TEXT hDlg, %IDC_LABEL1, TXT$
+        TXT$ = "Segment Height ED"
+        CONTROL SET TEXT hDlg, %IDC_LABEL2, TXT$
+        TXT$ = "Radius
+        CONTROL SET TEXT hDlg, %IDC_LABEL3, TXT$
+        TXT$ = "Apothem OE"
+        CONTROL SET TEXT hDlg, %IDC_LABEL4, TXT$
+        TXT$ = "Central Angle"
+        CONTROL SET TEXT hDlg, %IDC_LABEL5, TXT$
+        TXT$ = "Arc AB
+        CONTROL SET TEXT hDlg, %IDC_LABEL6, TXT$
+        TXT$ = "Circumference"
+        CONTROL SET TEXT hDlg, %IDC_LABEL7, TXT$
+        TXT$ = "Segment Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL8, TXT$
+        TXT$ = "Triangle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL9, TXT$
+        TXT$ = "Sector Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
+        TXT$ = "Total Circle Area"
+        CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
+    END IF
+END FUNCTION
+
+FUNCTION BUILDWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
     exeICON = "exeICON"
@@ -158,7 +311,6 @@ END FUNCTION
      %WS_GROUP , , CALL Calc_button()
     CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX3, "", 600, 210, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-
     CONTROL ADD LABEL, hDlg, %IDC_LABEL3, TXT$, 500, 210, 100, 20
     CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX4, "", 600, 230, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
@@ -185,15 +337,23 @@ END FUNCTION
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg, %IDC_LABEL11, TXT$, 500, 370, 100, 20
     CONTROL ADD OPTION, hDlg, %OPT1, "Radius and Central Angle", 600, 6, 180, 14, _
-    %WS_GROUP OR %WS_TABSTOP
-    CONTROL ADD OPTION, hDlg, %OPT2, "Radius & Chord AB", 600, 20, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT3, "Radius & Segment Height ED", 600, 34, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT4, "Radius & Apothem OE", 600, 48, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT5, "Radius & Arc AB", 600, 62, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT6, "Chord AB & Segment Height ED", 600, 76, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT7, "Chord AB & Apothem OE", 600, 90, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT8, "Segment Height ED & Apothem OE ", 600, 104, 180, 14
-    CONTROL ADD OPTION, hDlg, %OPT9, "Chord AB & Arc AB", 600, 118, 180, 14
+    %WS_GROUP OR %WS_TABSTOP, , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT2, "Radius & Chord AB", 600, 20, 180, 14 , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT3, "Radius & Segment Height ED", 600, 34, 180, 14 , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT4, "Radius & Apothem OE", 600, 48, 180, 14   , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT5, "Radius & Arc AB", 600, 62, 180, 14  , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT6, "Chord AB & Segment Height ED", 600, 76, 180, 14   , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT7, "Chord AB & Apothem OE", 600, 90, 180, 14 , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT8, "Segment Height ED & Apothem OE ", 600, 104, 180, 14  , _
+     , , CALL Button_call()
+    CONTROL ADD OPTION, hDlg, %OPT9, "Chord AB & Arc AB", 600, 118, 180, 14    , _
+     , , CALL Button_call()
 
   ' Set the initial state to OPTION button 3
     CONTROL SET OPTION hDlg, %OPT1, %OPT1, %OPT9
@@ -228,7 +388,6 @@ END FUNCTION
         CONTROL SET TEXT hDlg, %IDC_LABEL10, TXT$
         TXT$ = "Total Circle Area"
         CONTROL SET TEXT hDlg, %IDC_LABEL11, TXT$
-
     END IF
 
 

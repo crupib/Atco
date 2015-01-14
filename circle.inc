@@ -6,12 +6,13 @@ GLOBAL x,x1,y,y1 AS DOUBLE
 GLOBAL demo AS LONG
 GLOBAL usecolor AS LONG
 GLOBAL kbd AS STRING
-GLOBAL AE, AO, ED, OE, AB, area, AOE AS DOUBLE
+GLOBAL AE, AO, ED, OE, AB, area, AOE,ce,eb AS DOUBLE
 GLOBAL centerx, centery AS LONG
 GLOBAL radius AS LONG
 GLOBAL central_angle, arc_ABD, arc_ABR, arclen_AB AS DOUBLE
 GLOBAL circumference,chord_AB, circle_area AS DOUBLE
 GLOBAL Sector_area AS DOUBLE
+GLOBAL Arc_AB AS DOUBLE
 GLOBAL Triangle_Area, Segment_area AS DOUBLE
 %IDC_GRAPHIC1 = 110
 %IDC_EDITBOX1 = 111

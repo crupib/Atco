@@ -23,11 +23,54 @@ END FUNCTION
 FUNCTION Calculate_Chord_AB_Segment_Height_ED() AS LONG
     radius = Chord_AB/(2*AOE)
 END FUNCTION
+FUNCTION Calculate_Radius_ED() AS LONG
+  AO = radius
+  oe = AO - ED
+  AE = SQR(AO^2 - OE^2)
+  aoe = ATN(ae/oe)
+  chord_ab = 2*AE
+  central_angle = 2*(aoe*(180/pi))
+  arc_ABD =  (central_angle / 180) * Pi * radius
+  arc_ABR = central_angle*(Pi/180)
+  x = (centerX + radius * SIN(-arc_ABR))
+  y = (centerY + radius * COS(-arc_ABR))
+  x1 = (centerX + radius * SIN( arc_ABR))
+  y1 = (centerY + radius * COS( arc_ABR))
+  AOE = SIN(Pi/180*(central_angle/2))
+  circumference = 2 * Pi * AO
+  circle_area = Pi*radius^2
+  arclen_AB =  Central_angle*(Pi/180) * radius
+  Sector_area = (Central_angle/360)*Pi*radius^2
+  Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
+  Segment_area =Sector_area - Triangle_area
+
+  TXT$ =  STR$(chord_ab)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
+  TXT$ =  STR$(OE)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
+  TXT$ =  STR$(central_angle)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX5, TXT$
+  TXT$ =  STR$(arclen_AB)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX6, TXT$
+  TXT$ =  STR$(circumference)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX7, TXT$
+  TXT$ =  STR$(Segment_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX8, TXT$
+  TXT$ =  STR$(Triangle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX9, TXT$
+  TXT$ =  STR$(Sector_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX10, TXT$
+  TXT$ =  STR$(circle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
+
+'  radius = Chord_AB/(2*AOE)
+END FUNCTION
 FUNCTION Calculate_Radius_Chord_AB() AS LONG
   ae = .5*chord_ab
   AO = radius
   oe = SQR( AO^2 - AE^2 )
   aoe = ATN(ae/oe)
+  chord_AB = 2 * AOE * radius
   central_angle = 2*(aoe*(180/pi))
   arc_ABD =  (central_angle / 180) * Pi * radius
   arc_ABR = central_angle*(Pi/180)
@@ -86,7 +129,7 @@ FUNCTION Calculate_Radis_Central_Angle() AS LONG
   Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
   Segment_area =Sector_area - Triangle_area
 
-  TXT$ =  STR$(ED)
+  TXT$ =  STR$(chord_AB)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
   TXT$ =  STR$(OE)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
@@ -122,6 +165,10 @@ SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
   CONTROL GET CHECK hDlg, %OPT2 TO lResult&
   IF  lResult <> 0 THEN
     CALL  Calculate_Radius_Chord_AB()
+  END IF
+  CONTROL GET CHECK hDlg, %OPT3 TO lResult&
+  IF  lResult <> 0 THEN
+    CALL  Calculate_Radius_ED()
   END IF
    ' Calculate and draw circle based on center location of circle
   CALL  circle(centerX,centerY,radius)
@@ -176,6 +223,13 @@ CALLBACK FUNCTION EditControlCallback()
         radius = VAL(TXT$)
         CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
         Chord_ab = VAL(TXT$)
+    END IF
+    CONTROL GET CHECK hDlg, %OPT3 TO lResult&
+    IF  lResult <> 0 THEN
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+        radius = VAL(TXT$)
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+        Ed = VAL(TXT$)
     END IF
 END FUNCTION
 CALLBACK FUNCTION Calc_button()

@@ -25,16 +25,15 @@ FUNCTION Calculate_Radius_Arc_AB() AS LONG
   '''''''''''''''''''''''''''''''''''''''''''''''''''''
   circumference = 2 * Pi * AO
   Central_Angle = (Arc_AB / Circumference) * 360
-  AOE = SIN(Pi/180*(central_angle/2))
-  Chord_AB = 2*SIN (AOE) * radius
   arc_ABD =  (central_angle / 180) * Pi * radius
   arc_ABR = central_angle*(Pi/180)
   x = (centerX + radius * SIN(-arc_ABR))
   y = (centerY + radius * COS(-arc_ABR))
   x1 = (centerX + radius * SIN( arc_ABR))
   y1 = (centerY + radius * COS( arc_ABR))
-  ''''''''''''''''''''''''''''''
-  AE = SIN(AOE) * AO
+  ''''''''''''''''''''''''''''''''''''
+  Chord_AB = 2*SIN ((pi/180)*(central_angle/2)) * radius
+  AE = .5*Chord_ab
   oe = SQR( AO^2 - AE^2 )
   ED = AO - OE
 
@@ -67,7 +66,7 @@ FUNCTION Calculate_Chord_AB_Segment_Height_ED() AS LONG
     AE=Chord_ab/2
     eb=chord_ab/2
     ce=(ae*eb)/ed
-    radius = Chord_AB/(2*AOE)
+    radius = (CE+ED/2)
 END FUNCTION
 FUNCTION Calculate_Radius_OE() AS LONG
   AO = radius
@@ -577,64 +576,64 @@ FUNCTION BUILDWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
     exeICON = "exeICON"
-    DIALOG NEW PIXELS, 0, "Atco Circles",,, 1920, 1080,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, 0, "Atco Circles",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
     ' Set up a pixel-based coordinate system in the Graphic control
     DIALOG SET ICON hDlg, exeICON$
-    CONTROL GET CLIENT hDlg, %IDC_GRAPHIC1 TO w, h  ' Get client size
-    CONTROL ADD GRAPHIC, hDlg, %IDC_GRAPHIC1, "", 0, 0, 400, 400
+    CONTROL ADD GRAPHIC, hDlg, %IDC_GRAPHIC1, "", 0, 0, 600, 600
     TXT$ = ""
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX1, "", 600, 150, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX1, "", 800, 150, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL1, TXT$, 500, 150, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX2, "", 600, 170, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL1, TXT$, 700, 150, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX2, "", 800, 170, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL2, TXT$, 500, 170, 100, 20
-    CONTROL ADD BUTTON, hDlg, %IDOK, "Calculate", 600, 190, 80, 20, _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL2, TXT$, 700, 170, 100, 20
+    CONTROL ADD BUTTON, hDlg, %IDOK, "Calculate", 800, 190, 80, 20, _
      %WS_GROUP , , CALL Calc_button()
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX3, "", 600, 210, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX3, "", 700, 210, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL3, TXT$, 500, 210, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX4, "", 600, 230, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL3, TXT$, 700, 210, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX4, "", 800, 230, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL4, TXT$, 500, 230, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX5, "", 600, 250, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL4, TXT$, 700, 230, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX5, "", 800, 250, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL5, TXT$, 500, 250, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX6, "", 600, 270, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL5, TXT$, 700, 250, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX6, "", 800, 270, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL6, TXT$, 500, 270, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX7, "", 600, 290, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL6, TXT$, 700, 270, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX7, "", 800, 290, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL7, TXT$, 500, 290, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX8, "", 600, 310, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL7, TXT$, 700, 290, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX8, "", 800, 310, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL8, TXT$, 500, 310, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX9, "", 600, 330, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL8, TXT$, 700, 310, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX9, "", 800, 330, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL9, TXT$, 500, 330, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX10, "", 600, 350, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL9, TXT$, 700, 330, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX10, "", 800, 350, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL10, TXT$, 500, 350, 100, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX11, "", 600, 370, 80, 20, , , _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL10, TXT$, 700, 350, 100, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX11, "", 800, 370, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg, %IDC_LABEL11, TXT$, 500, 370, 100, 20
-    CONTROL ADD OPTION, hDlg, %OPT1, "Radius and Central Angle", 600, 6, 180, 14, _
+    CONTROL ADD LABEL, hDlg, %IDC_LABEL11, TXT$, 700, 370, 100, 20
+    CONTROL ADD OPTION, hDlg, %OPT1, "Radius and Central Angle", 800, 6, 180, 14, _
     %WS_GROUP OR %WS_TABSTOP, , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT2, "Radius & Chord AB", 600, 20, 180, 14 , _
+    CONTROL ADD OPTION, hDlg, %OPT2, "Radius & Chord AB", 800, 20, 180, 14 , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT3, "Radius & Segment Height ED", 600, 34, 180, 14 , _
+    CONTROL ADD OPTION, hDlg, %OPT3, "Radius & Segment Height ED", 800, 34, 180, 14 , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT4, "Radius & Apothem OE", 600, 48, 180, 14   , _
+    CONTROL ADD OPTION, hDlg, %OPT4, "Radius & Apothem OE", 900, 48, 180, 14   , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT5, "Radius & Arc AB", 600, 62, 180, 14  , _
+    CONTROL ADD OPTION, hDlg, %OPT5, "Radius & Arc AB", 900, 62, 180, 14  , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT6, "Chord AB & Segment Height ED", 600, 76, 180, 14   , _
+    CONTROL ADD OPTION, hDlg, %OPT6, "Chord AB & Segment Height ED", 800, 76, 180, 14   , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT7, "Chord AB & Apothem OE", 600, 90, 180, 14 , _
+    CONTROL ADD OPTION, hDlg, %OPT7, "Chord AB & Apothem OE", 800, 90, 180, 14 , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT8, "Segment Height ED & Apothem OE ", 600, 104, 180, 14  , _
+    CONTROL ADD OPTION, hDlg, %OPT8, "Segment Height ED & Apothem OE ", 800, 104, 180, 14  , _
      , , CALL Button_call()
-    CONTROL ADD OPTION, hDlg, %OPT9, "Chord AB & Arc AB", 600, 118, 180, 14    , _
+    CONTROL ADD OPTION, hDlg, %OPT9, "Chord AB & Arc AB", 800, 118, 180, 14    , _
      , , CALL Button_call()
 
   ' Set the initial state to OPTION button 3
@@ -644,7 +643,7 @@ FUNCTION BUILDWINDOW() AS LONG
     GRAPHIC CLEAR
     GRAPHIC REDRAW
     GRAPHIC SET FOCUS
-    GRAPHIC SCALE (-399,-399)-(399,399)  'work with symmetric screen
+    GRAPHIC SCALE (-299,-299)-(299,299)  'work with symmetric screen
     Pi = 4 * ATN(1)      ' Calculate Pi
     CONTROL GET CHECK hDlg, %OPT1 TO lResult&
     IF  lResult <> 0 THEN

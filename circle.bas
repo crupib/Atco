@@ -10,7 +10,7 @@
 #RESOURCE ICON, exeICON, "ATCO.ico"
 
 GLOBAL hDlg AS DWORD, w, h AS LONG
-FUNCTION circle(CenterX AS LONG, CenterY AS LONG, Radius AS LONG ) AS LONG
+FUNCTION circle(CenterX AS LONG, CenterY AS LONG, Radius AS DOUBLE ) AS LONG
     LOCAL x,y AS DOUBLE
     LOCAL k AS DOUBLE
     FOR k=0 TO 2 * Pi STEP .0001 ' or a larger step if you like
@@ -24,7 +24,7 @@ FUNCTION Calculate_Radius_Arc_AB() AS LONG
   AO = radius
   '''''''''''''''''''''''''''''''''''''''''''''''''''''
   circumference = 2 * Pi * AO
-  Central_Angle = (Arc_AB / Circumference) * 360
+  Central_Angle = (Arc_AB / Circumference) * 360.00
   arc_ABD =  (central_angle / 180) * Pi * radius
   arc_ABR = central_angle*(Pi/180)
   x = (centerX + radius * SIN(-arc_ABR))
@@ -62,12 +62,49 @@ FUNCTION Calculate_Radius_Arc_AB() AS LONG
   TXT$ =  STR$(circle_area)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
 END FUNCTION
+
 FUNCTION Calculate_Chord_AB_Segment_Height_ED() AS LONG
-    AE=Chord_ab/2
-    eb=chord_ab/2
-    ce=(ae*eb)/ed
-    radius = (CE+ED/2)
+    AE=Chord_ab/2.0
+    eb=chord_ab/2.0
+    ce=(Chord_AB^2)/(4*ED)
+    radius = (CE+ED)/2.0
+    oe= radius - ed
+    aoe =  ATN(ae/oe)
+    aoeR = (180/pi)*aoe
+    central_angle = 2.0*aoeR
+    arc_ABD =  (central_angle / 180.0) * Pi * radius
+    arc_ABR = central_angle*(Pi/180.0)
+    x = (centerX + radius * SIN(-arc_ABR))
+    y = (centerY + radius * COS(-arc_ABR))
+    x1 = (centerX + radius * SIN( arc_ABR))
+    y1 = (centerY + radius * COS( arc_ABR))
+    circumference = 2 * Pi * radius
+    circle_area = Pi*radius^2
+    arclen_AB =  Central_angle*(Pi/180) * radius
+    Sector_area = (Central_angle/360)*Pi*radius^2
+    Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
+    Segment_area =Sector_area - Triangle_area
+
+  TXT$ =  STR$(radius)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
+  TXT$ =  STR$(OE)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
+  TXT$ =  STR$(central_angle)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX5, TXT$
+  TXT$ =  STR$(arclen_AB)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX6, TXT$
+  TXT$ =  STR$(circumference)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX7, TXT$
+  TXT$ =  STR$(Segment_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX8, TXT$
+  TXT$ =  STR$(Triangle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX9, TXT$
+  TXT$ =  STR$(Sector_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX10, TXT$
+  TXT$ =  STR$(circle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
 END FUNCTION
+
 FUNCTION Calculate_Radius_OE() AS LONG
   AO = radius
   AE = SQR(AO^2 - OE^2)
@@ -148,7 +185,6 @@ FUNCTION Calculate_Radius_ED() AS LONG
   TXT$ =  STR$(circle_area)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
 
-'  radius = Chord_AB/(2*AOE)
 END FUNCTION
 FUNCTION Calculate_Radius_Chord_AB() AS LONG
   ae = .5*chord_ab
@@ -262,6 +298,25 @@ SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
   IF  lResult <> 0 THEN
     CALL Calculate_Radius_Arc_AB()
   END IF
+  CONTROL GET CHECK hDlg, %OPT6 TO lResult&
+  IF  lResult <> 0 THEN
+    Calculate_Chord_AB_Segment_Height_ED()
+  END IF
+  CONTROL GET CHECK hDlg, %OPT7 TO lResult&
+  IF  lResult <> 0 THEN
+    MSGBOX "Not implemented."
+
+  END IF
+  CONTROL GET CHECK hDlg, %OPT8 TO lResult&
+  IF  lResult <> 0 THEN
+    MSGBOX "Not implemented."
+
+  END IF
+  CONTROL GET CHECK hDlg, %OPT9 TO lResult&
+  IF  lResult <> 0 THEN
+    MSGBOX "Not implemented."
+
+  END IF
    ' Calculate and draw circle based on center location of circle
   CALL  circle(centerX,centerY,radius)
 
@@ -337,8 +392,13 @@ CALLBACK FUNCTION EditControlCallback()
         CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
         Arc_ab = VAL(TXT$)
     END IF
-
-
+    CONTROL GET CHECK hDlg, %OPT6 TO lResult&
+    IF  lResult <> 0 THEN
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+        Chord_AB = VAL(TXT$)
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+        ED = VAL(TXT$)
+    END IF
 END FUNCTION
 CALLBACK FUNCTION Calc_button()
      DrawSystem hDlg, %IDC_GRAPHIC1
@@ -590,7 +650,7 @@ FUNCTION BUILDWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg, %IDC_LABEL2, TXT$, 700, 170, 100, 20
     CONTROL ADD BUTTON, hDlg, %IDOK, "Calculate", 800, 190, 80, 20, _
      %WS_GROUP , , CALL Calc_button()
-    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX3, "", 700, 210, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX3, "", 800, 210, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg, %IDC_LABEL3, TXT$, 700, 210, 100, 20
     CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX4, "", 800, 230, 80, 20, , , _

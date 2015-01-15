@@ -6,7 +6,7 @@ GLOBAL x,x1,y,y1 AS DOUBLE
 GLOBAL demo AS LONG
 GLOBAL usecolor AS LONG
 GLOBAL kbd AS STRING
-GLOBAL AE, AO, ED, OE, AB, area, AOE AS DOUBLE
+GLOBAL AE, AO, ED, OE, AB, area, AOE,aoer,ce,eb AS DOUBLE
 GLOBAL centerx, centery AS LONG
 GLOBAL radius AS LONG
 GLOBAL central_angle, arc_ABD, arc_ABR, arclen_AB AS DOUBLE

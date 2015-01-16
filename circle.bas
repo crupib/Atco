@@ -267,8 +267,6 @@ FUNCTION Calculate_Radius_Chord_AB() AS LONG
   CONTROL SET TEXT hDlg, %IDC_EDITBOX10, TXT$
   TXT$ =  STR$(circle_area)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
-
-'  radius = Chord_AB/(2*AOE)
 END FUNCTION
 FUNCTION Calculate_Radis_Central_Angle() AS LONG
   arc_ABD =  (central_angle / 180) * Pi * radius
@@ -409,6 +407,49 @@ CALLBACK FUNCTION DlgProc () AS LONG
          END SELECT
     END SELECT
 END FUNCTION
+SUB scaleimage()
+  GRAPHIC CLEAR
+  IF temprad < radius+scaler THEN
+      TempRad = radius+scaler
+  ELSE
+      tempRad = radius-scaler
+  END IF
+  arc_ABD =  (central_angle / 180) * Pi * TempRad
+  arc_ABR = central_angle*(Pi/180)
+  x = (centerX + TempRad * SIN(-arc_ABR))
+  y = (centerY + TempRad * COS(-arc_ABR))
+  x1 = (centerX + TempRad * SIN( arc_ABR))
+  y1 = (centerY + TempRad * COS( arc_ABR))
+
+  CALL  circle(centerX,centerY,TempRad)
+  GRAPHIC PIE (-TempRad+CenterX, -TempRad+CenterY)-(TempRad+CenterX, TempRad+CenterY), 3*Pi/2-arc_ABR, 3*pi/2+arc_ABR, %GRAY, %LTGRAY, 4
+  'line AO
+  GRAPHIC LINE (centerX,centerY) - (x,y)
+  ' line OB
+  GRAPHIC LINE (centerX,centerY) - (x1,y1)
+  GRAPHIC WIDTH 2
+  ' line AB
+  GRAPHIC LINE (x,y) - (x1,y1)
+  'GRAPHIC PAINT BORDER (x+10, y-3), %RED, %BLUE, 0
+ 'line OD
+  GRAPHIC LINE (centerX,centerY) - (centerX,TempRad+centerY)
+' line CB
+  GRAPHIC LINE (centerX,-TempRad+centerY) - (x1,y1)
+' line AC
+  GRAPHIC LINE (centerX,-TempRad+centerY) - (x,y)
+  'GRAPHIC PAINT BORDER (x+10, y+2), %GREEN, %BLUE, 0
+ ' GRAPHIC PAINT BORDER (x+radius-10, y+2), %GREEN, %BLUE, 0
+  'GRAPHIC PIE (-radius+CenterX, -radius+CenterY)-(radius+CenterX, radius+CenterY), 3*Pi/2-arc_ABR, 3*pi/2+arc_ABR, %GRAY, %LTGRAY, 4
+  GRAPHIC REDRAW
+  DIALOG SET TEXT hDlg, "Atco Circle"
+END SUB
+CALLBACK FUNCTION scaleCallback()
+         temprad = radius
+         CONTROL GET TEXT hDlg, %IDC_TextBox TO TXT$
+         scaler = VAL(TXT$)
+         CALL scaleimage()
+END FUNCTION
+
 CALLBACK FUNCTION EditControlCallback()
     LOCAL lResult AS LONG
     CONTROL GET CHECK hDlg, %OPT1 TO lResult&
@@ -703,11 +744,11 @@ FUNCTION BUILDWINDOW() AS LONG
     DIALOG SET ICON hDlg, exeICON$   '
     TXT$ = "Scale"
     CONTROL ADD LABEL, hDlg, %IDC_LABSPIN, TXT$, 700, 420, 40, 20
-    CONTROL ADD TEXTBOX, hDlg, %IDC_TextBox, "0", 800,420,50,50
+    CONTROL ADD TEXTBOX, hDlg, %IDC_TextBox, "0", 800,420,50,30,,, CALL scaleCallback()
     CONTROL ADD "msctls_updown32", hDlg, %IDC_UpDown, "", 0, 0, 8, 8, %WS_CHILD OR %WS_BORDER _
       OR %WS_VISIBLE OR %UDS_ArrowKeys OR %UDS_AlignRight OR %UDS_SetBuddyInt
     CONTROL SEND hDlg, %IDC_UpDown, %UDM_SetBuddy, GetDlgItem(hDlg, %IDC_TextBox), 0
-    CONTROL SEND hDlg, %IDC_UpDown, %UDM_SetRange, 0, MAK(LONG,20,0)   'Max,Min
+    CONTROL SEND hDlg, %IDC_UpDown, %UDM_SetRange, 0, MAK(LONG,200,0)   'Max,Min
 
     CONTROL ADD GRAPHIC, hDlg, %IDC_GRAPHIC1, "", 0, 0, 600, 600
     TXT$ = ""

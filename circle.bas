@@ -7,6 +7,7 @@
 #COMPILE EXE
 #DIM ALL
 #INCLUDE "circle.inc"
+#INCLUDE "Win32API.inc"
 #RESOURCE ICON, exeICON, "ATCO.ico"
 
 GLOBAL hDlg AS DWORD, w, h AS LONG
@@ -358,6 +359,7 @@ SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
 
   END IF
    ' Calculate and draw circle based on center location of circle
+
   CALL  circle(centerX,centerY,radius)
 
   GRAPHIC PIE (-radius+CenterX, -radius+CenterY)-(radius+CenterX, radius+CenterY), 3*Pi/2-arc_ABR, 3*pi/2+arc_ABR, %GRAY, %LTGRAY, 4
@@ -384,15 +386,27 @@ END SUB
 ' Main dialog callback procedure
 '
 CALLBACK FUNCTION DlgProc () AS LONG
+    LOCAL temp$
     SELECT CASE CB.MSG
-    CASE %WM_INITDIALOG   ' <- Sent right before the dialog is shown
-    CASE %WM_COMMAND      ' <- A control is calling
-        SELECT CASE CB.CTL  ' <- Look at control's id
-        CASE %IDCANCEL
-            IF CB.CTLMSG = %BN_CLICKED THEN ' Exit on Esc
+        CASE %WM_INITDIALOG   ' <- Sent right before the dialog is shown
+        CASE %WM_COMMAND      ' <- A control is calling
+            SELECT CASE CB.CTL  ' <- Look at control's id
+            CASE %IDCANCEL
+             IF CB.CTLMSG = %BN_CLICKED THEN ' Exit on Esc
                 DIALOG END CB.HNDL
-            END IF
-        END SELECT
+             END IF
+            END SELECT
+         CASE %WM_NOTIFY
+            SELECT CASE CB.NMID
+                CASE %IDC_UpDown
+                 SELECT CASE CB.NMCODE
+                  CASE %UDN_DeltaPOS
+                     LOCAL UPD AS NMUPDOWN PTR
+                     UPD = CB.LPARAM
+                     'old value will be @upd.iPos
+                     'change (delta) to old value will be @upd.iDelta
+               END SELECT
+         END SELECT
     END SELECT
 END FUNCTION
 CALLBACK FUNCTION EditControlCallback()
@@ -686,7 +700,15 @@ FUNCTION BUILDWINDOW() AS LONG
     DESKTOP GET SIZE TO w, h
     DIALOG NEW PIXELS, 0, "Atco Circles",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
     ' Set up a pixel-based coordinate system in the Graphic control
-    DIALOG SET ICON hDlg, exeICON$
+    DIALOG SET ICON hDlg, exeICON$   '
+    TXT$ = "Scale"
+    CONTROL ADD LABEL, hDlg, %IDC_LABSPIN, TXT$, 700, 420, 40, 20
+    CONTROL ADD TEXTBOX, hDlg, %IDC_TextBox, "0", 800,420,50,50
+    CONTROL ADD "msctls_updown32", hDlg, %IDC_UpDown, "", 0, 0, 8, 8, %WS_CHILD OR %WS_BORDER _
+      OR %WS_VISIBLE OR %UDS_ArrowKeys OR %UDS_AlignRight OR %UDS_SetBuddyInt
+    CONTROL SEND hDlg, %IDC_UpDown, %UDM_SetBuddy, GetDlgItem(hDlg, %IDC_TextBox), 0
+    CONTROL SEND hDlg, %IDC_UpDown, %UDM_SetRange, 0, MAK(LONG,20,0)   'Max,Min
+
     CONTROL ADD GRAPHIC, hDlg, %IDC_GRAPHIC1, "", 0, 0, 600, 600
     TXT$ = ""
     CONTROL ADD TEXTBOX, hDlg, %IDC_EDITBOX1, "", 800, 150, 80, 20, , , _
@@ -779,8 +801,7 @@ FUNCTION BUILDWINDOW() AS LONG
     END IF
  END FUNCTION
 
-' Program entry point
-'
+
 FUNCTION PBMAIN () AS LONG
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc

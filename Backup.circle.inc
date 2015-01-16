@@ -8,7 +8,7 @@ GLOBAL usecolor AS LONG
 GLOBAL kbd AS STRING
 GLOBAL AE, AO, ED, OE, AB, area, AOE,aoer,ce,eb AS DOUBLE
 GLOBAL centerx, centery AS LONG
-GLOBAL radius AS LONG
+GLOBAL radius AS DOUBLE
 GLOBAL central_angle, arc_ABD, arc_ABR, arclen_AB AS DOUBLE
 GLOBAL circumference,chord_AB, circle_area AS DOUBLE
 GLOBAL Sector_area AS DOUBLE
@@ -38,6 +38,9 @@ GLOBAL Triangle_Area, Segment_area AS DOUBLE
 %IDC_EDITBOX9 = 120
 %IDC_EDITBOX10 = 121
 %IDC_EDITBOX11 = 122
+%IDC_TextBox   = 123
+%IDC_UpDown = 124
+
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003

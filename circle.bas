@@ -20,6 +20,46 @@ FUNCTION circle(CenterX AS LONG, CenterY AS LONG, Radius AS DOUBLE ) AS LONG
     NEXT k
     FUNCTION = 1
 END FUNCTION
+FUNCTION Calculate_Chord_AB_OE() AS LONG
+    AE=Chord_ab/2.0
+    radius = SQR(oe^2+ae^2)
+    aoe =  ATN(ae/oe)
+    ed = radius-oe
+    aoeR = (180/pi)*aoe
+    central_angle = 2.0*aoeR
+    arc_ABD =  (central_angle / 180.0) * Pi * radius
+    arc_ABR = central_angle*(Pi/180.0)
+    x = (centerX + radius * SIN(-arc_ABR))
+    y = (centerY + radius * COS(-arc_ABR))
+    x1 = (centerX + radius * SIN( arc_ABR))
+    y1 = (centerY + radius * COS( arc_ABR))
+    circumference = 2 * Pi * radius
+    circle_area = Pi*radius^2
+    arclen_AB =  Central_angle*(Pi/180) * radius
+    Sector_area = (Central_angle/360)*Pi*radius^2
+    Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
+    Segment_area =Sector_area - Triangle_area
+
+  TXT$ =  STR$(radius)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
+  TXT$ =  STR$(ED)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
+  TXT$ =  STR$(central_angle)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX5, TXT$
+  TXT$ =  STR$(arclen_AB)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX6, TXT$
+  TXT$ =  STR$(circumference)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX7, TXT$
+  TXT$ =  STR$(Segment_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX8, TXT$
+  TXT$ =  STR$(Triangle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX9, TXT$
+  TXT$ =  STR$(Sector_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX10, TXT$
+  TXT$ =  STR$(circle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
+END FUNCTION
+
 FUNCTION Calculate_Radius_Arc_AB() AS LONG
   AO = radius
   '''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -300,13 +340,13 @@ SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
   END IF
   CONTROL GET CHECK hDlg, %OPT6 TO lResult&
   IF  lResult <> 0 THEN
-    Calculate_Chord_AB_Segment_Height_ED()
+    CALL Calculate_Chord_AB_Segment_Height_ED()
   END IF
   CONTROL GET CHECK hDlg, %OPT7 TO lResult&
   IF  lResult <> 0 THEN
-    MSGBOX "Not implemented."
-
+   CALL Calculate_Chord_AB_OE()
   END IF
+
   CONTROL GET CHECK hDlg, %OPT8 TO lResult&
   IF  lResult <> 0 THEN
     MSGBOX "Not implemented."
@@ -398,6 +438,13 @@ CALLBACK FUNCTION EditControlCallback()
         Chord_AB = VAL(TXT$)
         CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
         ED = VAL(TXT$)
+    END IF
+    CONTROL GET CHECK hDlg, %OPT7 TO lResult&
+    IF  lResult <> 0 THEN
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+        Chord_AB = VAL(TXT$)
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+        OE = VAL(TXT$)
     END IF
 END FUNCTION
 CALLBACK FUNCTION Calc_button()

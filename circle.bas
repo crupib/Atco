@@ -1,7 +1,10 @@
 '====================================================================
 '
 '    ATCO
-'
+'    Circle Formulas
+'    no error checking implemented yet.
+'    need some clean up and refactoring
+'    bc 1/16/2015
 '====================================================================
 #COMPILER PBWIN 10
 #COMPILE EXE
@@ -44,6 +47,48 @@ FUNCTION Calculate_Chord_AB_OE() AS LONG
   TXT$ =  STR$(radius)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
   TXT$ =  STR$(ED)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
+  TXT$ =  STR$(central_angle)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX5, TXT$
+  TXT$ =  STR$(arclen_AB)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX6, TXT$
+  TXT$ =  STR$(circumference)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX7, TXT$
+  TXT$ =  STR$(Segment_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX8, TXT$
+  TXT$ =  STR$(Triangle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX9, TXT$
+  TXT$ =  STR$(Sector_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX10, TXT$
+  TXT$ =  STR$(circle_area)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX11, TXT$
+END FUNCTION
+
+FUNCTION Calculate_ED_OE() AS LONG
+    AO = ED+OE
+    radius = AO
+    AE = SQR(AO^2-OE^2)
+    aoe =  ATN(ae/oe)
+    ed = AO-oe
+    aoeR = (180/pi)*aoe
+    chord_ab = 2*ae
+    central_angle = 2.0*aoeR
+    arc_ABD =  (central_angle / 180.0) * Pi * radius
+    arc_ABR = central_angle*(Pi/180.0)
+    x = (centerX + radius * SIN(-arc_ABR))
+    y = (centerY + radius * COS(-arc_ABR))
+    x1 = (centerX + radius * SIN( arc_ABR))
+    y1 = (centerY + radius * COS( arc_ABR))
+    circumference = 2 * Pi * radius
+    circle_area = Pi*radius^2
+    arclen_AB =  Central_angle*(Pi/180) * radius
+    Sector_area = (Central_angle/360)*Pi*radius^2
+    Triangle_area = (.5*radius*radius)*SIN((central_angle*Pi)/180)
+    Segment_area =Sector_area - Triangle_area
+
+  TXT$ =  STR$(radius)
+  CONTROL SET TEXT hDlg, %IDC_EDITBOX3, TXT$
+  TXT$ =  STR$(Chord_AB)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX4, TXT$
   TXT$ =  STR$(central_angle)
   CONTROL SET TEXT hDlg, %IDC_EDITBOX5, TXT$
@@ -348,8 +393,7 @@ SUB DrawSystem (BYVAL hDlg AS DWORD, BYVAL ID AS LONG)
 
   CONTROL GET CHECK hDlg, %OPT8 TO lResult&
   IF  lResult <> 0 THEN
-    MSGBOX "Not implemented."
-
+    CALL Calculate_ED_OE()
   END IF
   CONTROL GET CHECK hDlg, %OPT9 TO lResult&
   IF  lResult <> 0 THEN
@@ -501,6 +545,14 @@ CALLBACK FUNCTION EditControlCallback()
         CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
         OE = VAL(TXT$)
     END IF
+    CONTROL GET CHECK hDlg, %OPT8 TO lResult&
+    IF  lResult <> 0 THEN
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+        ED = VAL(TXT$)
+        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+        OE = VAL(TXT$)
+    END IF
+
 END FUNCTION
 CALLBACK FUNCTION Calc_button()
      DrawSystem hDlg, %IDC_GRAPHIC1

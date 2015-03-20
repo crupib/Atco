@@ -44,7 +44,7 @@ FUNCTION PBMAIN () AS LONG
  CLOSE #1
  OPEN "File.txt" FOR BINARY AS #1  BASE = 1
  GET$ #1, 4, StringVariable$
- GET #1, 5,  inrecord
+ GET #1, 4,  inrecord
  CLOSE #1
  PRINT StringVariable$
  PRINT inrecord.id

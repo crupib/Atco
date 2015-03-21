@@ -5,10 +5,19 @@ GLOBAL PICPort AS STRING
 GLOBAL PICBaud AS LONG
 GLOBAL nComm AS LONG
 GLOBAL StringVariable AS STRING
+GLOBAL HdrVer AS STRING * 20
+GLOBAL temp AS STRING * 20
+GLOBAL ThumbDisk AS STRING * 2
+GLOBAL ECODE AS INTEGER
 MACRO CONST = MACRO
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
 DECLARE FUNCTION OpenComPorts  AS INTEGER
+GLOBAL filenum AS INTEGER
+GLOBAL bytesread AS INTEGER
+DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
+DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
@@ -19,6 +28,8 @@ FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
  DIM VV AS INTEGER
  DIM GG AS STRING
+  HdrVer = "SCU-1.00            "
+  ThumbDisk = "C:\UCALS\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
  CON.PRINT "       ATCO         "
@@ -35,18 +46,21 @@ FUNCTION PBMAIN () AS LONG
  NEXT  VV
 
  RESET StringVariable$
- StringVariable$ = "Test"
+ HdrVer = "SCU-1.00            "
+ 'temp = HdrVer
  myrecord.id = 99
  myrecord.Styles = 99
- OPEN "File.txt" FOR BINARY AS #1
- PUT$ #1, StringVariable$
- PUT #1, 5, myrecord
- CLOSE #1
- OPEN "File.txt" FOR BINARY AS #1  BASE = 1
- GET$ #1, 4, StringVariable$
- GET #1, 5,  inrecord
- CLOSE #1
- PRINT StringVariable$
+ 'OPEN "File.txt" FOR BINARY AS filenum
+ FOpen (filenum, 0,0, filenum, ECode)
+ 'PUT$ filenum, HdrVer
+ 'PUT filenum, 21, myrecord
+ 'CLOSE filenum
+ 'OPEN "File.txt" FOR BINARY AS filenum  BASE = 1
+ CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
+ 'GET$ filenum, 20, HdrVer
+' GET filenum, 21,  inrecord
+' CLOSE #filenum
+ PRINT temp
  PRINT inrecord.id
  PRINT inrecord.Styles
  WAITSTAT
@@ -77,4 +91,14 @@ SUB flushbuffers (PICPort AS STRING, zero AS INTEGER, ECode AS INTEGER)
 END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr
+END SUB
+SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20, DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET$ filenum, 20, dseg
+    GET filenum, 21,  inrecord
+END SUB
+SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
+    OPEN "File.txt" FOR BINARY AS filenumber
+END SUB
+SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
+    OPEN "File.txt" FOR BINARY AS filenumber
 END SUB

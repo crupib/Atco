@@ -106,7 +106,7 @@ DECLARE FUNCTION CalSave (FILENAME$)
 DECLARE FUNCTION CalLoad (FileNumber$)
 'DECLARE SUB FCreate (FileNumber$, ATTR, HANDLE, ECode)
 DECLARE SUB FCreate (FileNumber$, ATTR, Filler, ECode)
-DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, FIller, ECode)
+DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, HANDLE, ECode)
 DECLARE SUB FClose (HANDLE)
 DECLARE SUB DFWrite (HANDLE, DSeg, DOfs, BYTES&, BytesWrote&, ECode)
 DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
@@ -359,85 +359,87 @@ CONST HomeFlagMask = &HFE0F
   'delay timer
   GLOBAL DelayCtr AS LONG
   GLOBAL WaitX AS INTEGER
-  GLOBAL YCtr          AS SINGLE       'YCts/inch
-  GLOBAL XCtr          AS SINGLE       'XCts/inch
-  GLOBAL ACtr          AS SINGLE       'Aux Enc Cts/inch
-  GLOBAL YCal          AS SINGLE       'Y Cal Inch distance
-  GLOBAL XCal          AS SINGLE       'X Cal Inch distance
-  GLOBAL ACal          AS SINGLE       'Aux Cal Inch distance
-  GLOBAL XOffset       AS SINGLE       'X inch pos when counter zeroed
-  GLOBAL YOffset       AS SINGLE       'Y inch pos when counter zeroed
-  GLOBAL AOffset       AS SINGLE       'A Inch pos when counter zeroed
-  GLOBAL XPos          AS SINGLE       'current X inch position
-  GLOBAL YPos          AS SINGLE       'current Y inch position
-  GLOBAL APos          AS SINGLE       'current A inch position
-  GLOBAL XPlus         AS INTEGER      'X scan +/-
-  GLOBAL YPlus         AS INTEGER      'Y scan +/-
-  GLOBAL XDataStart    AS LONG         'x array position for scan start
-  GLOBAL YDataStart    AS LONG         'y array position for scan start
-  GLOBAL XDataEnd      AS LONG         'x array position for scan end
-  GLOBAL YDataEnd      AS LONG         'y array position for scan end
-  GLOBAL XIndex        AS SINGLE       'x inch index
-  GLOBAL YIndex        AS SINGLE       'y inch index
-  GLOBAL XIndexCts     AS LONG         'x actual value (+/-) counts per index
-  GLOBAL YIndexCts     AS LONG         'y actual value (+/-) counts per index
-  GLOBAL IndexLow      AS INTEGER      'Index towards High or Low
-  GLOBAL XCts          AS LONG         'x absolute value scan start counts
-  GLOBAL YCts          AS LONG         'y absolute value scan start counts
-  GLOBAL ACts          AS LONG         'A absolute value scan start counts
-  GLOBAL XStartCts     AS LONG         'x actual value (+/-) scan start counts
-  GLOBAL YStartCts     AS LONG         'y actual value (+/-) scan start counts
-  GLOBAL XEndCts       AS LONG         'x actual value (+/-) scan end counts
-  GLOBAL YEndCts       AS LONG         'y actual value (+/-) scan end counts
-  GLOBAL XLow          AS SINGLE       'x scan start inch position
-  GLOBAL YLow          AS SINGLE       'y scan start inch position
-  GLOBAL XHigh         AS SINGLE       'x scan end inch position
-  GLOBAL YHigh         AS SINGLE       'y scan end inch position
-  GLOBAL OVERLAP       AS SINGLE       'added si scan overlap
-  GLOBAL XSpeed        AS SINGLE       'x scan speed in inches
-  GLOBAL YSpeed        AS SINGLE       'y scan speed in inches
-  GLOBAL XEnable       AS INTEGER      'flag true/false X axis on
-  GLOBAL YEnable       AS INTEGER      'flag true/false Y axis on
-  GLOBAL XSpdDir       AS INTEGER      'flag X speed cntrl direction
-  GLOBAL IndexY        AS INTEGER      'flag true/false X or Y
-  GLOBAL StopChk       AS INTEGER      'flag true/false autoOff on/off
-  GLOBAL DualRas     AS INTEGER      'flag true/false step index
-  GLOBAL AutoHold      AS INTEGER      'flag true/false Auto Hold
-  GLOBAL IndexCt AS INTEGER            'index loop counter
-  GLOBAL IndexInc AS INTEGER           'index loop incrementer
-  GLOBAL ScanFlag AS INTEGER           '
-  GLOBAL Index AS INTEGER              'scan direction
-  GLOBAL NextFlag AS INTEGER           'added for si auto scan increment
-  GLOBAL YCtrStr AS STRING  * 10
-  GLOBAL XCtrStr AS STRING  * 10
-  GLOBAL ACtrStr AS STRING   * 10
-  GLOBAL YCalStr AS STRING * 10      'Y Cal Inch distance
-  GLOBAL XCalStr AS STRING * 10      'X Cal Inch distance
-  GLOBAL ACalStr AS STRING * 10      'A Cal Inch distance
-  GLOBAL XPosStr AS STRING * 10
-  GLOBAL YPosStr AS STRING * 10
-  GLOBAL APosStr AS STRING * 10
-  GLOBAL XPlusSTR AS STRING * 10
-  GLOBAL YPlusSTR AS STRING * 10
-  GLOBAL XIndexSTR AS STRING * 10
-  GLOBAL YIndexSTR AS STRING * 10
-  GLOBAL ndexLowStr AS STRING * 10
-  GLOBAL XLowStr AS STRING * 10
-  GLOBAL YLowStr AS STRING * 10
-  GLOBAL XHighStr AS STRING * 10
-  GLOBAL YHighStr AS STRING * 10
-  GLOBAL OverLapStr AS STRING * 10
-  GLOBAL XSpeedSTR AS STRING * 10
-  GLOBAL YSpeedSTR AS STRING * 10
-  GLOBAL XEnableSTR AS STRING * 10
-  GLOBAL YEnableSTR AS STRING * 10
-  GLOBAL XSpdDirSTR AS STRING * 10
-  GLOBAL IndexYSTR AS STRING * 10
-  GLOBAL StopChkSTR AS STRING * 10
-  GLOBAL DualRasSTR AS STRING * 10
-  GLOBAL NextFlagSTR AS STRING * 10
-  GLOBAL AutoHoldSTR AS STRING * 10
-  GLOBAL IndexLowStr AS STRING * 10
+  TYPE ScanPrams
+   YCtr          AS SINGLE       'YCts/inch
+   XCtr          AS SINGLE       'XCts/inch
+   ACtr          AS SINGLE       'Aux Enc Cts/inch
+   YCal          AS SINGLE       'Y Cal Inch distance
+   XCal          AS SINGLE       'X Cal Inch distance
+   ACal          AS SINGLE       'Aux Cal Inch distance
+   XOffset       AS SINGLE       'X inch pos when counter zeroed
+   YOffset       AS SINGLE       'Y inch pos when counter zeroed
+   AOffset       AS SINGLE       'A Inch pos when counter zeroed
+   XPos          AS SINGLE       'current X inch position
+   YPos          AS SINGLE       'current Y inch position
+   APos          AS SINGLE       'current A inch position
+   XPlus         AS INTEGER      'X scan +/-
+   YPlus         AS INTEGER      'Y scan +/-
+   XDataStart    AS LONG         'x array position for scan start
+   YDataStart    AS LONG         'y array position for scan start
+   XDataEnd      AS LONG         'x array position for scan end
+   YDataEnd      AS LONG         'y array position for scan end
+   XIndex        AS SINGLE       'x inch index
+   YIndex        AS SINGLE       'y inch index
+   XIndexCts     AS LONG         'x actual value (+/-) counts per index
+   YIndexCts     AS LONG         'y actual value (+/-) counts per index
+   IndexLow      AS INTEGER      'Index towards High or Low
+   XCts          AS LONG         'x absolute value scan start counts
+   YCts          AS LONG         'y absolute value scan start counts
+   ACts          AS LONG         'A absolute value scan start counts
+   XStartCts     AS LONG         'x actual value (+/-) scan start counts
+   YStartCts     AS LONG         'y actual value (+/-) scan start counts
+   XEndCts       AS LONG         'x actual value (+/-) scan end counts
+   YEndCts       AS LONG         'y actual value (+/-) scan end counts
+   XLow          AS SINGLE       'x scan start inch position
+   YLow          AS SINGLE       'y scan start inch position
+   XHigh         AS SINGLE       'x scan end inch position
+   YHigh         AS SINGLE       'y scan end inch position
+   OverLap       AS SINGLE       'added si scan overlap
+   XSpeed        AS SINGLE       'x scan speed in inches
+   YSpeed        AS SINGLE       'y scan speed in inches
+   XEnable       AS INTEGER      'flag true/false X axis on
+   YEnable       AS INTEGER      'flag true/false Y axis on
+   XSpdDir       AS INTEGER      'flag X speed cntrl direction
+   IndexY        AS INTEGER      'flag true/false X or Y
+   StopChk       AS INTEGER      'flag true/false autoOff on/off
+   DualRas     AS INTEGER      'flag true/false step index
+   AutoHold      AS INTEGER      'flag true/false Auto Hold
+   IndexCt AS INTEGER            'index loop counter
+   IndexInc AS INTEGER           'index loop incrementer
+   ScanFlag AS INTEGER           '
+   Index AS INTEGER              'scan direction
+   NextFlag AS INTEGER           'added for si auto scan increment
+   YCtrStr AS STRING * 10
+   XCtrStr AS STRING * 10
+   ACtrStr AS STRING * 10
+   YCalStr AS STRING * 10      'Y Cal Inch distance
+   XCalStr AS STRING * 10      'X Cal Inch distance
+   ACalStr AS STRING * 10      'A Cal Inch distance
+   XPosStr AS STRING * 10
+   YPosStr AS STRING * 10
+   APosStr AS STRING * 10
+   XPlusSTR AS STRING * 10
+   YPlusSTR AS STRING * 10
+   XIndexSTR AS STRING * 10
+   YIndexSTR AS STRING * 10
+   IndexLowStr AS STRING * 10
+   XLowStr AS STRING * 10
+   YLowStr AS STRING * 10
+   XHighStr AS STRING * 10
+   YHighStr AS STRING * 10
+   OverLapStr AS STRING * 10
+   XSpeedSTR AS STRING * 10
+   YSpeedSTR AS STRING * 10
+   XEnableSTR AS STRING * 10
+   YEnableSTR AS STRING * 10
+   XSpdDirSTR AS STRING * 10
+   IndexYSTR AS STRING * 10
+   StopChkSTR AS STRING * 10
+   DualRasSTR AS STRING * 10
+   NextFlagSTR AS STRING * 10
+   AutoHoldSTR AS STRING * 10
+  END TYPE
+  GLOBAL SCANparm AS ScanPrams
   TYPE glorecord
    NumModules AS INTEGER
    StatusDef(5) AS INTEGER
@@ -802,12 +804,12 @@ PrintMainMenu:
 
 
 SetDefaults:
-  YCtr = 14858 'cts per inch travel
-  XCtr = 62047
-  ACtr = 1000
+  SCANparm.YCtr = 14858 'cts per inch travel
+  SCANparm.XCtr = 62047
+  SCANparm.ACtr = 1000
   GetXyPos  'load current encoder position
   XLow = 0
-  XLowStr = QStr$(XLow, 10)
+  SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
   XHigh = 96
   XHighStr = QStr(XHigh, 10)
   YLow = 0: YLowStr = QStr(YLow, 10)
@@ -1463,7 +1465,7 @@ FUNCTION CalLoad (FileNumber$)
      GOTO ExitCalLoad
    END IF
 
-   CALL DFRead(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesRead&, ECode)
+   CALL DFRead(HANDLE, VARSEG(SCANparm), VARPTR(SCANparm), LEN(SCANparm), BytesRead&, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
 
@@ -1492,7 +1494,7 @@ FUNCTION CalSave (FILENAMEX$)
    CALL DFWrite(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesWrote&, ECode)
    IF ECode THEN GOTO ExitCalSave
 
-   CALL DFWrite(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesWrote&, ECode)
+   CALL DFWrite(HANDLE, VARSEG(SCANparm), VARPTR(SCANparm), LEN(SCANparm), BytesWrote&, ECode)
    IF ECode THEN GOTO ExitCalSave
 
 ExitCalSave:

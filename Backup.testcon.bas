@@ -58,9 +58,9 @@ FUNCTION PBMAIN () AS LONG
  'OPEN "File.txt" FOR BINARY AS filenum  BASE = 1
  CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
  'GET$ filenum, 20, HdrVer
- GET filenum, 21,  inrecord
+' GET filenum, 21,  inrecord
 ' CLOSE #filenum
- PRINT
+ PRINT temp
  PRINT inrecord.id
  PRINT inrecord.Styles
  WAITSTAT

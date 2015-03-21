@@ -808,28 +808,28 @@ SetDefaults:
   SCANparm.XCtr = 62047
   SCANparm.ACtr = 1000
   GetXyPos  'load current encoder position
-  XLow = 0
+  SCANparm.XLow = 0
   SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
-  XHigh = 96
-  XHighStr = QStr(XHigh, 10)
-  YLow = 0: YLowStr = QStr(YLow, 10)
-  YHigh = 12: YHighStr = QStr(YHigh, 10)
-  XIndex = .25: XIndexSTR = QStr(XIndex, 10)
-  YIndex = .125: YIndexSTR = QStr(YIndex, 10)
-  IndexLow = FALSE
-  IndexLowStr = "LOW - HIGH"
-  XPlus = TRUE:  XPlusSTR = "POSITIVE  "
-  YPlus = FALSE: YPlusSTR = "NEGATIVE  "
-  XSpeed = 2: XSpeedSTR = QStr(XSpeed, 10)
-  YSpeed = 16: YSpeedSTR = QStr(YSpeed, 10)
-  XCtrStr = QStr(XCtr, 10)
-  YCtrStr = QStr(YCtr, 10)
-  ACtrStr = QStr(ACtr, 10)
-  XEnable = TRUE: XEnableSTR = "ON        "
-  YEnable = TRUE: YEnableSTR = "ON        "
-  XSpdDir = TRUE: XSpdDirSTR = "FORWARD*"
-  AutoHold = TRUE: AutoHoldSTR = "ON "
-  IndexY = FALSE: IndexYSTR = "X         "
+  SCANparm.XHigh = 96
+  SCANparm.XHighStr = QStr(SCANparm.XHigh, 10)
+  SCANparm.YLow = 0: SCANparm.YLowStr = QStr(SCANparm.YLow, 10)
+  SCANparm.YHigh = 12: SCANparm.YHighStr = QStr(SCANparm.YHigh, 10)
+  SCANparm.XIndex = .25: SCANparm.XIndexSTR = QStr(SCANparm.XIndex, 10)
+  SCANparm.YIndex = .125: SCANparm.YIndexSTR = QStr(SCANparm.YIndex, 10)
+  SCANparm.IndexLow = FALSE
+  SCANparm. IndexLowStr = "LOW - HIGH"
+  SCANparm.XPlus = TRUE:  SCANparm.XPlusSTR = "POSITIVE  "
+  SCANparm.YPlus = FALSE: SCANparm.YPlusSTR = "NEGATIVE  "
+  SCANparm.XSpeed = 2: SCANparm.XSpeedSTR = QStr(SCANparm.XSpeed, 10)
+  SCANparm.YSpeed = 16: SCANparm.YSpeedSTR = QStr(SCANparm.YSpeed, 10)
+  SCANparm.XCtrStr = QStr(SCANparm.XCtr, 10)
+  SCANparm.YCtrStr = QStr(SCANparm.YCtr, 10)
+  SCANparm.ACtrStr = QStr(SCANparm.ACtr, 10)
+  SCANparm.XEnable = TRUE: SCANparm.XEnableSTR = "ON        "
+  SCANparm.YEnable = TRUE: SCANparm.YEnableSTR = "ON        "
+  SCANparm.XSpdDir = TRUE: SCANparm.XSpdDirSTR = "FORWARD*"
+  SCANparm.AutoHold = TRUE: SCANparm.AutoHoldSTR = "ON "
+  SCANparm.IndexY = FALSE: SCANparm.IndexYSTR = "X         "
   OVERLAP = 1: OverLapStr = "1         "
   DualRas = FALSE: DualRasSTR = "OFF       "
   RETURN

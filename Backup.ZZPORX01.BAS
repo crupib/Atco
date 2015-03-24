@@ -4511,10 +4511,9 @@ SUB StrobeInstr (insb)
 
 END SUB
 SUB FCreate (FileNumber$, ATTR, Filler, ECode)
-    OPEN FileNumber$ FOR BINARY AS filenumber
+    OPEN FileNumber$ FOR OUTPUT AS #1
 END SUB
 SUB FOpen (FileNumber$, ReadWrite, Sharing, Filler, ECode)
-    OPEN FileNumber$ FOR BINARY AS filenumber
 END SUB
 SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20, DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET$ filenum, 20, dseg

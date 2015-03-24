@@ -37,6 +37,8 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
+ CON.CLS
+ 'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
  FOR VV = 1 TO 10000

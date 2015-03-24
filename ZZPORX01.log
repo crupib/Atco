@@ -1,0 +1,7 @@
+PowerBASIC 6 Console Compiler
+Copyright (c) 1998-2011 PowerBasic Inc.
+Englewood, Florida USA
+All Rights Reserved
+
+Error 480 in C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01.BAS(1461:027):  Parameter mismatches definition
+  Line 1461:    CALL DFRead(FileNumber$, temp$, temp$, LEN(HdrVer), BytesRead, ECode)  

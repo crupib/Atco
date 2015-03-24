@@ -18,6 +18,7 @@ GLOBAL bytesread AS INTEGER
 DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
+DECLARE SUB FClose (filenumber AS INTEGER)
 TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
@@ -36,6 +37,8 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
+ CON.CLS$
+ 'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
  FOR VV = 1 TO 10000
@@ -47,25 +50,17 @@ FUNCTION PBMAIN () AS LONG
 
  RESET StringVariable$
  HdrVer = "SCU-1.00            "
- 'temp = HdrVer
  myrecord.id = 99
  myrecord.Styles = 99
- 'OPEN "File.txt" FOR BINARY AS filenum
  FOpen (filenum, 0,0, filenum, ECode)
- 'PUT$ filenum, HdrVer
- 'PUT filenum, 21, myrecord
- 'CLOSE filenum
- 'OPEN "File.txt" FOR BINARY AS filenum  BASE = 1
  CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
- 'GET$ filenum, 20, HdrVer
-' GET filenum, 21,  inrecord
-' CLOSE #filenum
+ FClose(filenum)
  PRINT temp
  PRINT inrecord.id
  PRINT inrecord.Styles
  WAITSTAT
-
  END FUNCTION
+
  FUNCTION OpenComPorts AS INTEGER
     LOCAL ECode AS INTEGER
 '    LOCAL nComm   AS LONG
@@ -101,4 +96,7 @@ SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECod
 END SUB
 SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
     OPEN "File.txt" FOR BINARY AS filenumber
+END SUB
+SUB FClose (filenumber AS INTEGER)
+    CLOSE filenumber
 END SUB

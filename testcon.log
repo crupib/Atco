@@ -3,9 +3,9 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {101 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {103 total lines}
 Target compilation:  testcon.EXE
-Compile time:  0.1 seconds, at 121200 lines/minute
+Compile time:  0.1 seconds, at 123600 lines/minute
 
 1536 bytes compiled code, 14916 bytes RTLibrary,
 232 bytes string literals, and 2988 bytes dgroup.

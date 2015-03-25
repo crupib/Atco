@@ -3,5 +3,23 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Error 477 in C:\Users\Bill\Documents\GitHub\Atco\testcon.bas(64:010):  Syntax error
-  Line 64:  PRINT y&.id  
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {110 total lines}
+Target compilation:  testcon.EXE
+Compile time:  0.1 seconds, at 132000 lines/minute
+
+1520 bytes compiled code, 14864 bytes RTLibrary,
+260 bytes string literals, and 2996 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 20992 bytes   Memory image: 18120 bytes.
+
+Component Files:
+----------------
+C:\Users\Bill\Documents\GitHub\Atco\testcon.bas
+
+
+Code Extracted:
+---------------
+OPENCOMPORTS
+FCREATE
+FLUSHBUFFERS
+WRITETOCOMM

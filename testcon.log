@@ -3,23 +3,5 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {105 total lines}
-Target compilation:  testcon.EXE
-Compile time:  0.1 seconds, at 126000 lines/minute
-
-1456 bytes compiled code, 14804 bytes RTLibrary,
-232 bytes string literals, and 2988 bytes dgroup.
-Executable stack size:  1048576 bytes.
-Disk image: 20992 bytes   Memory image: 18024 bytes.
-
-Component Files:
-----------------
-C:\Users\Bill\Documents\GitHub\Atco\testcon.bas
-
-
-Code Extracted:
----------------
-OPENCOMPORTS
-FCREATE
-FLUSHBUFFERS
-WRITETOCOMM
+Error 477 in C:\Users\Bill\Documents\GitHub\Atco\testcon.bas(64:010):  Syntax error
+  Line 64:  PRINT y&.id  

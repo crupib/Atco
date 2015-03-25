@@ -109,7 +109,12 @@ DECLARE SUB FCreate (FileNumber$, ATTR, Filler, ECode)
 DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, HANDLE, ECode)
 DECLARE SUB FClose (HANDLE)
 DECLARE SUB DFWrite (HANDLE, DSeg, DOfs, BYTES&, BytesWrote&, ECode)
+<<<<<<< HEAD
 DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
+=======
+'DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
+DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
 DECLARE FUNCTION Exist2 (FileNumber$)
 
 REM 'added from crescent
@@ -344,8 +349,12 @@ CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
+<<<<<<< HEAD
 
  'DIM SHARED Glo AS GLOBAL
+=======
+  GLOBAL filenum AS INTEGER
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   GLOBAL HdrVer AS STRING * 20
   GLOBAL nComm   AS LONG
   GLOBAL ThumbDisk AS STRING * 2
@@ -440,6 +449,10 @@ CONST HomeFlagMask = &HFE0F
    AutoHoldSTR AS STRING * 10
   END TYPE
   GLOBAL SCANparm AS ScanPrams
+<<<<<<< HEAD
+=======
+ 'DIM SHARED Glo AS GLOBAL
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   TYPE glorecord
    NumModules AS INTEGER
    StatusDef(5) AS INTEGER
@@ -808,6 +821,7 @@ SetDefaults:
   SCANparm.XCtr = 62047
   SCANparm.ACtr = 1000
   GetXyPos  'load current encoder position
+<<<<<<< HEAD
   XLow = 0
   XLowStr = QStr$(SCANparm.XLow, 10)
   XHigh = 96
@@ -832,6 +846,32 @@ SetDefaults:
   IndexY = FALSE: IndexYSTR = "X         "
   OVERLAP = 1: OverLapStr = "1         "
   DualRas = FALSE: DualRasSTR = "OFF       "
+=======
+  SCANparm.XLow = 0
+  SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
+  SCANparm.XHigh = 96
+  SCANparm.XHighStr = QStr(SCANparm.XHigh, 10)
+  SCANparm.YLow = 0: SCANparm.YLowStr = QStr(SCANparm.YLow, 10)
+  SCANparm.YHigh = 12: SCANparm.YHighStr = QStr(SCANparm.YHigh, 10)
+  SCANparm.XIndex = .25: SCANparm.XIndexSTR = QStr(SCANparm.XIndex, 10)
+  SCANparm.YIndex = .125: SCANparm.YIndexSTR = QStr(SCANparm.YIndex, 10)
+  SCANparm.IndexLow = FALSE
+  SCANparm. IndexLowStr = "LOW - HIGH"
+  SCANparm.XPlus = TRUE:  SCANparm.XPlusSTR = "POSITIVE  "
+  SCANparm.YPlus = FALSE: SCANparm.YPlusSTR = "NEGATIVE  "
+  SCANparm.XSpeed = 2: SCANparm.XSpeedSTR = QStr(SCANparm.XSpeed, 10)
+  SCANparm.YSpeed = 16: SCANparm.YSpeedSTR = QStr(SCANparm.YSpeed, 10)
+  SCANparm.XCtrStr = QStr(SCANparm.XCtr, 10)
+  SCANparm.YCtrStr = QStr(SCANparm.YCtr, 10)
+  SCANparm.ACtrStr = QStr(SCANparm.ACtr, 10)
+  SCANparm.XEnable = TRUE: SCANparm.XEnableSTR = "ON        "
+  SCANparm.YEnable = TRUE: SCANparm.YEnableSTR = "ON        "
+  SCANparm.XSpdDir = TRUE: SCANparm.XSpdDirSTR = "FORWARD*"
+  SCANparm.AutoHold = TRUE: SCANparm.AutoHoldSTR = "ON "
+  SCANparm.IndexY = FALSE: SCANparm.IndexYSTR = "X         "
+  SCANparm.OVERLAP = 1: SCANparm.OverLapStr = "1         "
+  SCANparm.DualRas = FALSE: SCANparm.DualRasSTR = "OFF       "
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   RETURN
 
 XScan:
@@ -938,8 +978,13 @@ ScanMenu:
            XLow = XLow + ScanLength!
            XHigh = XHigh + ScanLength!
          END IF
+<<<<<<< HEAD
          XLowStr = QStr$(XLow, 10)
          XHighStr = QStr$(XHigh, 10)
+=======
+         SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
+         SCANparm.XHighStr = QStr$(SCANparm.XHigh, 10)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
          NextFlag = TRUE
          CALL PrintChar(1, 9, " ")
          SetLcdPos 1, 1
@@ -964,18 +1009,32 @@ ScanMenu:
          GOSUB PrintScanMenu
          CALL PrintChar(1, 16, ">")
          IF XCode = KeyEnter THEN
+<<<<<<< HEAD
            XPos = 0: YPos = 0: APos = 0
            XPosStr = QStr$(XPos, 10)
            YPosStr = QStr$(YPos, 10)
            APosStr = QStr$(APos, 10)
            XOffset = 0: YOffset = 0: AOffset = 0
+=======
+           SCANparm.XPos = 0: SCANparm.YPos = 0: SCANparm.APos = 0
+           SCANparm.XPosStr = QStr$(SCANparm.XPos, 10)
+           SCANparm.YPosStr = QStr$(SCANparm.YPos, 10)
+           SCANparm.APosStr = QStr$(SCANparm.APos, 10)
+           SCANparm.XOffset = 0: SCANparm.YOffset = 0: SCANparm.AOffset = 0
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            CALL ResetPosition(Servo1)
            CALL ResetPosition(Servo2)
            CALL ResetPosition(Servo3)
            CALL ResetPosition(Servo4)
+<<<<<<< HEAD
            PrintStr (2, 7, XPosStr)
            PrintStr (3, 7, YPosStr)
            PrintStr (4, 7, APosStr)
+=======
+           PrintStr (2, 7, SCANparm.XPosStr)
+           PrintStr (3, 7, SCANparm.YPosStr)
+           PrintStr (4, 7, SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
          END IF
          XCode = 0
          SetLcdPos 1, 16
@@ -987,20 +1046,33 @@ ScanMenu:
        SELECT CASE RowPos
          CASE 2 ' XPos
            CALL PrintChar(2, 1, ">")
+<<<<<<< HEAD
            SetLcdPos 2, 8: Temp$ = XPosStr
+=======
+           SetLcdPos 2, 8: Temp$ = SCANparm.XPosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
            XPos = VAL(Temp$)
+<<<<<<< HEAD
            XPosStr = QStr$(XPos, 10)
            XOffset = GetXCord(CLNG(XPos * XCtr))
+=======
+           SCANparm.XPosStr = QStr$(SCANparm.XPos, 10)
+           SCANparm. XOffset = GetXCord(CLNG(SCANparm.XPos * SCANparm.XCtr))
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            CALL ResetPosition(Servo1)
            CALL ResetPosition(Servo2)
          END IF
            END IF
+<<<<<<< HEAD
            PrintStr 2, 8, XPosStr
+=======
+           PrintStr 2, 8, SCANparm.XPosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            SetLcdPos 2, 1
            IF XCode = KeyUP THEN
          CALL PrintChar(2, 1, " ")
@@ -1011,12 +1083,17 @@ ScanMenu:
            END IF
          CASE 3  'YPos
            CALL PrintChar(3, 1, ">")
+<<<<<<< HEAD
            SetLcdPos 3, 8: Temp$ = YPosStr
+=======
+           SetLcdPos 3, 8: Temp$ = SCANparm.YPosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
+<<<<<<< HEAD
            YPos = VAL(Temp$)
            YPosStr = QStr$(YPos, 10)
            YOffset = GetYCord(CLNG(YPos * YCtr))
@@ -1024,6 +1101,15 @@ ScanMenu:
          END IF
            END IF
            PrintStr 3, 8, YPosStr
+=======
+           SCANparm.YPos = VAL(Temp$)
+           SCANparm.YPosStr = QStr$(SCANparm.YPos, 10)
+           SCANparm.YOffset = GetYCord(CLNG(SCANparm.YPos * SCANparm.YCtr))
+           CALL ResetPosition(Servo3)
+         END IF
+           END IF
+           PrintStr 3, 8, SCANparm.YPosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
          CALL PrintChar(3, 1, " ")
@@ -1034,12 +1120,17 @@ ScanMenu:
            END IF
          CASE 4 ' APos
            CALL PrintChar(4, 1, ">")
+<<<<<<< HEAD
            SetLcdPos 4, 8: Temp$ = APosStr
+=======
+           SetLcdPos 4, 8: Temp$ = SCANparm.APosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
+<<<<<<< HEAD
            APos = VAL(Temp$)
            APosStr = QStr$(APos, 10)
            AOffset = GetXCord(CLNG(APos * ACtr))
@@ -1047,6 +1138,15 @@ ScanMenu:
          END IF
            END IF
            PrintStr 4, 8, APosStr
+=======
+           SCANparm.APos = VAL(Temp$)
+           SCANparm.APosStr = QStr$(SCANparm.APos, 10)
+           SCANparm.AOffset = GetXCord(CLNG(SCANparm.APos * SCANparm.ACtr))
+           CALL ResetPosition(Servo4)
+         END IF
+           END IF
+           PrintStr 4, 8, SCANparm.APosStr
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
            SetLcdPos 4, 1
            IF XCode = KeyUP THEN
          CALL PrintChar(4, 1, " ")
@@ -1063,9 +1163,15 @@ ScanMenu:
 PrintScanMenu:
   GetXyPos
   CALL PrintClrStr(1, 1, " BEGIN   NEXT   ALL0")
+<<<<<<< HEAD
   CALL PrintClrStr(2, 1, " XPOS: " + XPosStr)
   CALL PrintClrStr(3, 1, " YPOS: " + YPosStr)
   CALL PrintClrStr(4, 1, " APOS: " + APosStr)
+=======
+  CALL PrintClrStr(2, 1, " XPOS: " + SCANparm.XPosStr)
+  CALL PrintClrStr(3, 1, " YPOS: " + SCANparm.YPosStr)
+  CALL PrintClrStr(4, 1, " APOS: " + SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   RETURN
 
 
@@ -1272,16 +1378,27 @@ SUB CalEncoder (EncNum)
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     IF EncNum = Servo1 THEN
       CALL PrintStr(4, 1, "X Pos: ")
+<<<<<<< HEAD
       CALL PrintStr(4, 8, XPosStr)
     ELSE
       CALL PrintStr(4, 1, "A Pos: ")
       CALL PrintStr(4, 8, APosStr)
+=======
+      CALL PrintStr(4, 8, SCANparm.XPosStr)
+    ELSE
+      CALL PrintStr(4, 1, "A Pos: ")
+      CALL PrintStr(4, 8, SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
     END IF
   ELSE           'Servo3 Y
     CALL PrintStr(1, 1, "Move Y Axis to Start")
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     CALL PrintStr(4, 1, "Y Pos: ")
+<<<<<<< HEAD
     CALL PrintStr(4, 8, YPosStr)
+=======
+    CALL PrintStr(4, 8, SCANparm.YPosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   END IF
 
   MFlag = 1
@@ -1297,16 +1414,27 @@ SUB CalEncoder (EncNum)
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     IF EncNum = Servo1 THEN
       CALL PrintStr(4, 1, "X Pos: ")
+<<<<<<< HEAD
       CALL PrintStr(4, 8, XPosStr)
     ELSE
       CALL PrintStr(4, 1, "A Pos: ")
       CALL PrintStr(4, 8, APosStr)
+=======
+      CALL PrintStr(4, 8, SCANparm.XPosStr)
+    ELSE
+      CALL PrintStr(4, 1, "A Pos: ")
+      CALL PrintStr(4, 8, SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
     END IF
   ELSE
     CALL PrintStr(1, 1, "Move Y Axis to End  ")
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     CALL PrintStr(4, 1, "Y Pos: ")
+<<<<<<< HEAD
     CALL PrintStr(4, 8, YPosStr)
+=======
+    CALL PrintStr(4, 8, SCANparm.YPosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
   END IF
 
   MFlag = 2
@@ -1333,6 +1461,7 @@ GetDis:
       IF VAL(Temp$) > 0 THEN
     IF AxisNum = Servo1 THEN
       IF EncNum = Servo1 THEN
+<<<<<<< HEAD
         XCal = VAL(Temp$)
         XCalStr = QStr(XCal, 10)
       ELSE
@@ -1342,10 +1471,22 @@ GetDis:
     ELSE
       YCal = VAL(Temp$)
       YCalStr = QStr(YCal, 10)
+=======
+        SCANparm.XCal = VAL(Temp$)
+        SCANparm.XCalStr = QStr(SCANparm.XCal, 10)
+      ELSE
+        SCANparm.ACal = VAL(Temp$)
+        SCANparm.ACalStr = QStr(SCANparm.ACal, 10)
+      END IF
+    ELSE
+      SCANparm.YCal = VAL(Temp$)
+      SCANparm.YCalStr = QStr(SCANparm.YCal, 10)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
     END IF
     IF ABS(EndCts& - StartCts&) > 0 THEN
       IF AxisNum = Servo1 THEN
         IF EncNum = Servo1 THEN
+<<<<<<< HEAD
           XCtr = ABS(EndCts& - StartCts&) / XCal
           XCtrStr = QStr(XCtr, 10)
         ELSE
@@ -1355,6 +1496,17 @@ GetDis:
       ELSE
         YCtr = ABS(EndCts& - StartCts&) / YCal
         YCtrStr = QStr(YCtr, 10)
+=======
+          SCANparm.XCtr = ABS(EndCts& - StartCts&) / SCANparm.XCal
+          SCANparm.XCtrStr = QStr(SCANparm.XCtr, 10)
+        ELSE
+          SCANparm.ACtr = ABS(EndCts& - StartCts&) / SCANparm.ACal
+          SCANparm.ACtrStr = QStr(SCANparm.ACtr, 10)
+        END IF
+      ELSE
+        SCANparm.YCtr = ABS(EndCts& - StartCts&) / SCANparm.YCal
+        SCANparm.YCtrStr = QStr(SCANparm.YCtr, 10)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
       END IF
     END IF
       END IF
@@ -1375,9 +1527,15 @@ MoveAxis:
     DO
        CALL GetXyPos
        IF EncNum = Servo1 THEN
+<<<<<<< HEAD
          CALL PrintStr(4, 8, XPosStr)
        ELSE
          CALL PrintStr(4, 8, APosStr)
+=======
+         CALL PrintStr(4, 8, SCANparm.XPosStr)
+       ELSE
+         CALL PrintStr(4, 8, SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
        END IF
     LOOP WHILE KeyDown
     CALL StopMtrs
@@ -1388,9 +1546,15 @@ MoveAxis:
     DO
        CALL GetXyPos
        IF EncNum = Servo1 THEN
+<<<<<<< HEAD
          CALL PrintStr(4, 8, XPosStr)
        ELSE
          CALL PrintStr(4, 8, APosStr)
+=======
+         CALL PrintStr(4, 8, SCANparm.XPosStr)
+       ELSE
+         CALL PrintStr(4, 8, SCANparm.APosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
        END IF
     LOOP WHILE KeyDown
     CALL StopMtrs
@@ -1400,7 +1564,11 @@ MoveAxis:
     CALL MoveYVel(NegDir)
     DO
        CALL GetXyPos
+<<<<<<< HEAD
        CALL PrintStr(4, 8, YPosStr)
+=======
+       CALL PrintStr(4, 8, SCANparm.YPosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
     LOOP WHILE KeyDown
     CALL StopMtrs
     FlushKeys
@@ -1409,7 +1577,11 @@ MoveAxis:
     CALL MoveYVel(PosDir)
     DO
        CALL GetXyPos
+<<<<<<< HEAD
        CALL PrintStr(4, 8, YPosStr)
+=======
+       CALL PrintStr(4, 8, SCANparm.YPosStr)
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
     LOOP WHILE KeyDown
     CALL StopMtrs
     FlushKeys
@@ -1445,8 +1617,13 @@ MoveAxis:
 END SUB
 
 FUNCTION CalLoad (FileNumber$)
+<<<<<<< HEAD
 
    Temp$ = HdrVer
+=======
+   LOCAL Temp AS STRING * 20
+   Temp = HdrVer
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
 
 '   CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
    CALL FOpen(FileNumber$, 0, 0, Filler, ECode)
@@ -1456,11 +1633,20 @@ FUNCTION CalLoad (FileNumber$)
    END IF
 
    'read header label
+<<<<<<< HEAD
    CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
    'Verify correct header
    IF HdrVer <> Temp$ THEN
+=======
+   'CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
+   CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalLoad
+
+   'Verify correct header
+   IF HdrVer <> Temp THEN
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
@@ -4509,7 +4695,18 @@ SUB StrobeInstr (insb)
 
 END SUB
 SUB FCreate (FileNumber$, ATTR, Filler, ECode)
+<<<<<<< HEAD
     OPEN FileNumber$ FOR OUTPUT AS #1
 END SUB
 SUB FOpen (FileNumber$, ReadWrite, Sharing, Filler, ECode)
+=======
+    OPEN FileNumber$ FOR BINARY AS filenumber
+END SUB
+SUB FOpen (FileNumber$, ReadWrite, Sharing, Filler, ECode)
+    OPEN FileNumber$ FOR BINARY AS filenumber
+END SUB
+SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20, DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET$ filenum, 20, dseg
+    GET filenum, 21,  inrecord
+>>>>>>> bd0c912ba6edb6fdefa660b13e15ecd1200705e5
 END SUB

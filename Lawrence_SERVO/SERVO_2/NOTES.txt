@@ -1,0 +1,35 @@
+
+
+This PIC dual servo has been very successful. 
+
+I have:
+- a working prototype board using the dspic33fj128202 28 pin chip
+
+- a working dual channel power amplifier based on the LMD18200 chip
+
+- 2 axis of servos with full PID-FF positioning loops,
+
+- 2 axis serial command interface for setting up and controlling both axis
+
+- 2 channels of offset/pc position control via quadrature signalling 
+
+- 4 channels of analog I/O 
+
+- 2 quadrature encoder interfaces
+
+- serial commands for both raw velocity and raw PWM output
+
+- a trapezoidal motion profile command via the serial port
+
+- non volatile parameter storage in the code space (dspic33 does not have eeprom memory)
+
+- 28% of the code space is used and 12% of the ram memory space is used... 
+  this leaves lots of room for program additions as may be required in final application.
+
+- screenshot.png shows the serial command help listing
+
+- screenshot-1.png shows the tuning parameters available for each axis.
+
+- screenshot-2.png shows a diagnostic screen showing servo status
+
+This code is stable, complete, and well tested and ready for use as is or add more features.

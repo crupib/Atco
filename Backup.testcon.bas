@@ -6,7 +6,6 @@ GLOBAL PICBaud AS LONG
 GLOBAL nComm AS LONG
 GLOBAL StringVariable AS STRING
 GLOBAL HdrVer AS STRING * 20
-GLOBAL temp AS STRING * 20
 GLOBAL ThumbDisk AS STRING * 2
 GLOBAL ECODE AS INTEGER
 MACRO CONST = MACRO
@@ -15,7 +14,8 @@ CONST FALSE = NOT TRUE
 DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
-DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+'DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFRead (filenum AS INTEGER, passStruc&, filler&, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
@@ -23,12 +23,14 @@ TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
 END TYPE
-GLOBAL myrecord AS MYTYPE
+GLOBAL myrecord AS MYTYPE, y&
 GLOBAL inrecord AS MYTYPE
+
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
  DIM VV AS INTEGER
  DIM GG AS STRING
+ DIM x AS STRING * 20,t&
   HdrVer = "SCU-1.00            "
   ThumbDisk = "C:\UCALS\"
  CON.CAPTION$ = "Atco Motor controllor"
@@ -37,7 +39,7 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
- CON.CLS$
+ 'CON.CLS
  'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
@@ -49,15 +51,18 @@ FUNCTION PBMAIN () AS LONG
  NEXT  VV
 
  RESET StringVariable$
- HdrVer = "SCU-1.00            "
- myrecord.id = 99
- myrecord.Styles = 99
+ HdrVer = "SCU-2.00            "
+ myrecord.id = 88
+ myrecord.Styles = 88
+ t& = VARPTR(hdrver)
+ y& = VARPTR(myrecord)
  FOpen (filenum, 0,0, filenum, ECode)
- CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
+ CALL DFRead(filenum, t&, t&, LEN(HdrVer), BytesRead, ECode)
+ CALL DFRead(filenum, y&, y&, LEN(myrecord), BytesRead, ECode)
  FClose(filenum)
- PRINT temp
- PRINT inrecord.id
- PRINT inrecord.Styles
+ PRINT hdrver
+ PRINT myrecord.id
+ PRINT myrecord.Styles
  WAITSTAT
  END FUNCTION
 
@@ -87,9 +92,9 @@ END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr
 END SUB
-SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20, DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-    GET$ filenum, 20, dseg
-    GET filenum, 21,  inrecord
+SUB DFRead (filenum AS INTEGER, passStruc& ,filler&, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET filenum, bytes, passStruc&
+    PRINT passStruc&
 END SUB
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
     OPEN "File.txt" FOR BINARY AS filenumber

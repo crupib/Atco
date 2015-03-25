@@ -345,8 +345,7 @@ CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
-
- 'DIM SHARED Glo AS GLOBAL
+  GLOBAL filenum AS INTEGER
   GLOBAL HdrVer AS STRING * 20
   GLOBAL nComm   AS LONG
   GLOBAL ThumbDisk AS STRING * 2
@@ -441,6 +440,7 @@ CONST HomeFlagMask = &HFE0F
    AutoHoldSTR AS STRING * 10
   END TYPE
   GLOBAL SCANparm AS ScanPrams
+ 'DIM SHARED Glo AS GLOBAL
   TYPE glorecord
    NumModules AS INTEGER
    StatusDef(5) AS INTEGER
@@ -1446,8 +1446,8 @@ MoveAxis:
 END SUB
 
 FUNCTION CalLoad (FileNumber$)
-
-   Temp$ = HdrVer
+   LOCAL Temp AS STRING * 20
+   Temp = HdrVer
 
 '   CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
    CALL FOpen(FileNumber$, 0, 0, Filler, ECode)
@@ -1458,16 +1458,16 @@ FUNCTION CalLoad (FileNumber$)
 
    'read header label
    'CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
-   CALL DFRead(FileNumber$, temp$, temp$, LEN(HdrVer), BytesRead, ECode)
+   CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
    'Verify correct header
-   IF HdrVer <> Temp$ THEN
+   IF HdrVer <> Temp THEN
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
 
-   CALL DFRead(HANDLE, VARSEG(SCANparm), VARPTR(SCANparm), LEN(SCANparm), BytesRead&, ECode)
+   CALL DFRead(filenum, SCANparm, SCANparm, LEN(SCANparm), BytesRead&, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
 

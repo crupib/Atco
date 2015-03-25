@@ -14,6 +14,8 @@ CONST FALSE = NOT TRUE
 DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
+GLOBAL mystring AS STRING * 20
+
 TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
@@ -31,7 +33,7 @@ FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
  DIM VV AS INTEGER
  DIM GG AS STRING
- DIM x AS STRING * 20,t&
+
  HdrVer = "SCU-1.00            "
  ThumbDisk = "C:\UCALS\"
  CON.CAPTION$ = "Atco Motor controllor"
@@ -56,10 +58,10 @@ FUNCTION PBMAIN () AS LONG
  myrecord.id = 88
  myrecord.Styles = 88
  FOpen (filenum, 0,0, filenum, ECode)
- CALL DFRead(filenum, inrecord, inrecord, LEN(myrecord), BytesRead, ECode)
- FClose(filenum)
-' PRINT hdrver
 
+ CALL DFRead(filenum, BYVAL VARPTR(inrecord), BYVAL VARPTR(inrecord), LEN(inrecord), BytesRead, ECode)
+ FClose(filenum)
+ PRINT mystring
  PRINT inrecord.id
  PRINT inrecord.Styles
  WAITSTAT
@@ -91,13 +93,18 @@ END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr
 END SUB
-SUB DFRead (filenum AS INTEGER,  passStruc AS mytype , filler AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-    LOCAL mystring AS STRING * 20
-    GET$ filenum, 20, mystring
+SUB DFRead (filenum AS INTEGER,   passStruc AS mytype , filler AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+  '  LOCAL mystring AS STRING * 20
+    GET$ filenum, 20,  mystring
+    GET filenum, 21, passStruc
+END SUB
+'SUB DFRead (filenum AS INTEGER,  passStruc AS mytype , filler AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+'  '  LOCAL mystring AS STRING * 20
+'    GET$ filenum, 20, mystring
 '    GET filenum, 21,  inrecord
 '    GET filenum, 20, passStruc
-    GET filenum, bytes, passStruc
-END SUB
+'    GET filenum, bytes, passStruc
+'END SUB
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
     OPEN "File.txt" FOR BINARY AS filenumber
 END SUB

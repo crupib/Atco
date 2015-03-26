@@ -20,21 +20,25 @@ TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
 END TYPE
+TYPE MYSTRINGTYPE
+  hdr AS STRING * 20
+END TYPE
 'DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-DECLARE SUB DFRead (filenum AS INTEGER, passrec AS mytype , passrec AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFRead (filenum AS INTEGER, passrec AS mytype ,  filler AS mystringtype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
 
 GLOBAL myrecord AS MYTYPE
 GLOBAL inrecord AS MYTYPE
+GLOBAL hdrrecord AS mystringtype
+
 
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
  DIM VV AS INTEGER
  DIM GG AS STRING
 
- HdrVer = "SCU-1.00            "
  ThumbDisk = "C:\UCALS\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
@@ -54,16 +58,14 @@ FUNCTION PBMAIN () AS LONG
  NEXT  VV
 
  RESET StringVariable$
- HdrVer = "SCU-2.00            "
- myrecord.id = 88
- myrecord.Styles = 88
+
  FOpen (filenum, 0,0, filenum, ECode)
 
+ CALL DFRead(filenum, BYVAL VARPTR(hdrrecord), BYVAL VARPTR(hdrrecord), LEN(hdrrecord), BytesRead, ECode)
+' CALL DFRead(filenum, BYVAL VARPTR(inrecord), BYVAL VARPTR(inrecord), LEN(hdrrecord), BytesRead, ECode)
 
- CALL DFRead(filenum, BYVAL VARPTR(inrecord), BYVAL VARPTR(inrecord), LEN(inrecord), BytesRead, ECode)
  FClose(filenum)
-' PRINT hdrver
- PRINT mystring
+ PRINT hdrrecord.hdr
  PRINT inrecord.id
  PRINT inrecord.Styles
  WAITSTAT
@@ -95,18 +97,12 @@ END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr
 END SUB
-SUB DFRead (filenum AS INTEGER,   passStruc AS mytype , filler AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+SUB DFRead (filenum AS INTEGER,   passStruc AS mytype , filler AS mystringtype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
   '  LOCAL mystring AS STRING * 20
-    GET$ filenum, 20,  mystring
-    GET filenum, 21, passStruc
+    GET filenum, 1,  filler
+    'GET filenum, 4, passStruc
 END SUB
-'SUB DFRead (filenum AS INTEGER,  passStruc AS mytype , filler AS mytype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-'  '  LOCAL mystring AS STRING * 20
-'    GET$ filenum, 20, mystring
-'    GET filenum, 21,  inrecord
-'    GET filenum, 20, passStruc
-'    GET filenum, bytes, passStruc
-'END SUB
+
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
     OPEN "File.txt" FOR BINARY AS filenumber
 END SUB

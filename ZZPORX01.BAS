@@ -9,6 +9,138 @@
 #RESOURCE PRODUCTVERSION 6, 0, 0, 0
 DEFINT A-Z
 
+TYPE ScanPrams
+   YCtr          AS SINGLE       'YCts/inch
+   XCtr          AS SINGLE       'XCts/inch
+   ACtr          AS SINGLE       'Aux Enc Cts/inch
+   YCal          AS SINGLE       'Y Cal Inch distance
+   XCal          AS SINGLE       'X Cal Inch distance
+   ACal          AS SINGLE       'Aux Cal Inch distance
+   XOffset       AS SINGLE       'X inch pos when counter zeroed
+   YOffset       AS SINGLE       'Y inch pos when counter zeroed
+   AOffset       AS SINGLE       'A Inch pos when counter zeroed
+   XPos          AS SINGLE       'current X inch position
+   YPos          AS SINGLE       'current Y inch position
+   APos          AS SINGLE       'current A inch position
+   XPlus         AS INTEGER      'X scan +/-
+   YPlus         AS INTEGER      'Y scan +/-
+   XDataStart    AS LONG         'x array position for scan start
+   YDataStart    AS LONG         'y array position for scan start
+   XDataEnd      AS LONG         'x array position for scan end
+   YDataEnd      AS LONG         'y array position for scan end
+   XIndex        AS SINGLE       'x inch index
+   YIndex        AS SINGLE       'y inch index
+   XIndexCts     AS LONG         'x actual value (+/-) counts per index
+   YIndexCts     AS LONG         'y actual value (+/-) counts per index
+   IndexLow      AS INTEGER      'Index towards High or Low
+   XCts          AS LONG         'x absolute value scan start counts
+   YCts          AS LONG         'y absolute value scan start counts
+   ACts          AS LONG         'A absolute value scan start counts
+   XStartCts     AS LONG         'x actual value (+/-) scan start counts
+   YStartCts     AS LONG         'y actual value (+/-) scan start counts
+   XEndCts       AS LONG         'x actual value (+/-) scan end counts
+   YEndCts       AS LONG         'y actual value (+/-) scan end counts
+   XLow          AS SINGLE       'x scan start inch position
+   YLow          AS SINGLE       'y scan start inch position
+   XHigh         AS SINGLE       'x scan end inch position
+   YHigh         AS SINGLE       'y scan end inch position
+   OverLap       AS SINGLE       'added si scan overlap
+   XSpeed        AS SINGLE       'x scan speed in inches
+   YSpeed        AS SINGLE       'y scan speed in inches
+   XEnable       AS INTEGER      'flag true/false X axis on
+   YEnable       AS INTEGER      'flag true/false Y axis on
+   XSpdDir       AS INTEGER      'flag X speed cntrl direction
+   IndexY        AS INTEGER      'flag true/false X or Y
+   StopChk       AS INTEGER      'flag true/false autoOff on/off
+   DualRas     AS INTEGER      'flag true/false step index
+   AutoHold      AS INTEGER      'flag true/false Auto Hold
+   IndexCt AS INTEGER            'index loop counter
+   IndexInc AS INTEGER           'index loop incrementer
+   ScanFlag AS INTEGER           '
+   Index AS INTEGER              'scan direction
+   NextFlag AS INTEGER           'added for si auto scan increment
+   YCtrStr AS STRING * 10
+   XCtrStr AS STRING * 10
+   ACtrStr AS STRING * 10
+   YCalStr AS STRING * 10      'Y Cal Inch distance
+   XCalStr AS STRING * 10      'X Cal Inch distance
+   ACalStr AS STRING * 10      'A Cal Inch distance
+   XPosStr AS STRING * 10
+   YPosStr AS STRING * 10
+   APosStr AS STRING * 10
+   XPlusSTR AS STRING * 10
+   YPlusSTR AS STRING * 10
+   XIndexSTR AS STRING * 10
+   YIndexSTR AS STRING * 10
+   IndexLowStr AS STRING * 10
+   XLowStr AS STRING * 10
+   YLowStr AS STRING * 10
+   XHighStr AS STRING * 10
+   YHighStr AS STRING * 10
+   OverLapStr AS STRING * 10
+   XSpeedSTR AS STRING * 10
+   YSpeedSTR AS STRING * 10
+   XEnableSTR AS STRING * 10
+   YEnableSTR AS STRING * 10
+   XSpdDirSTR AS STRING * 10
+   IndexYSTR AS STRING * 10
+   StopChkSTR AS STRING * 10
+   DualRasSTR AS STRING * 10
+   NextFlagSTR AS STRING * 10
+   AutoHoldSTR AS STRING * 10
+  END TYPE
+  GLOBAL SCANparm AS ScanPrams
+
+ 'DIM SHARED Glo AS GLOBAL
+  TYPE glorecord
+   NumModules AS INTEGER
+   StatusDef(5) AS INTEGER
+   ModuleType(5) AS INTEGER
+   ModuleVer(5) AS INTEGER
+   Position(5) AS LONG
+   CmdPosition(5) AS LONG
+   HomePosition(5) AS LONG
+   velocity(5) AS INTEGER
+   CmdVelocity(5) AS LONG
+   CmdAccel(5) AS LONG
+   CmdPwm(5) AS INTEGER 'LONG
+   AdVal(5) AS INTEGER
+   Stat(5) AS INTEGER
+   AuxStat(5) AS INTEGER
+   Kp(5) AS INTEGER
+   Ki(5) AS INTEGER
+   Kd(5) AS INTEGER
+   IL(5) AS INTEGER
+   ol(5) AS INTEGER
+   CL(5) AS INTEGER
+   EL(5) AS INTEGER
+   SRD(5) AS INTEGER
+   MiscMode(5) AS INTEGER
+   SIOErrorMode AS INTEGER
+   SIOError AS INTEGER
+   CkSumError AS INTEGER
+   SIOPort AS INTEGER
+   AmpQuery AS INTEGER
+   PowerQuery AS INTEGER
+   baud AS LONG
+   'added for PIC-IO
+   IO1 AS INTEGER
+   IO2 AS INTEGER
+   Ad1 AS INTEGER
+   Ad2 AS INTEGER
+   Ad3 AS INTEGER
+   Counter AS LONG
+   SyncIO1 AS INTEGER
+   SyncIO2 AS INTEGER
+   SyncCounter AS LONG
+ END TYPE
+ GLOBAL glo AS glorecord
+
+UNION HEADER
+  hdr AS STRING * 20
+  SCANPARMS AS ScanPrams
+END UNION
+
 REM new RS232 PC compatible
 'DECLARE SUB SetIRQ (ComPortNum%, IRQ%, ECode%)
 'DECLARE SUB SetPortAddr (ComPortNum%, PortAddress%, ECode%)
@@ -105,12 +237,14 @@ DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
 DECLARE FUNCTION CalSave (FILENAME$)
 DECLARE FUNCTION CalLoad (FileNumber$)
 'DECLARE SUB FCreate (FileNumber$, ATTR, HANDLE, ECode)
-DECLARE SUB FCreate (FileNumber$, ATTR, Filler, ECode)
-DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, HANDLE, ECode)
-DECLARE SUB FClose (HANDLE)
+DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
+DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
+DECLARE SUB FClose (filenumber AS INTEGER)
 DECLARE SUB DFWrite (HANDLE, DSeg, DOfs, BYTES&, BytesWrote&, ECode)
+DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 'DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
-DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+'DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+
 DECLARE FUNCTION Exist2 (FileNumber$)
 
 REM 'added from crescent
@@ -345,101 +479,22 @@ CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
-  GLOBAL filenum AS INTEGER
-  GLOBAL HdrVer AS STRING * 20
-  GLOBAL nComm   AS LONG
-  GLOBAL ThumbDisk AS STRING * 2
+GLOBAL filenum AS INTEGER
+GLOBAL HdrVer AS HEADER
+GLOBAL SCANPARAMS AS header
+GLOBAL nComm   AS LONG
+GLOBAL ThumbDisk AS STRING * 2
   'COM PORTS
-  GLOBAL RecvSize AS LONG
-  GLOBAL XmitSize AS LONG
-  GLOBAL MemSize AS LONG
+GLOBAL RecvSize AS LONG
+GLOBAL XmitSize AS LONG
+GLOBAL MemSize AS LONG
  ' GLOBAL PICPort AS INTEGER
-  GLOBAL PICPort AS STRING
-  GLOBAL PICBaud AS LONG
+GLOBAL PICPort AS STRING
+GLOBAL PICBaud AS LONG
   'delay timer
-  GLOBAL DelayCtr AS LONG
-  GLOBAL WaitX AS INTEGER
-  TYPE ScanPrams
-   YCtr          AS SINGLE       'YCts/inch
-   XCtr          AS SINGLE       'XCts/inch
-   ACtr          AS SINGLE       'Aux Enc Cts/inch
-   YCal          AS SINGLE       'Y Cal Inch distance
-   XCal          AS SINGLE       'X Cal Inch distance
-   ACal          AS SINGLE       'Aux Cal Inch distance
-   XOffset       AS SINGLE       'X inch pos when counter zeroed
-   YOffset       AS SINGLE       'Y inch pos when counter zeroed
-   AOffset       AS SINGLE       'A Inch pos when counter zeroed
-   XPos          AS SINGLE       'current X inch position
-   YPos          AS SINGLE       'current Y inch position
-   APos          AS SINGLE       'current A inch position
-   XPlus         AS INTEGER      'X scan +/-
-   YPlus         AS INTEGER      'Y scan +/-
-   XDataStart    AS LONG         'x array position for scan start
-   YDataStart    AS LONG         'y array position for scan start
-   XDataEnd      AS LONG         'x array position for scan end
-   YDataEnd      AS LONG         'y array position for scan end
-   XIndex        AS SINGLE       'x inch index
-   YIndex        AS SINGLE       'y inch index
-   XIndexCts     AS LONG         'x actual value (+/-) counts per index
-   YIndexCts     AS LONG         'y actual value (+/-) counts per index
-   IndexLow      AS INTEGER      'Index towards High or Low
-   XCts          AS LONG         'x absolute value scan start counts
-   YCts          AS LONG         'y absolute value scan start counts
-   ACts          AS LONG         'A absolute value scan start counts
-   XStartCts     AS LONG         'x actual value (+/-) scan start counts
-   YStartCts     AS LONG         'y actual value (+/-) scan start counts
-   XEndCts       AS LONG         'x actual value (+/-) scan end counts
-   YEndCts       AS LONG         'y actual value (+/-) scan end counts
-   XLow          AS SINGLE       'x scan start inch position
-   YLow          AS SINGLE       'y scan start inch position
-   XHigh         AS SINGLE       'x scan end inch position
-   YHigh         AS SINGLE       'y scan end inch position
-   OverLap       AS SINGLE       'added si scan overlap
-   XSpeed        AS SINGLE       'x scan speed in inches
-   YSpeed        AS SINGLE       'y scan speed in inches
-   XEnable       AS INTEGER      'flag true/false X axis on
-   YEnable       AS INTEGER      'flag true/false Y axis on
-   XSpdDir       AS INTEGER      'flag X speed cntrl direction
-   IndexY        AS INTEGER      'flag true/false X or Y
-   StopChk       AS INTEGER      'flag true/false autoOff on/off
-   DualRas     AS INTEGER      'flag true/false step index
-   AutoHold      AS INTEGER      'flag true/false Auto Hold
-   IndexCt AS INTEGER            'index loop counter
-   IndexInc AS INTEGER           'index loop incrementer
-   ScanFlag AS INTEGER           '
-   Index AS INTEGER              'scan direction
-   NextFlag AS INTEGER           'added for si auto scan increment
-   YCtrStr AS STRING * 10
-   XCtrStr AS STRING * 10
-   ACtrStr AS STRING * 10
-   YCalStr AS STRING * 10      'Y Cal Inch distance
-   XCalStr AS STRING * 10      'X Cal Inch distance
-   ACalStr AS STRING * 10      'A Cal Inch distance
-   XPosStr AS STRING * 10
-   YPosStr AS STRING * 10
-   APosStr AS STRING * 10
-   XPlusSTR AS STRING * 10
-   YPlusSTR AS STRING * 10
-   XIndexSTR AS STRING * 10
-   YIndexSTR AS STRING * 10
-   IndexLowStr AS STRING * 10
-   XLowStr AS STRING * 10
-   YLowStr AS STRING * 10
-   XHighStr AS STRING * 10
-   YHighStr AS STRING * 10
-   OverLapStr AS STRING * 10
-   XSpeedSTR AS STRING * 10
-   YSpeedSTR AS STRING * 10
-   XEnableSTR AS STRING * 10
-   YEnableSTR AS STRING * 10
-   XSpdDirSTR AS STRING * 10
-   IndexYSTR AS STRING * 10
-   StopChkSTR AS STRING * 10
-   DualRasSTR AS STRING * 10
-   NextFlagSTR AS STRING * 10
-   AutoHoldSTR AS STRING * 10
-  END TYPE
-  GLOBAL SCANparm AS ScanPrams
+GLOBAL DelayCtr AS LONG
+GLOBAL WaitX AS INTEGER
+
  'DIM SHARED Glo AS GLOBAL
   TYPE glorecord
    NumModules AS INTEGER
@@ -487,7 +542,7 @@ CONST HomeFlagMask = &HFE0F
 
 FUNCTION PBMAIN
 
-  HdrVer = "SCU-1.00            "
+  HdrVer.hdr = "SCU-1.00            "
   ThumbDisk = "C:\UCALS\"
   'set com port numbers & baud
  ' PICPort = 1
@@ -1446,11 +1501,12 @@ MoveAxis:
 END SUB
 
 FUNCTION CalLoad (FileNumber$)
-   LOCAL Temp AS STRING * 20
+   LOCAL Temp AS header
    Temp = HdrVer
 
 '   CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
-   CALL FOpen(FileNumber$, 0, 0, Filler, ECode)
+   'CALL FOpen(FileNumber$, 0, 0, Filler, ECode)
+   FOpen (filenum, 0,0, FileNumber$, ECode)
    IF ECode THEN
      CalLoad = FALSE
      EXIT FUNCTION
@@ -1458,22 +1514,22 @@ FUNCTION CalLoad (FileNumber$)
 
    'read header label
    'CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
-   CALL DFRead(filenum, temp, temp, LEN(HdrVer), BytesRead, ECode)
+   CALL DFRead(filenum, temp, 0, BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
    'Verify correct header
-   IF HdrVer <> Temp THEN
+   IF HdrVer.hdr <> Temp.hdr THEN
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
 
-   CALL DFRead(filenum, SCANparm, SCANparm, LEN(SCANparm), BytesRead&, ECode)
+   CALL DFRead(filenum, SCANparm, LEN(SCANparm), BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
 
 ExitCalLoad:
-   HdrVer = Temp$ 'in case of corrupt hdr read
-   CALL FClose(HANDLE)
+   HdrVer = Temp 'in case of corrupt hdr read
+   CALL FClose(filenum)
    IF ECode THEN
      CalLoad = FALSE
    ELSE
@@ -1487,7 +1543,9 @@ END FUNCTION
 
 FUNCTION CalSave (FILENAMEX$)
 
-   CALL FCreate(FILENAMEX$, 0, HANDLE, ECode)
+   'CALL FCreate(FILENAMEX$, 0, HANDLE, ECode)
+  ' call FCreate (FILENAMEX$, 0,0, filenum, ECode)
+   FCreate (filenumber, 0, FILENAMEX$, ECode)
    IF ECode THEN
      CalSave = FALSE
      EXIT FUNCTION
@@ -1500,7 +1558,7 @@ FUNCTION CalSave (FILENAMEX$)
    IF ECode THEN GOTO ExitCalSave
 
 ExitCalSave:
-   CALL FClose(HANDLE)
+   CALL FClose(filenum)
    IF ECode THEN
      CalSave = FALSE
    ELSE
@@ -4510,13 +4568,15 @@ SUB StrobeInstr (insb)
   CALL ddelay(D20)
 
 END SUB
-SUB FCreate (FileNumber$, ATTR, Filler, ECode)
-    OPEN FileNumber$ FOR BINARY AS filenumber
+SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING, ECode AS INTEGER)
+    OPEN filename FOR BINARY AS filenumber BASE = 0
 END SUB
-SUB FOpen (FileNumber$, ReadWrite, Sharing, Filler, ECode)
-    OPEN FileNumber$ FOR BINARY AS filenumber
+SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
+    OPEN filename FOR BINARY AS filenumber BASE = 0
 END SUB
-SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20, DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-    GET$ filenum, 20, dseg
-    GET filenum, 21,  inrecord
+SUB FClose (filenumber AS INTEGER)
+    CLOSE filenumber
+END SUB
+SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET filenum, offset ,PASSREC
 END SUB

@@ -20,18 +20,20 @@ TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
 END TYPE
-TYPE MYSTRINGTYPE
+UNION HEADER
   hdr AS STRING * 20
-END TYPE
-'DECLARE SUB DFRead (filenum AS INTEGER, DSeg AS STRING * 20  , DOfs AS STRING * 20, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-DECLARE SUB DFRead (filenum AS INTEGER, passrec AS mytype ,  filler AS mystringtype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
-DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
+  SCANPARMS AS MYTYPE
+END UNION
+
+DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
+DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
 
-GLOBAL myrecord AS MYTYPE
-GLOBAL inrecord AS MYTYPE
-GLOBAL hdrrecord AS mystringtype
+GLOBAL myrecord AS HEADER
+GLOBAL inrecord AS HEADER
+GLOBAL hdrrecord AS HEADER
 
 
 FUNCTION PBMAIN () AS LONG
@@ -39,7 +41,7 @@ FUNCTION PBMAIN () AS LONG
  DIM VV AS INTEGER
  DIM GG AS STRING
 
- ThumbDisk = "C:\UCALS\"
+ ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
  CON.PRINT "       ATCO         "
@@ -58,15 +60,16 @@ FUNCTION PBMAIN () AS LONG
  NEXT  VV
 
  RESET StringVariable$
+ fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
+ 'FOpen (filenum, 0,0, ThumbDisk+"file.txt", ECode)
 
- FOpen (filenum, 0,0, filenum, ECode)
-
- CALL DFRead(filenum, BYVAL VARPTR(hdrrecord), BYVAL VARPTR(hdrrecord), LEN(hdrrecord), BytesRead, ECode)
-
+ 'CALL DFRead(filenum, BYVAL VARPTR(hdrrecord.hdr),  0, BytesRead, ECode)
+ 'CALL DFRead(filenum, BYVAL VARPTR(inrecord.SCANPARMS),  len(hdrrecord.hdr), BytesRead, ECode)
  FClose(filenum)
- PRINT hdrrecord.hdr
- PRINT inrecord.id
- PRINT inrecord.Styles
+
+' PRINT hdrrecord.hdr
+' PRINT inrecord.SCANPARMS.id
+' PRINT inrecord.SCANPARMS.Styles
  WAITSTAT
  END FUNCTION
 
@@ -96,17 +99,15 @@ END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr
 END SUB
-SUB DFRead (filenum AS INTEGER,   passStruc AS mytype , filler AS mystringtype, BYTES AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-  '  LOCAL mystring AS STRING * 20
-    GET filenum, 1, filler
-    'GET filenum, 4, passStruc
+SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET filenum, offset ,PASSREC
 END SUB
 
-SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
-    OPEN "File.txt" FOR BINARY AS filenumber
+SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING, ECode AS INTEGER)
+    OPEN filename FOR BINARY AS filenumber BASE = 0
 END SUB
-SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filehandle AS INTEGER, ECode AS INTEGER)
-    OPEN "File.txt" FOR BINARY AS filenumber
+SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
+    OPEN filename FOR BINARY AS filenumber BASE = 0
 END SUB
 SUB FClose (filenumber AS INTEGER)
     CLOSE filenumber

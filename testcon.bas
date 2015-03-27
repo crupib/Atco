@@ -20,19 +20,20 @@ TYPE MYTYPE
   id AS INTEGER
   Styles AS WORD
 END TYPE
-UNION HEADER
+
+TYPE HEADER
   hdr AS STRING * 20
-  SCANPARMS AS MYTYPE
-END UNION
+END TYPE
 
 DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS mytype , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
 
 GLOBAL myrecord AS HEADER
-GLOBAL inrecord AS HEADER
+GLOBAL inrecord AS mytype
 GLOBAL hdrrecord AS HEADER
 
 
@@ -59,17 +60,22 @@ FUNCTION PBMAIN () AS LONG
     END IF
  NEXT  VV
 
- RESET StringVariable$
+' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
- 'FOpen (filenum, 0,0, ThumbDisk+"file.txt", ECode)
+ hdrrecord.hdr =  "SCU-3.00            "
+ CALL DFWrite(filenum, BYVAL VARPTR(hdrrecord), 0, BytesRead, ECode)
+ inrecord.id = 99
+ inrecord.styles = 101
+ CALL DFWrite2(filenum, BYVAL VARPTR(inrecord),LEN(hdrrecord), BytesRead, ECode)
 
+ 'FOpen (filenum, 0,0, ThumbDisk+"file.txt", ECode)
  'CALL DFRead(filenum, BYVAL VARPTR(hdrrecord.hdr),  0, BytesRead, ECode)
  'CALL DFRead(filenum, BYVAL VARPTR(inrecord.SCANPARMS),  len(hdrrecord.hdr), BytesRead, ECode)
  FClose(filenum)
 
-' PRINT hdrrecord.hdr
-' PRINT inrecord.SCANPARMS.id
-' PRINT inrecord.SCANPARMS.Styles
+ PRINT hdrrecord.hdr
+ PRINT inrecord.id
+ PRINT inrecord.Styles
  WAITSTAT
  END FUNCTION
 
@@ -101,6 +107,12 @@ SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, 
 END SUB
 SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
+END SUB
+SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
+        PUT filenum,  offset ,PASSREC
+END SUB
+SUB DFWrite2 (filenum AS INTEGER, passrec AS mytype , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
+        PUT filenum,  offset ,PASSREC
 END SUB
 
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING, ECode AS INTEGER)

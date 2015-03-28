@@ -26,6 +26,7 @@ TYPE HEADER
 END TYPE
 
 DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFRead2 (filenum AS INTEGER, passrec AS MYTYPE , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS mytype , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
@@ -65,12 +66,12 @@ FUNCTION PBMAIN () AS LONG
  hdrrecord.hdr =  "SCU-3.00            "
  CALL DFWrite(filenum, BYVAL VARPTR(hdrrecord), 0, BytesRead, ECode)
  inrecord.id = 99
- inrecord.styles = 101
+ inrecord.styles = 200
  CALL DFWrite2(filenum, BYVAL VARPTR(inrecord),LEN(hdrrecord), BytesRead, ECode)
-
- 'FOpen (filenum, 0,0, ThumbDisk+"file.txt", ECode)
- 'CALL DFRead(filenum, BYVAL VARPTR(hdrrecord.hdr),  0, BytesRead, ECode)
- 'CALL DFRead(filenum, BYVAL VARPTR(inrecord.SCANPARMS),  len(hdrrecord.hdr), BytesRead, ECode)
+ FClose(filenum)
+ FOpen (filenum, 0,0, ThumbDisk+"file2.txt", ECode)
+ CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
+ CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
 
  PRINT hdrrecord.hdr
@@ -106,6 +107,9 @@ SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, 
     COMM SEND #nComm, SendStr
 END SUB
 SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+    GET filenum, offset ,PASSREC
+END SUB
+SUB DFRead2 (filenum AS INTEGER, passrec AS MYTYPE , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
 END SUB
 SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)

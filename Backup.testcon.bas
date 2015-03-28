@@ -42,6 +42,7 @@ FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
  DIM VV AS INTEGER
  DIM GG AS STRING
+ DIM myinput AS STRING
 
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
@@ -51,6 +52,8 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
  'CON.CLS
+ 'con.input("Hello",II)
+ 'con.print II
  'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
@@ -60,15 +63,23 @@ FUNCTION PBMAIN () AS LONG
        END
     END IF
  NEXT  VV
-
+ CON.WAITKEY$ TO  myinput
+ PRINT myinput
 ' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
+ IF ecode = 0 THEN
+    PRINT "File created!"
+ END IF
  hdrrecord.hdr =  "SCU-3.00            "
  CALL DFWrite(filenum, BYVAL VARPTR(hdrrecord), 0, BytesRead, ECode)
  inrecord.id = 99
- inrecord.styles = 65536
+ inrecord.styles = 200
  CALL DFWrite2(filenum, BYVAL VARPTR(inrecord),LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
+ hdrrecord.hdr =  ""
+ CALL DFWrite(filenum, BYVAL VARPTR(hdrrecord), 0, BytesRead, ECode)
+ inrecord.id = 0
+ inrecord.styles = 0
  FOpen (filenum, 0,0, ThumbDisk+"file2.txt", ECode)
  CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
  CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
@@ -82,7 +93,7 @@ FUNCTION PBMAIN () AS LONG
 
  FUNCTION OpenComPorts AS INTEGER
     LOCAL ECode AS INTEGER
-'    LOCAL nComm   AS LONG
+'   LOCAL nComm   AS LONG
     LOCAL x AS INTEGER
     nComm = FREEFILE
     COMM OPEN PicPort AS #nComm
@@ -108,22 +119,41 @@ SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, 
 END SUB
 SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
+     ECode = -1
 END SUB
 SUB DFRead2 (filenum AS INTEGER, passrec AS MYTYPE , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
+    ECode = -1
 END SUB
 SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
         PUT filenum,  offset ,PASSREC
+        ECode = -1
 END SUB
 SUB DFWrite2 (filenum AS INTEGER, passrec AS mytype , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
         PUT filenum,  offset ,PASSREC
+        ECode = -1
 END SUB
 
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING, ECode AS INTEGER)
-    OPEN filename FOR BINARY AS filenumber BASE = 0
+    LOCAL FileExists AS INTEGER
+    FileExists = ISFILE(FileName)
+    IF FileExists THEN
+        OPEN filename FOR BINARY AS filenumber BASE = 0
+        ECode = -1
+    ELSE
+        ecode = 0
+        OPEN filename FOR BINARY AS filenumber BASE = 0
+    END IF
 END SUB
 SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
-    OPEN filename FOR BINARY AS filenumber BASE = 0
+    LOCAL FileExists AS INTEGER
+    FileExists = ISFILE(FileName)
+    IF FileExists THEN
+        OPEN filename FOR BINARY AS filenumber BASE = 0
+        ecode = -1
+    ELSE
+        ecode = 0
+    END IF
 END SUB
 SUB FClose (filenumber AS INTEGER)
     CLOSE filenumber

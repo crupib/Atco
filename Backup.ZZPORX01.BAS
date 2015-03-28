@@ -541,7 +541,8 @@ GLOBAL WaitX AS INTEGER
  GLOBAL glo AS glorecord
 
 FUNCTION PBMAIN
-
+  DIM keyin AS STRING
+  DIM myinput AS STRING
   HdrVer.hdr = "SCU-1.00            "
   ThumbDisk = "C:\UCALS\"
   'set com port numbers & baud
@@ -556,11 +557,11 @@ FUNCTION PBMAIN
   CALL SetTables
 
   'memory line start positions for LCD
-  DIM StartLPos(3) AS BYTE
-  StartLPos(0) = &H0
-  StartLPos(1) = &H40
-  StartLPos(2) = &H14
-  StartLPos(3) = &H54
+'  DIM StartLPos(3) AS BYTE
+' StartLPos(0) = &H0
+'  StartLPos(1) = &H40
+'  StartLPos(2) = &H14
+'  StartLPos(3) = &H54
 
   DIM KeyTable(20) AS STRING
   'new keypad layout
@@ -606,19 +607,15 @@ FUNCTION PBMAIN
   'CALL SetPorts
   'CALL InitDisplay
   '
-  'ClrLCD
+  ClrLCD
 
-  'CALL PrintClrStr(1, 1, "       ATCO         ")
-  'CALL PrintClrStr(2, 1, "MCU-P2000      V1.01")
-  'CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2011")
-  'CALL PrintClrStr(4, 1, " ")
+  CALL PrintClrStr(1, 1, "       ATCO         ")
+  CALL PrintClrStr(2, 1, "MCU-P2000      V1.01")
+  CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2011")
+  CALL PrintClrStr(4, 1, " ")
   CON.CAPTION$ = "Atco Motor controllor MCU-P3000"
   CON.SCREEN = 8,80
-  CON.PRINT "       ATCO         "
-  CON.PRINT "MCU-P3000      V1.00"
-  CON.PRINT "COPYRIGHT 1997- 2015"
-  CON.PRINT " "
- ' CON.WAITSTAT
+
  'for debug with PC Keyboard to exit program
  'This won't work on a pc (pc to fast)
  'I know this is trying to grab the inkey$ will update it to 1000000
@@ -635,15 +632,13 @@ FUNCTION PBMAIN
   '  - check PIC, power on, etc..
   '***********************************************
   IF NOT OpenComPorts THEN
-'    CALL PrintClrStr(4, 1, "ERROR, POWER OFF/ON")
-     CON.PRINT "ERROR, POWER OFF/ON"
+    CALL PrintClrStr(4, 1, "ERROR, POWER OFF/ON")
     DO
     LOOP
   END IF
 
   IF NOT InitNetWork THEN
- '  CALL PrintClrStr(4, 1, "SETUP ERROR")
-    CON.PRINT("Setup Error")
+    CALL PrintClrStr(4, 1, "SETUP ERROR")
     DO
       CALL DelayX(200)
     LOOP UNTIL InitNetWork
@@ -675,82 +670,83 @@ BaseMenu:
 
   GOSUB PrintMainMenu
 
-  CALL SetLcdPos(1, 1)
+  'CALL SetLcdPos(1, 1)
 
-  CALL FlushKeys
+  'CALL FlushKeys
 
   DO
 
-    RowPos = GetLcdRowPos
-    ColPos = GetLcdColPos
+    'RowPos = GetLcdRowPos
+    'ColPos = GetLcdColPos
 
-    IF ColPos < 11 THEN
-
-       SELECT CASE RowPos 'GetLcdRowPos
-         CASE 1  'scan setup
-           CALL PrintChar(1, 1, ">")
-           DO: XCode = GetSelectKey
+   'IF ColPos < 11 THEN
+    IF mykey = 1 THEN       'Setup
+         CALL PrintChar(1, 1, ">")
+         DO: XCode = GetSelectKey
            LOOP UNTIL XCode
-           IF XCode = KeyDN THEN
-         CALL PrintChar(1, 1, " ")
-         SetLcdPos 2, 1
-           ELSEIF XCode = KeyRgt THEN
-         CALL PrintChar(1, 1, " ")
-         SetLcdPos 1, 11
-           ELSEIF XCode = KeyEnter THEN 'do menu
-         GetScanCal
-         GOSUB PrintMainMenu
-         SetLcdPos 1, 1
-           END IF
-         CASE 2  'joystick
-           CALL PrintChar(2, 1, ">")
-           DO: XCode = GetSelectKey
+         IF XCode = KeyDN THEN
+            CALL PrintChar(1, 1, " ")
+            SetLcdPos 2, 1
+         ELSEIF XCode = KeyRgt THEN
+            CALL PrintChar(1, 1, " ")
+            SetLcdPos 1, 11
+         ELSEIF XCode = KeyEnter THEN 'do menu
+            GetScanCal
+            GOSUB PrintMainMenu
+            SetLcdPos 1, 1
+         END IF
+    END IF
+    IF mykey = 2 THEN     'joy stick
+        CALL PrintChar(2, 1, ">")
+        DO: XCode = GetSelectKey
            LOOP UNTIL XCode
-           IF XCode = KeyDN THEN
+         IF XCode = KeyDN THEN
+           CALL PrintChar(2, 1, " ")
+           SetLcdPos 3, 1
+         ELSEIF XCode = KeyUP THEN
+            CALL PrintChar(2, 1, " ")
+            SetLcdPos 1, 1
+         ESEIF XCode = KeyRgt THEN
          CALL PrintChar(2, 1, " ")
-         SetLcdPos 3, 1
-           ELSEIF XCode = KeyUP THEN
-         CALL PrintChar(2, 1, " ")
-         SetLcdPos 1, 1
-           ELSEIF XCode = KeyRgt THEN
-         CALL PrintChar(2, 1, " ")
-         SetLcdPos 2, 11
-           ELSEIF XCode = KeyEnter THEN
-         CALL SetForAuto
-         JogJoyStk
-         GOSUB PrintMainMenu
-         SetLcdPos 2, 1
-           END IF
-         CASE 3 ' Auto Jog
-           CALL PrintChar(3, 1, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyUP THEN
+            SetLcdPos 2, 11
+         ELSEIF XCode = KeyEnter THEN
+            CALL SetForAuto
+            JogJoyStk
+            GOSUB PrintMainMenu
+            SetLcdPos 2, 1
+         END IF
+    END IF
+    IF mykey = 3 THEN    ' Auto Jog
+      CALL PrintChar(3, 1, ">")
+      DO: XCode = GetSelectKey
+         LOOP UNTIL XCode
+      IF XCode = KeyUP THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 2, 1
-           ELSEIF XCode = KeyDN THEN
+       ELSEIF XCode = KeyDN THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 4, 1
-           ELSEIF XCode = KeyRgt THEN
+       ELSEIF XCode = KeyRgt THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 3, 11
-           ELSEIF XCode = KeyEnter THEN 'do menu
+       ELSEIF XCode = KeyEnter THEN 'do menu
          CALL SetForAuto
          JogAuto
          GOSUB PrintMainMenu
          SetLcdPos 3, 1
-           END IF
-         CASE 4 ' Save Setup
-           CALL PrintChar(4, 1, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyUP THEN
+       END IF
+    END IF
+    IF mykey = 4 THEN   ' Save Setup
+       CALL PrintChar(4, 1, ">")
+       DO: XCode = GetSelectKey
+       LOOP UNTIL XCode
+       IF XCode = KeyUP THEN
          CALL PrintChar(4, 1, " ")
          SetLcdPos 3, 1
-           ELSEIF XCode = KeyRgt THEN
+       ELSEIF XCode = KeyRgt THEN
          CALL PrintChar(4, 1, " ")
          SetLcdPos 4, 11
-           ELSEIF XCode = KeyEnter THEN 'save setup
+       ELSEIF XCode = KeyEnter THEN 'save setup
          ClrLCD
          CursorON
          CALL PrintClrStr(1, 1, "SAVE SETUP Y/N:* ")
@@ -762,76 +758,76 @@ BaseMenu:
          END IF
          GOSUB PrintMainMenu
          SetLcdPos 4, 1
-           END IF
-       END SELECT
+       END IF
+    END IF
 
-    ELSE
-
-       SELECT CASE RowPos
-         CASE 1 'begin scan
-           CALL PrintChar(1, 11, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyDN THEN
-         CALL PrintChar(1, 11, " ")
-         SetLcdPos 2, 11
-           ELSEIF XCode = KeyLft THEN
-         CALL PrintChar(1, 11, " ")
-         SetLcdPos 1, 1
-           ELSEIF XCode = KeyEnter THEN 'do menu
-         GOSUB ScanMenu
-         GOSUB PrintMainMenu
-         SetLcdPos 1, 1
-           END IF
-         CASE 2  'XSPD Cntrol
-           CALL PrintChar(2, 11, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyDN THEN
-         CALL PrintChar(2, 11, " ")
-         SetLcdPos 3, 11
-           ELSEIF XCode = KeyUP THEN
-         CALL PrintChar(2, 11, " ")
-         SetLcdPos 1, 11
-           ELSEIF XCode = KeyLft THEN
-         CALL PrintChar(2, 11, " ")
-         SetLcdPos 2, 1
-           ELSEIF XCode = KeyEnter THEN
-         CALL SetForAuto
-         JogXSpd
-         GOSUB PrintMainMenu
-         SetLcdPos 2, 11
-           END IF
-         CASE 3 ' Manual Jog
-           CALL PrintChar(3, 11, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyUP THEN
-         CALL PrintChar(3, 11, " ")
-         SetLcdPos 2, 11
-           ELSEIF XCode = KeyDN THEN
-         CALL PrintChar(3, 11, " ")
-         SetLcdPos 4, 11
-           ELSEIF XCode = KeyLft THEN
-         CALL PrintChar(3, 11, " ")
-         SetLcdPos 3, 1
-           ELSEIF XCode = KeyEnter THEN 'do menu
-         CALL SetForAuto
-         JogMan
-         GOSUB PrintMainMenu
-         SetLcdPos 3, 11
-           END IF
-         CASE 4 ' Load setup
-           CALL PrintChar(4, 11, ">")
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyUP THEN
+    IF mykey = 5 THEN   'begin scan Auto scan
+       CALL PrintChar(1, 11, ">")
+       DO: XCode = GetSelectKey
+         LOOP UNTIL XCode
+       IF XCode = KeyDN THEN
+        CALL PrintChar(1, 11, " ")
+        SetLcdPos 2, 11
+       ELSEIF XCode = KeyLft THEN
+        CALL PrintChar(1, 11, " ")
+        SetLcdPos 1, 1
+       ELSEIF XCode = KeyEnter THEN 'do menu
+        GOSUB ScanMenu
+        GOSUB PrintMainMenu
+        SetLcdPos 1, 1
+       END IF
+    END IF
+    IF mykey = 6 THEN  'XSPD Cntrol
+         CALL PrintChar(2, 11, ">")
+         DO: XCode = GetSelectKey
+          LOOP UNTIL XCode
+         IF XCode = KeyDN THEN
+           CALL PrintChar(2, 11, " ")
+           SetLcdPos 3, 11
+         ELSEIF XCode = KeyUP THEN
+           CALL PrintChar(2, 11, " ")
+           SetLcdPos 1, 11
+         ELSEIF XCode = KeyLft THEN
+           CALL PrintChar(2, 11, " ")
+           SetLcdPos 2, 1
+         ELSEIF XCode = KeyEnter THEN
+           CALL SetForAuto
+           JogXSpd
+           GOSUB PrintMainMenu
+           SetLcdPos 2, 11
+         END IF
+    END IF
+    IF mykey = 7 THEN  ' Manual Jog
+         CALL PrintChar(3, 11, ">")
+         DO: XCode = GetSelectKey
+         LOOP UNTIL XCode
+         IF XCode = KeyUP THEN
+           CALL PrintChar(3, 11, " ")
+           SetLcdPos 2, 11
+         ELSEIF XCode = KeyDN THEN
+           CALL PrintChar(3, 11, " ")
+           SetLcdPos 4, 11
+         ELSEIF XCode = KeyLft THEN
+            CALL PrintChar(3, 11, " ")
+            SetLcdPos 3, 1
+         ELSEIF XCode = KeyEnter THEN 'do menu
+            CALL SetForAuto
+            JogMan
+            GOSUB PrintMainMenu
+            SetLcdPos 3, 11
+         END IF
+    END IF
+    IF mykey = 8 THEN  ' Load setup
+       CALL PrintChar(4, 11, ">")
+       DO: XCode = GetSelectKey
+       LOOP UNTIL XCode
+       IF XCode = KeyUP THEN
          CALL PrintChar(4, 11, " ")
          SetLcdPos 3, 11
-           ELSEIF XCode = KeyLft THEN
+       ELSEIF XCode = KeyLft THEN
          CALL PrintChar(4, 11, " ")
          SetLcdPos 4, 1
-           ELSEIF XCode = KeyEnter THEN 'Load setup
+       ELSEIF XCode = KeyEnter THEN 'Load setup
          ClrLCD
          CursorON
          CALL PrintClrStr(1, 1, "LOAD SETUP Y/N:* ")
@@ -843,21 +839,21 @@ BaseMenu:
          END IF
          GOSUB PrintMainMenu
          SetLcdPos 4, 11
-           END IF
-       END SELECT
+       END IF
     END IF
-
   LOOP
 
 PrintMainMenu:
-
   CALL ClrLCD
-  CALL PrintClrStr(1, 1, " SETUP     AUTOSCAN ")
-  CALL PrintClrStr(2, 1, " JOYSTK    XSPD CTRL")
-  CALL PrintClrStr(3, 1, " A-JOG     M-JOG    ")
-  CALL PrintClrStr(4, 1, " SAVE      LOAD     ")
+  CALL PrintClrStr(0, 0, "Select Option number     ")
+  CALL PrintClrStr(0, 0, "    Select Option number ")
+  CALL PrintClrStr(1, 1, "1. SETUP     5. AUTOSCAN ")
+  CALL PrintClrStr(2, 1, "2. JOYSTK    6. XSPD CTRL")
+  CALL PrintClrStr(3, 1, "3. A-JOG     7. M-JOG    ")
+  CALL PrintClrStr(4, 1, "4. SAVE      8. LOAD     ")
+  CON.WAITKEY$ TO myinput
+  mykey = VAL(myinput)
   RETURN
-
 
 SetDefaults:
   SCANparm.YCtr = 14858 'cts per inch travel
@@ -938,37 +934,36 @@ ScanMenu:
 
   GOSUB PrintScanMenu
 
-  CALL SetLcdPos(1, 1)
+  'CALL SetLcdPos(1, 1)
 
-  CALL FlushKeys
+  'CALL FlushKeys
 
   DO
 
-    RowPos = GetLcdRowPos
-    ColPos = GetLcdColPos
+   ' RowPos = GetLcdRowPos
+   ' ColPos = GetLcdColPos
 
-    IF RowPos = 1 THEN
-
-       SELECT CASE ColPos
-         CASE 1  'Begin Scan
-           CALL PrintChar(1, 1, ">")
-           SetLcdPos 1, 1
-           DO: XCode = GetSelectKey
-           LOOP UNTIL XCode
-           IF XCode = KeyDN THEN
-         CALL PrintChar(1, 1, " ")
-         SetLcdPos 2, 1
-           ELSEIF XCode = KeyRgt THEN
-         CALL PrintChar(1, 1, " ")
-         SetLcdPos 1, 9
-           ELSEIF XCode = KeyEnter THEN 'begin scan
-         DO                     'Added 9/13/11
+   ' IF RowPos = 1 THEN
+   IF mykey = 1 THEN  'Begin Scan
+     CALL PrintChar(1, 1, ">")
+     SetLcdPos 1, 1
+     DO: XCode = GetSelectKey
+        LOOP UNTIL XCode
+     IF XCode = KeyDN THEN
+        CALL PrintChar(1, 1, " ")
+        SetLcdPos 2, 1
+     ELSEIF XCode = KeyRgt THEN
+        CALL PrintChar(1, 1, " ")
+        SetLcdPos 1, 9
+     ELSEIF XCode = KeyEnter THEN 'begin scan
+       DO                     'Added 9/13/11
          LOOP WHILE KeyDown     'problem with key double press
-         FlushKeys
-         GOSUB BeginScan
-         GOSUB PrintScanMenu
-         SetLcdPos 1, 1
-           END IF
+      ' FlushKeys
+       GOSUB BeginScan
+       GOSUB PrintScanMenu
+       SetLcdPos 1, 1
+     END IF
+   END IF
          CASE 9  'Next
            CALL PrintChar(1, 9, ">")
            SetLcdPos 1, 9
@@ -1117,13 +1112,15 @@ ScanMenu:
 
 
 PrintScanMenu:
-  GetXyPos
-  CALL PrintClrStr(1, 1, " BEGIN   NEXT   ALL0")
-  CALL PrintClrStr(2, 1, " XPOS: " + SCANparm.XPosStr)
-  CALL PrintClrStr(3, 1, " YPOS: " + SCANparm.YPosStr)
-  CALL PrintClrStr(4, 1, " APOS: " + SCANparm.APosStr)
+  'GetXyPos
+  CALL ClrLCD
+  CALL PrintClrStr(1, 1, "1. BEGIN   2. NEXT   3. ALL0")
+  CALL PrintClrStr(2, 1, "4. XPOS: " + SCANparm.XPosStr)
+  CALL PrintClrStr(3, 1, "5. YPOS: " + SCANparm.YPosStr)
+  CALL PrintClrStr(4, 1, "6. APOS: " + SCANparm.APosStr)
+  CON.WAITKEY$ TO myinput
+  mykey = VAL(myinput)
   RETURN
-
 
 BeginScan:
   GOSUB Profiler  'make sure scan ok before next scan add or subtract
@@ -1544,8 +1541,8 @@ END FUNCTION
 FUNCTION CalSave (FILENAMEX$)
 
    'CALL FCreate(FILENAMEX$, 0, HANDLE, ECode)
-   CALL FCreate (FILENAMEX$, 0,0, filenum, ECode)
-
+  ' call FCreate (FILENAMEX$, 0,0, filenum, ECode)
+   FCreate (filenumber, 0, FILENAMEX$, ECode)
    IF ECode THEN
      CalSave = FALSE
      EXIT FUNCTION
@@ -1654,8 +1651,8 @@ END SUB
 
 SUB ClrLCD
 
-   CALL StrobeInstr(&H1)    ' clear display
-
+   'CALL StrobeInstr(&H1)    ' clear display
+   CON.CLS
 END SUB
 
 SUB CursorOFF
@@ -3706,11 +3703,33 @@ END SUB
 SUB PrintChar (y, x, char$)
 
 
-    CALL SetLcdPos(y, x) 'position cursor
-    CALL StrobeData(ASC(char$))
+   ' CALL SetLcdPos(y, x) 'position cursor
+   ' CALL StrobeData(ASC(char$))
+   PRINT ASC(char$)
 
 END SUB
 
+SUB PrintClrStr (y, x, Text$)
+
+    YY = y: XX = x
+
+    'CALL SetLcdPos(YY, XX) 'position cursor
+
+    'FOR i = 1 TO LEN(Text$)
+    '  IF XX <= LcdColumns THEN
+    '    CALL StrobeData(ASC(MID$(Text$, i, 1))) 'print the char
+    '    XX = XX + 1
+    '  END IF
+    'NEXT
+
+    'WHILE XX <= LcdColumns ' clear rest of line
+    '  CALL StrobeData(32) 'print spaces
+    '  XX = XX + 1
+    'WEND
+    CON.CLS
+    CON.PRINT Text$
+END SUB
+#IF 0
 SUB PrintClrStr (y, x, Text$)
 
     YY = y: XX = x
@@ -3730,6 +3749,8 @@ SUB PrintClrStr (y, x, Text$)
     WEND
 
 END SUB
+#ENDIF
+
 
 SUB PrintPos
 
@@ -4280,12 +4301,12 @@ SUB SetLcdPos (ROW, COL)
   C = COL - 1: R = ROW - 1
 
   'Sets lcd position to line 'row', column 'col' (if in lcd range)
-  IF ((C < LcdColumns) AND (R < LcdLines)) THEN
-    IF C >= 0 AND R >= 0 THEN
-      CALL StrobeInstr((LcdAddrSet OR StartLPos(R)) + C)
-    END IF
-  END IF
-
+  'IF ((C < LcdColumns) AND (R < LcdLines)) THEN
+  '  IF C >= 0 AND R >= 0 THEN
+  '    CALL StrobeInstr((LcdAddrSet OR StartLPos(R)) + C)
+  '  END IF
+ ' END IF
+ CON.CLS
 END SUB
 
 SUB SetModePos

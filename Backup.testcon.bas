@@ -64,7 +64,11 @@ FUNCTION PBMAIN () AS LONG
     END IF
  NEXT  VV
  CON.WAITKEY$ TO  myinput
- PRINT myinput
+ II = VAL(myinput)
+ IF II = 1 THEN
+     PRINT "Setup"
+ END IF
+
 ' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
  IF ecode = 0 THEN
@@ -88,6 +92,8 @@ FUNCTION PBMAIN () AS LONG
  PRINT hdrrecord.hdr
  PRINT inrecord.id
  PRINT inrecord.Styles
+
+
  WAITSTAT
  END FUNCTION
 

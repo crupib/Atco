@@ -63,7 +63,7 @@ FUNCTION PBMAIN () AS LONG
        END
     END IF
  NEXT  VV
- CON.WAITKEY$ TO  myinput
+ CON.WAITKEY$ TO myinput
  II = VAL(myinput)
  IF II = 1 THEN
      PRINT "Setup"
@@ -92,6 +92,8 @@ FUNCTION PBMAIN () AS LONG
  PRINT hdrrecord.hdr
  PRINT inrecord.id
  PRINT inrecord.Styles
+
+
  WAITSTAT
  END FUNCTION
 

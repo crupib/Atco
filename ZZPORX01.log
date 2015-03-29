@@ -3,5 +3,5 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Error 442 in C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01.BAS(683:007):  THEN expected
-  Line 683:     IF  
+Error 420 in C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01.BAS(1840:028):  Relational operator expected
+  Line 1840:  GetKeys$ = KeyTable(keyNum)  

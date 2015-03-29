@@ -51,6 +51,8 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
+ CON.LOCATE 4, 4
+ CON.PRINT "X"
  'CON.CLS
  'con.input("Hello",II)
  'con.print II

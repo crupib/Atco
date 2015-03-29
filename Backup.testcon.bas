@@ -43,7 +43,7 @@ FUNCTION PBMAIN () AS LONG
  DIM VV AS INTEGER
  DIM GG AS STRING
  DIM myinput AS STRING
-
+ DIM char AS BYTE
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
@@ -51,6 +51,7 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
+ CON.LOCATE 4, 4: PRINT Char$;
  'CON.CLS
  'con.input("Hello",II)
  'con.print II
@@ -63,7 +64,7 @@ FUNCTION PBMAIN () AS LONG
        END
     END IF
  NEXT  VV
- CON.WAITKEY$ TO  myinput
+ CON.WAITKEY$ TO myinput
  II = VAL(myinput)
  IF II = 1 THEN
      PRINT "Setup"

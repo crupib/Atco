@@ -1820,7 +1820,7 @@ FUNCTION GetKeys$
  ELSE
     keyNum = 0
  END IF
- GetKeys$ = KeyTable(KeyNum)
+ GetKeys$ = KeyTable(0)
 
  'get keypad press
  'IF INP(KeyReg) AND &H20 THEN   'keypress

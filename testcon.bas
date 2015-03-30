@@ -43,6 +43,7 @@ FUNCTION PBMAIN () AS LONG
  DIM VV AS INTEGER
  DIM GG AS STRING
  DIM myinput AS STRING
+ DIM aa AS STRING
 
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
@@ -59,6 +60,11 @@ FUNCTION PBMAIN () AS LONG
  'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
+
+ DO
+  aa = INKEY$
+  PRINT aa
+ LOOP UNTIL LEN(aa)
  FOR VV = 1 TO 10000
     GG$ = CON.INKEY$ 'INKEY$
     IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN

@@ -43,7 +43,8 @@ FUNCTION PBMAIN () AS LONG
  DIM VV AS INTEGER
  DIM GG AS STRING
  DIM myinput AS STRING
- DIM char AS BYTE
+ DIM aa AS STRING
+
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
@@ -51,13 +52,19 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
  CON.PRINT "--------------------"
- CON.LOCATE 4, 4: PRINT Char$;
+ CON.LOCATE 4, 4
+ CON.PRINT "X"
  'CON.CLS
  'con.input("Hello",II)
  'con.print II
  'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
+
+ DO
+  aa = INKEY$
+  PRINT aa
+ LOOP UNTIL LEN(aa)
  FOR VV = 1 TO 10000
     GG$ = CON.INKEY$ 'INKEY$
     IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN

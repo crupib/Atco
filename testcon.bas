@@ -32,11 +32,11 @@ DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS mytype , OFFSET AS INTEGER,
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
-
+DECLARE FUNCTION GetKeys$
 GLOBAL myrecord AS HEADER
 GLOBAL inrecord AS mytype
 GLOBAL hdrrecord AS HEADER
-
+GLOBAL  KeyTable() AS STRING
 
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
@@ -44,7 +44,29 @@ FUNCTION PBMAIN () AS LONG
  DIM GG AS STRING
  DIM myinput AS STRING
  DIM aa AS STRING
-
+ DIM KeyTable(20) AS STRING
+  'new keypad layout
+  KeyTable(0) = ""
+  KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
+  KeyTable(2) = CHR$(0) + CHR$(75) 'LftArrow
+  KeyTable(3) = CHR$(0) + CHR$(80) 'DnArrow
+  KeyTable(4) = CHR$(0) + CHR$(72) 'UpArrow
+  KeyTable(5) = CHR$(13)           'Ent
+  KeyTable(6) = CHR$(32)           'Space
+  KeyTable(7) = CHR$(8)            'BkSpace
+  KeyTable(8) = CHR$(27)           'ESC
+  KeyTable(9) = CHR$(46)           '.
+  KeyTable(10) = CHR$(57)          '9
+  KeyTable(11) = CHR$(54)          '6
+  KeyTable(12) = CHR$(51)          '3
+  KeyTable(13) = CHR$(48)          '0
+  KeyTable(14) = CHR$(56)          '8
+  KeyTable(15) = CHR$(53)          '5
+  KeyTable(16) = CHR$(50)          '2
+  KeyTable(17) = CHR$(46)          '.
+  KeyTable(18) = CHR$(55)          '7
+  KeyTable(19) = CHR$(52)          '4
+  KeyTable(20) = CHR$(49)          '1
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
  CON.SCREEN = 8,80
@@ -54,17 +76,20 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "--------------------"
  CON.LOCATE 4, 4
  CON.PRINT "X"
+' con.print KeyTable(1)
+ 'gg = keyTable(10)
  'CON.CLS
  'con.input("Hello",II)
  'con.print II
  'con.scroll.up(4)
  PICPort  =  "\\.\COM31"
  PICBaud = 19200
-
- DO
-  aa = INKEY$
-  PRINT aa
- LOOP UNTIL LEN(aa)
+ CON.PRINT gg
+ gg = GetKeys$
+' DO
+'  aa = INKEY$
+'  PRINT aa
+' LOOP UNTIL LEN(aa)
  FOR VV = 1 TO 10000
     GG$ = CON.INKEY$ 'INKEY$
     IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN
@@ -172,3 +197,15 @@ END SUB
 SUB FClose (filenumber AS INTEGER)
     CLOSE filenumber
 END SUB
+FUNCTION GetKeys$
+ LOCAL keynum AS INTEGER
+ LOCAL keybuff AS STRING
+ Keybuff = INKEY$
+ IF LEN(Keybuff)THEN
+    KeyNum = VAL(keybuff)
+ ELSE
+    keyNum = 0
+ END IF
+ GetKeys$ = KeyTable(KeyNum)
+
+END FUNCTION

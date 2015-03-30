@@ -507,6 +507,7 @@ CONST HomeFlagMask = &HFE0F
 
  GLOBAL filenum AS INTEGER
  GLOBAL HdrVer AS STRING * 20
+ GLOBAL KeyTable() AS STRING
 FUNCTION PBMAIN
   DIM HdrVer AS STRING * 20
   HdrVer = "SCU-1.00            "
@@ -556,7 +557,7 @@ FUNCTION PBMAIN
   StartLPos(2) = &H14
   StartLPos(3) = &H54
 
-  DIM  KeyTable(20) AS STRING
+
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -1813,6 +1814,7 @@ SUB GetAD
 END SUB
 
 FUNCTION GetKeys$
+
  LOCAL keybuff AS STRING
  Keybuff = INKEY$
  IF LEN(Keybuff)THEN
@@ -1820,7 +1822,8 @@ FUNCTION GetKeys$
  ELSE
     keyNum = 0
  END IF
- GetKeys$ = KeyTable(0)
+
+ GetKeys$ = KeyTable(KeyNum)
 
  'get keypad press
  'IF INP(KeyReg) AND &H20 THEN   'keypress
@@ -1840,7 +1843,9 @@ END FUNCTION
 
 FUNCTION GetLcdColPos
   'REMED
-  GetLcdColPos = POS(0)
+  DIM junk AS INTEGER
+'  GetLcdColPos = POS(0)
+  GetLcdColPos = GRAPHIC(POS.X)
   EXIT FUNCTION
   Position = GetLcdMemPos
 
@@ -1859,18 +1864,18 @@ END FUNCTION
 FUNCTION GetLcdMemPos
 
   'Get the present row & col (mem) position of the cursor
-  OUT LcdModeReg, DataPortIn 'set data port as input
-  CALL ddelay(D20)
-  OUT BitReg, LcdPos 'test busy flag & get mem position
-  CALL ddelay(D20)
+ ' OUT LcdModeReg, DataPortIn 'set data port as input
+ ' CALL ddelay(D20)
+ ' OUT BitReg, LcdPos 'test busy flag & get mem position
+ ' CALL ddelay(D20)
+ '
+ ' GetLcdMemPos = INP(LcdReg)
 
-  GetLcdMemPos = INP(LcdReg)
-
-  WHILE (INP(LcdReg) AND BusyFlag)  'loop while BF=1
-  WEND
-  OUT BitReg, DataStbOff
-  OUT LcdModeReg, DataPortOut
-  CALL ddelay(D20)
+  'WHILE (INP(LcdReg) AND BusyFlag)  'loop while BF=1
+ ' WEND
+  'OUT BitReg, DataStbOff
+ ' OUT LcdModeReg, DataPortOut
+ ' CALL ddelay(D20)
 
   EXIT FUNCTION
 
@@ -2792,33 +2797,33 @@ END SUB
 SUB InitDisplay
 
   'Sets up lcd display and 8255
-  OUT LcdModeReg, DataPortOut  ' set port as output
-  CALL StrobeInstr(&H1)    ' clear display
-  CALL StrobeInstr(&H38)   ' function set
+  'OUT LcdModeReg, DataPortOut  ' set port as output
+  'CALL StrobeInstr(&H1)    ' clear display
+  'CALL StrobeInstr(&H38)   ' function set
                 ' b7,b6 = 0, b5 = 1
                 ' b4, DL = 1   (8 bit data)
                 ' b3, N = 1    (4 lines)
                 ' b2, F = 0    (5 x 7 char font)
                 ' b1,b0 = 0    (dont care)
-  CALL StrobeInstr(&HC)    ' turn on display and cursor
+  'CALL StrobeInstr(&HC)    ' turn on display and cursor
                 ' b7-b4 = 0, b3 = 1
                 ' b2, D = 1    (display on)
                 ' b1, C = 0    (cursor off)
                 ' b0, B = 0    (blink off)
-  CALL StrobeInstr(&H6)    ' set entry mode increment right
+  'CALL StrobeInstr(&H6)    ' set entry mode increment right
                 ' b7-b3 = 0, b2 = 1
                 ' b1, I/D = 1  (increment)
                 ' b0, S = 0    (shift off)
 
-   CALL StrobeInstr(&H40)   ' set cg ram address
-   CALL StrobeData(&H0)     ' 1 row
-   CALL StrobeData(&H10)    ' 2 row
-   CALL StrobeData(&H8)     ' 3 row
-   CALL StrobeData(&H4)     ' 4 row
-   CALL StrobeData(&H2)     ' 5 row
-   CALL StrobeData(&H1)     ' 6 row
-   CALL StrobeData(&H0)     ' 7 row
-   CALL StrobeData(&H0)     ' 8 row
+   'CALL StrobeInstr(&H40)   ' set cg ram address
+   'CALL StrobeData(&H0)     ' 1 row
+   'CALL StrobeData(&H10)    ' 2 row
+   'CALL StrobeData(&H8)     ' 3 row
+   ''CALL StrobeData(&H4)     ' 4 row
+   'CALL StrobeData(&H2)     ' 5 row
+   'CALL StrobeData(&H1)     ' 6 row
+   'CALL StrobeData(&H0)     ' 7 row
+   'CALL StrobeData(&H0)     ' 8 row
 
 END SUB
 
@@ -2866,7 +2871,7 @@ FUNCTION InitNetWork
   'start network
 
   'flush the input buffer
-  CALL FlushBuffers(PICPort, 0, ECode)
+  CALL FlushBuffers(comport$, 0, ECode%)
 
   Glo.SIOErrorMode = DoNothing
 

@@ -3,5 +3,5 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Error 421 in C:\Users\crupib\Documents\GitHub\Atco\ZZPORX01_update.BAS(1823:023):  String operand expected
-  Line 1823:  GetKeys$ = KeyTable(0)  
+Error 480 in C:\Users\crupib\Documents\GitHub\Atco\ZZPORX01_update.BAS(3305:023):  Parameter mismatches definition
+  Line 3305:      PrintStr y, x, s$  

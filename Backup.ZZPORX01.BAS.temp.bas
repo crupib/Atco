@@ -479,6 +479,21 @@ CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
+GLOBAL filenum AS INTEGER
+GLOBAL HdrVer AS HEADER
+GLOBAL SCANPARAMS AS header
+GLOBAL nComm   AS LONG
+GLOBAL ThumbDisk AS STRING * 2
+  'COM PORTS
+GLOBAL RecvSize AS LONG
+GLOBAL XmitSize AS LONG
+GLOBAL MemSize AS LONG
+ ' GLOBAL PICPort AS INTEGER
+GLOBAL PICPort AS STRING
+GLOBAL PICBaud AS LONG
+  'delay timer
+GLOBAL DelayCtr AS LONG
+GLOBAL WaitX AS INTEGER
 
  'DIM SHARED Glo AS GLOBAL
   TYPE glorecord
@@ -524,21 +539,6 @@ CONST HomeFlagMask = &HFE0F
    SyncCounter AS LONG
  END TYPE
  GLOBAL glo AS glorecord
- GLOBAL filenum AS INTEGER
- GLOBAL HdrVer AS HEADER
- GLOBAL SCANPARAMS AS header
- GLOBAL nComm   AS LONG
- GLOBAL ThumbDisk AS STRING * 2
-  'COM PORTS
- GLOBAL RecvSize AS LONG
- GLOBAL XmitSize AS LONG
- GLOBAL MemSize AS LONG
- ' GLOBAL PICPort AS INTEGER
- GLOBAL PICPort AS STRING
- GLOBAL PICBaud AS LONG
-  'delay timer
- GLOBAL DelayCtr AS LONG
- GLOBAL WaitX AS INTEGER
 
 FUNCTION PBMAIN
   DIM keyin AS STRING
@@ -1836,7 +1836,7 @@ LOCAL KeyNum AS STRING
 '   KeyNum = 0            'return no keypress
 ' END IF
  CON.WAITKEY$ TO KeyNum
- GetKeys$ = KeyTable(keyNum)
+ GetKeys$ = KeyTable(CHR$(keyNum))
 
 END FUNCTION
 

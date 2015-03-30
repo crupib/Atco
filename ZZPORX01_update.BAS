@@ -1,13 +1,107 @@
+
 #COMPILE EXE
 #COMPILER PBCC 6
 
+' The resource gives the EXE program the "hello" icon in Explorer,
+' and provides it with Windows version information.
 #RESOURCE ICON, 100, "Atco.ico"
 #RESOURCE VERSIONINFO
 #RESOURCE FILEVERSION 6, 0, 0, 0
 #RESOURCE PRODUCTVERSION 6, 0, 0, 0
 DEFINT A-Z
 
-TYPE ScanPrams
+REM new RS232 PC compatible
+DECLARE SUB SetIRQ (ComPortNum$, IRQ%, ECode%)
+DECLARE SUB SetPortAddr (ComPortNum$, PortAddress%, ECode%)
+'DECLARE SUB CloseCommPort (ComPortNum$, ECode%)
+DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
+DECLARE SUB CommError (ComPortNum$, ECode%)
+DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
+DECLARE SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
+DECLARE SUB LineStatus (ComPortNum$, Cts%, DSR%, CD%, RI%, ECode%)
+DECLARE SUB GetDTRState (ComPortNum$, DTRState%, ECode%)
+DECLARE SUB GetRTSState (ComPortNum$, DTRState%, ECode%)
+DECLARE SUB SetDTRSignal (ComPortNum$, DTRState%, ECode%)
+DECLARE SUB SetRTSSignal (ComPortNum$, DTRState%, ECode%)
+DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
+DECLARE SUB SetFlowControl (ComPortNum$, InFlow%, OutFlow%, InMin%, InMax%, XonChar%, XoffChar%, ECode%)
+DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
+DECLARE SUB ChangeCommSettings (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
+DECLARE SUB OpenCommPort (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
+DECLARE SUB UARTType (ComPortNum$, UART%, ECode%)
+DECLARE SUB SetFIFOTriggerLevel (ComPortNum$, TriggerLevel%, ECode%)
+DECLARE SUB CalcRequiredMem (PortSeg%, PortOfs%, RecvSeg%, RecvOfs%, XmitSeg%, XmitOfs%, NumPorts%, MemSize&, ECode%)
+DECLARE SUB InitCommBuffers (ECode%)
+DECLARE SUB DeleteCommBuffers (ECode%)
+DECLARE SUB InitSharedHandler (PortSeg%, PortOfs%, NumPorts%, IRQ%, StatusRegisterAddr%, ECode%)
+
+'REM new routines for Joe Loyd Drive
+DECLARE SUB LoadInfo ()
+DECLARE SUB SaveInfo ()
+DECLARE SUB KeyWait ()
+DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
+DECLARE FUNCTION GetDiskFile$ (FSpec$)
+'DECLARE FUNCTION CheckDisk (DataDir, Drv$, WriteLen&, FileNumber$)
+
+'motor soft controls
+DECLARE FUNCTION GetXCord& (Cts&)
+DECLARE FUNCTION ProfileScan ()
+DECLARE SUB ReSetMotors ()
+DECLARE SUB SetForAuto ()
+DECLARE FUNCTION GetYCord& (Cts&)
+
+DECLARE FUNCTION DoX (AbsPos&)
+DECLARE FUNCTION DoY (AbsPosY&)
+
+DECLARE SUB MoveXVel (dir)
+DECLARE SUB MoveYVel (dir)
+DECLARE SUB PrintPos ()
+
+'new x-ray
+'added from probas lib 7.1
+DECLARE FUNCTION GetTick& ()
+DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
+DECLARE SUB Strip (A$)   'pro basic
+DECLARE SUB Delay18th (MiniDelay)
+DECLARE FUNCTION DosInky$ ()
+DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAtrr)
+DECLARE FUNCTION DirNext ()
+DECLARE FUNCTION DirFileName$ ()
+
+'REM J.L. added from probas lib 7.1
+DECLARE FUNCTION LVal& (St$)
+DECLARE FUNCTION StrRChr (St$, BYVAL SrchChar)
+DECLARE SUB StripChar (St$, Ch$, SLen%)
+DECLARE SUB CRC2 (Rec$, HiCRC%, LowCRC%)
+DECLARE FUNCTION GetTick& ()
+DECLARE FUNCTION FarPeek (BYVAL DSeg, BYVAL DOfs)
+DECLARE SUB FarPoke (BYVAL DSeg, BYVAL DOfs, BYVAL PVal)
+DECLARE SUB ShiftR (Value, COUNT)
+DECLARE SUB ShiftL (Value, COUNT)
+DECLARE FUNCTION GetByte (DSeg, DOfs)
+DECLARE SUB PutByte (DSeg, DOfs, PVal)
+DECLARE SUB BiosInKey (AscCode, ScanCode)
+DECLARE FUNCTION GetKeyQ (AscCode, ScanCode)
+DECLARE FUNCTION DosInky$ ()
+DECLARE FUNCTION CheckDsk (Drv$)
+DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
+DECLARE SUB Strip (A$)   'pro basic
+DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAttrib%)
+DECLARE FUNCTION DirNext ()
+DECLARE FUNCTION DirFileName$ ()
+DECLARE FUNCTION DirFileSize& ()
+'DECLARE SUB SCROLL (Ulr, Ulc, Lrr, Lrc, Tnum)
+DECLARE FUNCTION CalcAttr2% (FORE, BACK)
+DECLARE SUB IPtrSort (DSeg, DOfs1, DSeg2, DOfs2, Elements)
+DECLARE SUB InitPtr (DSeg, DOfs, COUNT)
+DECLARE SUB SFRead2 (HANDLE, St$, BR, ECode)
+DECLARE SUB SFWrite (HANDLE, St$, BW, ECode)
+DECLARE SUB ClrKbd ()
+DECLARE SUB Delay18th (MiniDelay)
+DECLARE FUNCTION SETDRV (Drv$)
+DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
+
+TYPE ScanParms
    YCtr          AS SINGLE       'YCts/inch
    XCtr          AS SINGLE       'XCts/inch
    ACtr          AS SINGLE       'Aux Enc Cts/inch
@@ -87,169 +181,31 @@ TYPE ScanPrams
    NextFlagSTR AS STRING * 10
    AutoHoldSTR AS STRING * 10
   END TYPE
-  GLOBAL SCANparm AS ScanPrams
-
-  TYPE glorecord
-   NumModules AS INTEGER
-   StatusDef(5) AS INTEGER
-   ModuleType(5) AS INTEGER
-   ModuleVer(5) AS INTEGER
-   Position(5) AS LONG
-   CmdPosition(5) AS LONG
-   HomePosition(5) AS LONG
-   velocity(5) AS INTEGER
-   CmdVelocity(5) AS LONG
-   CmdAccel(5) AS LONG
-   CmdPwm(5) AS INTEGER 'LONG
-   AdVal(5) AS INTEGER
-   Stat(5) AS INTEGER
-   AuxStat(5) AS INTEGER
-   Kp(5) AS INTEGER
-   Ki(5) AS INTEGER
-   Kd(5) AS INTEGER
-   IL(5) AS INTEGER
-   ol(5) AS INTEGER
-   CL(5) AS INTEGER
-   EL(5) AS INTEGER
-   SRD(5) AS INTEGER
-   MiscMode(5) AS INTEGER
-   SIOErrorMode AS INTEGER
-   SIOError AS INTEGER
-   CkSumError AS INTEGER
-   SIOPort AS INTEGER
-   AmpQuery AS INTEGER
-   PowerQuery AS INTEGER
-   baud AS LONG
-   'added for PIC-IO
-   IO1 AS INTEGER
-   IO2 AS INTEGER
-   Ad1 AS INTEGER
-   Ad2 AS INTEGER
-   Ad3 AS INTEGER
-   Counter AS LONG
-   SyncIO1 AS INTEGER
-   SyncIO2 AS INTEGER
-   SyncCounter AS LONG
- END TYPE
- GLOBAL glo AS glorecord
+  GLOBAL SCANstruc AS scanparms
 
 TYPE HEADER
-  hdr AS STRING * 20
-END TYPE
-
-'//////////////////////////////////////////////////////////////////
-REM new RS232 PC compatible
-'//////////////////////////////////////////////////////////////////
-'DECLARE SUB SetIRQ (ComPortNum%, IRQ%, ECode%)
-'DECLARE SUB SetPortAddr (ComPortNum%, PortAddress%, ECode%)
-'DECLARE SUB CloseCommPort (ComPortNum%, ECode%)
-DECLARE SUB CommError (ComPortNum%, ECode%)
-DECLARE FUNCTION OpenComPorts ()
-'DECLARE SUB FlushBuffers (ComPortNum%, WhichBuffer%, ECode%)
-DECLARE SUB FlushBuffers (PICPort AS STRING, zero AS INTEGER, ECode AS INTEGER)
-DECLARE SUB GetCharsInBuffer (PICPort AS STRING, RecvQue AS STRING, XmitQue AS INTEGER, ECode)
-DECLARE SUB LineStatus (ComPortNum%, Cts%, DSR%, CD%, RI%, ECode%)
-DECLARE SUB GetDTRState (ComPortNum%, DTRState%, ECode%)
-DECLARE SUB GetRTSState (ComPortNum%, DTRState%, ECode%)
-DECLARE SUB SetDTRSignal (ComPortNum%, DTRState%, ECode%)
-DECLARE SUB SetRTSSignal (ComPortNum%, DTRState%, ECode%)
-DECLARE SUB ReadFromComm (ComPortNum%, ReadBuffer$, BytesRead%, ECode%)
-DECLARE SUB SetFlowControl (ComPortNum%, InFlow%, OutFlow%, InMin%, InMax%, XonChar%, XoffChar%, ECode%)
-'DECLARE SUB WriteToComm (ComPortNum%, WriteBuffer$, BytesWritten%, ECode%)
-DECLARE SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
-DECLARE SUB ChangeCommSettings (ComPortNum%, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
-'DECLARE SUB OpenCommPort (ComPortNum%, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
-DECLARE SUB UARTType (ComPortNum%, UART%, ECode%)
-DECLARE SUB SetFIFOTriggerLevel (ComPortNum%, TriggerLevel%, ECode%)
-DECLARE SUB CalcRequiredMem (PortSeg%, PortOfs%, RecvSeg%, RecvOfs%, XmitSeg%, XmitOfs%, NumPorts%, MemSize&, ECode%)
-DECLARE SUB InitCommBuffers (ECode%)
-DECLARE SUB DeleteCommBuffers (ECode%)
-DECLARE SUB InitSharedHandler (PortSeg%, PortOfs%, NumPorts%, IRQ%, StatusRegisterAddr%, ECode%)
-DECLARE SUB CloseCommPort (comport AS STRING, ecode AS INTEGER)
-
-'REM new routines for Joe Loyd Drive
-DECLARE SUB LoadInfo ()
-DECLARE SUB SaveInfo ()
-DECLARE SUB KeyWait ()
-DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
-DECLARE FUNCTION GetDiskFile$ (FSpec$)
-'DECLARE FUNCTION CheckDisk (DataDir, Drv$, WriteLen&, FileNumber$)
-
-'motor soft controls
-DECLARE FUNCTION GetXCord& (Cts&)
-DECLARE FUNCTION ProfileScan ()
-DECLARE SUB ReSetMotors ()
-DECLARE SUB SetForAuto ()
-DECLARE FUNCTION GetYCord& (Cts&)
-
-DECLARE FUNCTION DoX (AbsPos&)
-DECLARE FUNCTION DoY (AbsPosY&)
-
-DECLARE SUB MoveXVel (dir)
-DECLARE SUB MoveYVel (dir)
-DECLARE SUB PrintPos ()
-
-'new x-ray
-'added from probas lib 7.1
-DECLARE FUNCTION GetTick& ()
-DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
-DECLARE SUB Strip (A$)   'pro basic
-DECLARE SUB Delay18th (MiniDelay)
-DECLARE FUNCTION DosInky$ ()
-DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAtrr)
-DECLARE FUNCTION DirNext ()
-DECLARE FUNCTION DirFileName$ ()
-
-'REM J.L. added from probas lib 7.1
-DECLARE FUNCTION LVal& (St$)
-DECLARE FUNCTION StrRChr (St$, BYVAL SrchChar)
-DECLARE SUB StripChar (St$, Ch$, SLen%)
-DECLARE SUB CRC2 (Rec$, HiCRC%, LowCRC%)
-DECLARE FUNCTION GetTick& ()
-DECLARE FUNCTION FarPeek (BYVAL DSeg, BYVAL DOfs)
-DECLARE SUB FarPoke (BYVAL DSeg, BYVAL DOfs, BYVAL PVal)
-DECLARE SUB ShiftR (Value, COUNT)
-DECLARE SUB ShiftL (Value, COUNT)
-DECLARE FUNCTION GetByte (DSeg, DOfs)
-DECLARE SUB PutByte (DSeg, DOfs, PVal)
-DECLARE SUB BiosInKey (AscCode, ScanCode)
-DECLARE FUNCTION GetKeyQ (AscCode, ScanCode)
-DECLARE FUNCTION DosInky$ ()
-DECLARE FUNCTION CheckDsk (Drv$)
-DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
-DECLARE SUB Strip (A$)   'pro basic
-DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAttrib%)
-DECLARE FUNCTION DirNext ()
-DECLARE FUNCTION DirFileName$ ()
-DECLARE FUNCTION DirFileSize& ()
-'DECLARE SUB SCROLL (Ulr, Ulc, Lrr, Lrc, Tnum)
-DECLARE FUNCTION CalcAttr2% (FORE, BACK)
-DECLARE SUB IPtrSort (DSeg, DOfs1, DSeg2, DOfs2, Elements)
-DECLARE SUB InitPtr (DSeg, DOfs, COUNT)
-DECLARE SUB SFRead2 (HANDLE, St$, BR, ECode)
-DECLARE SUB SFWrite (HANDLE, St$, BW, ECode)
-DECLARE SUB ClrKbd ()
-DECLARE SUB Delay18th (MiniDelay)
-DECLARE FUNCTION SETDRV (Drv$)
-DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
-
-
+   hdr AS STRING * 20
+ END TYPE
 'new Si
-DECLARE FUNCTION CalSave (FILENAME$)
+DECLARE FUNCTION CalSave (FILENAMEX$)
 DECLARE FUNCTION CalLoad (FileNumber$)
-
 DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-DECLARE SUB DFRead2 (filenum AS INTEGER, passrec AS ScanPrams , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFRead2 (filenum AS INTEGER, passrec AS ScanParms , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
-DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS ScanPrams , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS ScanParms , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
 
+'DECLARE SUB FCreate (FileNumber$, ATTR, HANDLE, ECode)
+'DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, HANDLE, ECode)
+'DECLARE SUB FClose (HANDLE)
+'DECLARE SUB DFWrite (HANDLE, DSeg, DOfs, BYTES&, BytesWrote&, ECode)
+'DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
 DECLARE FUNCTION Exist2 (FileNumber$)
 
 REM 'added from crescent
-'DECLARE FUNCTION Ascii (any$)
+'DECLARE FUNCTION Ascii (ANY$)
 DECLARE FUNCTION FUsing$ (Num$, Image$)
 'DECLARE SUB InitInt (SEG segm, Value, NumEls)
 'DECLARE SUB ISortI (SEG segm1, SEG segm2, NumEls, diri)
@@ -281,11 +237,12 @@ DECLARE FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
 DECLARE SUB StopMtrs ()
 DECLARE SUB FixSIOerror ()
 DECLARE SUB KEdit (Edit$, ExitCode)
-DECLARE SUB AlphaNumIN (EditStr AS STRING, ExitCode AS INTEGER)
+DECLARE SUB AlphaNumIN (Edit$, ExitCode)
 DECLARE FUNCTION DelayFact& ()
 
 DECLARE SUB GetScanCal ()
 
+DECLARE FUNCTION OpenComPorts ()
 DECLARE SUB CalEncoder (YXAxis)
 DECLARE SUB ManYRGT ()
 DECLARE SUB ManXUP ()
@@ -338,8 +295,8 @@ DECLARE SUB SetPorts ()
 DECLARE FUNCTION GetLcdMemPos ()
 DECLARE SUB CursorON ()
 DECLARE SUB CursorOFF ()
-
 MACRO CONST = MACRO
+
 CONST D10 = 150   ' ~ 1 usec (compiled code) x10 uncompiled
 CONST D20 = 500   ' ~ 3 usec
 CONST D50 = 1000  ' ~ 6 usec
@@ -374,13 +331,14 @@ CONST LcdAddress = &H7F
 CONST LcdAddrSet = &H80
 
 'miss const values
+'CONST TRUE = -1, FALSE = NOT TRUE, gain = 0, NegDir = 0, PosDir = -1
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
 CONST gain = 0
 CONST NegDir = 0
 CONST PosDir = -1
-
 'Number of servos in system, change as needed.
+'CONST Servo1 = 1, Servo2 = 2, Servo3 = 3, Servo4 = 4, AllServos = &HFF, LastServo = 4
 CONST Servo1 = 1
 CONST Servo2 = 2
 CONST Servo3 = 3
@@ -389,7 +347,10 @@ CONST AllServos = &HFF
 CONST LastServo = 4
 CONST InOut1 = 5
 
+
 'Key codes
+'CONST KeyUP = 72, KeyDN = 80, KeyLft = 75, KeyRgt = 77
+'CONST KeyBKSPC = 8, KeySPC = 32, KeyEnter = 13, KeyEsc = 27
 CONST KeyUP = 72
 CONST KeyDN = 80
 CONST KeyLft = 75
@@ -399,16 +360,20 @@ CONST KeySPC = 32
 CONST KeyEnter = 13
 CONST KeyEsc = 27
 
+
+
 'Sio error mode difinitions
+'CONST DoNothing = 0, ErrorBox = 1, AbortCom = 2, ExitProgram = 3
 CONST DoNothing = 0
 CONST ErrorBox = 1
 CONST AbortCom = 2
 CONST ExitProgram = 3
-
 'Module type definitions
 CONST PicServoType = 0
 
 'Status definitions bits for servo
+'CONST SendPos = 1, SendAD = 2, SendVel = 4, SendAux = 8
+'CONST SendHome = 16, SendID = 32
 CONST SendPos = 1
 CONST SendAD = 2
 CONST SendVel = 4
@@ -416,7 +381,10 @@ CONST SendAux = 8
 CONST SendHome = 16
 CONST SendID = 32
 
+
 'Status definitions bits for io (SendID is shared with PIC)
+'CONST SendIO = 1, SendAD1 = 2, SendAD2 = 4, SendAD3 = 8
+'CONST SendCtr = 16, SendSyncIO = 64, SendSyncCtr = 128
 CONST SendIO = 1
 CONST SendAD1 = 2
 CONST SendAD2 = 4
@@ -426,6 +394,8 @@ CONST SendSyncIO = 64
 CONST SendSyncCtr = 128
 
 'Load Trajectory control byte
+'CONST LoadPos = 1, LoadVel = 2, LoadAcc = 4, LoadPWM = 8, PosMode = 16
+'CONST VelMode = 32, RevDir = 64, StartNow = 128, PWMMode = 0'PWM added KJL
 CONST LoadPos = 1
 CONST LoadVel = 2
 CONST LoadAcc = 4
@@ -435,21 +405,23 @@ CONST VelMode = 32
 CONST RevDir = 64
 CONST StartNow = 128
 CONST PWMMode = 0 'PWM added KJL
-
 'Stop control byte
+'CONST EnableAmp = 1, MotorOff = 2, StopAbrupt = 5, StopSmooth = 9
 CONST EnableAmp = 1
 CONST MotorOff = 2
 CONST StopAbrupt = 5
 CONST StopSmooth = 9
-
 'Homing control byte
+'CONST HomeOnLimit1 = 1, HomeOnLimit2 = 2, HomeOnIndex = 8, HomeOnPerr = 64
+'CONST HomeOnCerr = 128
 CONST HomeOnLimit1 = 1
 CONST HomeOnLimit2 = 2
 CONST HomeOnIndex = 8
 CONST HomeOnPerr = 64
 CONST HomeOnCerr = 128
-
 'Status byte
+'CONST MoveDone = 1, CksumErr = 2, OverCurrent = 4, PowerOn = 8, PosError = 16
+'CONST Limit1 = 32, Limit2 = 64, HomeInProg = 128
 CONST MoveDone = 1
 CONST CksumErr = 2
 CONST OverCurrent = 4
@@ -460,13 +432,20 @@ CONST Limit2 = 64
 CONST HomeInProg = 128
 
 'Auxiliary status byte
+'CONST IndexPulse = 1, PositionWrap = 2, ServoOn = 4, AccelDone = 8
+'CONST SlewDone = 16, ServoOverrun = 32
 CONST IndexPulse = 1
 CONST PositionWrap = 2
 CONST ServoOn = 4
-CONST  AccelDone = 8
+CONST AccelDone = 8
 CONST SlewDone = 16
 CONST ServoOverrun = 32
 
+
+'MiscMode bit definitions
+'CONST AmpEnabled = 1, PWMSelected = 2, VelSelected = 4, PosSelected = 8
+'CONST OnL1Selected = 16, OnL2Selected = 32, OnIndexSelected = 64
+'CONST OnPeSelected = 128, OnCeSelected = 256, HomeFlagMask = &HFE0F
 'MiscMode bit definitions
 CONST AmpEnabled = 1
 CONST PWMSelected = 2
@@ -480,7 +459,7 @@ CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
 
- 'DIM SHARED Glo AS GLOBAL
+
   TYPE glorecord
    NumModules AS INTEGER
    StatusDef(5) AS INTEGER
@@ -524,46 +503,60 @@ CONST HomeFlagMask = &HFE0F
    SyncCounter AS LONG
  END TYPE
  GLOBAL glo AS glorecord
- GLOBAL filenum AS INTEGER
- GLOBAL HdrVer AS HEADER
- GLOBAL SCANPARAMS AS header
- GLOBAL nComm   AS LONG
- GLOBAL ThumbDisk AS STRING * 2
-  'COM PORTS
- GLOBAL RecvSize AS LONG
- GLOBAL XmitSize AS LONG
- GLOBAL MemSize AS LONG
- ' GLOBAL PICPort AS INTEGER
- GLOBAL PICPort AS STRING
- GLOBAL PICBaud AS LONG
-  'delay timer
- GLOBAL DelayCtr AS LONG
- GLOBAL WaitX AS INTEGER
 
+
+ GLOBAL filenum AS INTEGER
+ GLOBAL HdrVer AS STRING * 20
 FUNCTION PBMAIN
-  DIM keyin AS STRING
-  DIM myinput AS STRING
-  HdrVer.hdr = "SCU-1.00            "
-  ThumbDisk = "C:\UCALS\"
+  DIM HdrVer AS STRING * 20
+  HdrVer = "SCU-1.00            "
+  DIM ThumbDisk AS STRING * 2
+  ThumbDisk = "A:\UCALS\"
+
+  'COM PORTS
+  DIM  RecvSize AS LONG
+  DIM  XmitSize AS LONG
+  DIM  MemSize AS LONG
+  DIM  PICPort AS STRING
+  DIM  PICBaud AS LONG
+
+  'delay timer
+  DIM  DelayCtr AS LONG
+  DIM  WaitX AS INTEGER
+
   'set com port numbers & baud
- ' PICPort = 1
-  PICPort  =  "\\.\COM31"
+  PICPort ="\\.\COM31"
   PICBaud = 19200
 
   DelayCtr = DelayFact
   WaitX = 1   'delay used in comm
 
+  'joystick to pwm conversion table
+  DIM  LF(0 TO 255)
+  DIM  LU(0 TO 255)
+  DIM  Corr1(0 TO 255)
+  DIM  Corr2(0 TO 255)
+
+  'Vel & Accel pot tables
+  DIM  XVel(255) AS LONG
+  DIM  YVel(255) AS LONG
+  DIM  XAcel(255) AS LONG
+  DIM  YAcel(255) AS LONG
+
+  'Speed Control tables
+  DIM  XSpd(0 TO 255)
+  DIM  YSpd(0 TO 255)
 
   CALL SetTables
 
   'memory line start positions for LCD
-'  DIM StartLPos(3) AS BYTE
-' StartLPos(0) = &H0
-'  StartLPos(1) = &H40
-'  StartLPos(2) = &H14
-'  StartLPos(3) = &H54
+  DIM  StartLPos(3)
+  StartLPos(0) = &H0
+  StartLPos(1) = &H40
+  StartLPos(2) = &H14
+  StartLPos(3) = &H54
 
-  DIM KeyTable(20) AS STRING
+  DIM  KeyTable(20) AS STRING
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -587,7 +580,7 @@ FUNCTION PBMAIN
   KeyTable(19) = CHR$(52)          '4
   KeyTable(20) = CHR$(49)          '1
 
-  DIM ExtKey(49 TO 57, 0 TO 3) AS INTEGER
+  DIM  ExtKey(49 TO 57, 0 TO 3) AS INTEGER
   ExtKey(49, 0) = 49: ExtKey(49, 1) = 65: ExtKey(49, 2) = 66: ExtKey(49, 3) = 67
   ExtKey(50, 0) = 50: ExtKey(50, 1) = 68: ExtKey(50, 2) = 69: ExtKey(50, 3) = 70
   ExtKey(51, 0) = 51: ExtKey(51, 1) = 71: ExtKey(51, 2) = 72: ExtKey(51, 3) = 73
@@ -601,26 +594,20 @@ FUNCTION PBMAIN
   '*********************************************************************
   ' intialize LCD, KeyPad, & Ports
   '*********************************************************************
-  '*********************************************************************
-  'wlc removed don't need LCD KeyPad or ports
-  '*********************************************************************
-  'CALL SetPorts
-  'CALL InitDisplay
-  '
+  CALL SetPorts
+
+  CALL InitDisplay
+
   ClrLCD
 
   CALL PrintClrStr(1, 1, "       ATCO         ")
   CALL PrintClrStr(2, 1, "MCU-P2000      V1.01")
   CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2011")
   CALL PrintClrStr(4, 1, " ")
-  CON.CAPTION$ = "Atco Motor controllor MCU-P3000"
-  CON.SCREEN = 8,80
 
- 'for debug with PC Keyboard to exit program
- 'This won't work on a pc (pc to fast)
- 'I know this is trying to grab the inkey$ will update it to 1000000
-  FOR VV = 1 TO 10000
- 'FOR VV = 1 TO 1000
+  'for debug with PC Keyboard to exit program
+  FOR VV = 1 TO 1000
+    GG$ = INKEY$
     IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN
        END
     END IF
@@ -644,7 +631,7 @@ FUNCTION PBMAIN
     LOOP UNTIL InitNetWork
   END IF
 
-  DIM  GloErr AS INTEGER
+  DIM GloErr AS INTEGER
 
   CalSet = FALSE
   IF NOT KeyDown THEN  'do not load if user has key pressed
@@ -658,7 +645,7 @@ FUNCTION PBMAIN
     GOSUB SetDefaults
   END IF
 
-  NextFlag = FALSE 'incase cal was saved during scan
+  Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
 
   CALL SetForAuto  'set velocity, etc. & motors on
 
@@ -670,83 +657,82 @@ BaseMenu:
 
   GOSUB PrintMainMenu
 
-  'CALL SetLcdPos(1, 1)
+  CALL SetLcdPos(1, 1)
 
-  'CALL FlushKeys
+  CALL FlushKeys
 
   DO
 
-    'RowPos = GetLcdRowPos
-    'ColPos = GetLcdColPos
+    RowPos = GetLcdRowPos
+    ColPos = GetLcdColPos
 
-   'IF ColPos < 11 THEN
-    IF mykey = 1 THEN       'Setup
-         CALL PrintChar(1, 1, ">")
-         DO: XCode = GetSelectKey
+    IF ColPos < 11 THEN
+
+       SELECT CASE RowPos 'GetLcdRowPos
+         CASE 1  'scan setup
+           CALL PrintChar(1, 1, ">")
+           DO: XCode = GetSelectKey
            LOOP UNTIL XCode
-         IF XCode = KeyDN THEN
-            CALL PrintChar(1, 1, " ")
-            SetLcdPos 2, 1
-         ELSEIF XCode = KeyRgt THEN
-            CALL PrintChar(1, 1, " ")
-            SetLcdPos 1, 11
-         ELSEIF XCode = KeyEnter THEN 'do menu
-            GetScanCal
-            GOSUB PrintMainMenu
-            SetLcdPos 1, 1
-         END IF
-    END IF
-    IF mykey = 2 THEN     'joy stick
-        CALL PrintChar(2, 1, ">")
-        DO: XCode = GetSelectKey
+           IF XCode = KeyDN THEN
+         CALL PrintChar(1, 1, " ")
+         SetLcdPos 2, 1
+           ELSEIF XCode = KeyRgt THEN
+         CALL PrintChar(1, 1, " ")
+         SetLcdPos 1, 11
+           ELSEIF XCode = KeyEnter THEN 'do menu
+         GetScanCal
+         GOSUB PrintMainMenu
+         SetLcdPos 1, 1
+           END IF
+         CASE 2  'joystick
+           CALL PrintChar(2, 1, ">")
+           DO: XCode = GetSelectKey
            LOOP UNTIL XCode
-         IF XCode = KeyDN THEN
-           CALL PrintChar(2, 1, " ")
-           SetLcdPos 3, 1
-         ELSEIF XCode = KeyUP THEN
-            CALL PrintChar(2, 1, " ")
-            SetLcdPos 1, 1
-         ELSEIF XCode = KeyRgt THEN
+           IF XCode = KeyDN THEN
          CALL PrintChar(2, 1, " ")
-            SetLcdPos 2, 11
-         ELSEIF XCode = KeyEnter THEN
-            CALL SetForAuto
-            JogJoyStk
-            GOSUB PrintMainMenu
-            SetLcdPos 2, 1
-         END IF
-    END IF
-    IF mykey = 3 THEN    ' Auto Jog
-      CALL PrintChar(3, 1, ">")
-      DO: XCode = GetSelectKey
-         LOOP UNTIL XCode
-      IF XCode = KeyUP THEN
+         SetLcdPos 3, 1
+           ELSEIF XCode = KeyUP THEN
+         CALL PrintChar(2, 1, " ")
+         SetLcdPos 1, 1
+           ELSEIF XCode = KeyRgt THEN
+         CALL PrintChar(2, 1, " ")
+         SetLcdPos 2, 11
+           ELSEIF XCode = KeyEnter THEN
+         CALL SetForAuto
+         JogJoyStk
+         GOSUB PrintMainMenu
+         SetLcdPos 2, 1
+           END IF
+         CASE 3 ' Auto Jog
+           CALL PrintChar(3, 1, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyUP THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 2, 1
-       ELSEIF XCode = KeyDN THEN
+           ELSEIF XCode = KeyDN THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 4, 1
-       ELSEIF XCode = KeyRgt THEN
+           ELSEIF XCode = KeyRgt THEN
          CALL PrintChar(3, 1, " ")
          SetLcdPos 3, 11
-       ELSEIF XCode = KeyEnter THEN 'do menu
+           ELSEIF XCode = KeyEnter THEN 'do menu
          CALL SetForAuto
          JogAuto
          GOSUB PrintMainMenu
          SetLcdPos 3, 1
-       END IF
-    END IF
-    IF mykey = 4 THEN   ' Save Setup
-       CALL PrintChar(4, 1, ">")
-       DO: XCode = GetSelectKey
-       LOOP UNTIL XCode
-       IF XCode = KeyUP THEN
+           END IF
+         CASE 4 ' Save Setup
+           CALL PrintChar(4, 1, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyUP THEN
          CALL PrintChar(4, 1, " ")
          SetLcdPos 3, 1
-       ELSEIF XCode = KeyRgt THEN
+           ELSEIF XCode = KeyRgt THEN
          CALL PrintChar(4, 1, " ")
          SetLcdPos 4, 11
-       ELSEIF XCode = KeyEnter THEN 'save setup
+           ELSEIF XCode = KeyEnter THEN 'save setup
          ClrLCD
          CursorON
          CALL PrintClrStr(1, 1, "SAVE SETUP Y/N:* ")
@@ -758,76 +744,76 @@ BaseMenu:
          END IF
          GOSUB PrintMainMenu
          SetLcdPos 4, 1
-       END IF
-    END IF
+           END IF
+       END SELECT
 
-    IF mykey = 5 THEN   'begin scan Auto scan
-       CALL PrintChar(1, 11, ">")
-       DO: XCode = GetSelectKey
-         LOOP UNTIL XCode
-       IF XCode = KeyDN THEN
-        CALL PrintChar(1, 11, " ")
-        SetLcdPos 2, 11
-       ELSEIF XCode = KeyLft THEN
-        CALL PrintChar(1, 11, " ")
-        SetLcdPos 1, 1
-       ELSEIF XCode = KeyEnter THEN 'do menu
-        GOSUB ScanMenu
-        GOSUB PrintMainMenu
-        SetLcdPos 1, 1
-       END IF
-    END IF
-    IF mykey = 6 THEN  'XSPD Cntrol
-         CALL PrintChar(2, 11, ">")
-         DO: XCode = GetSelectKey
-          LOOP UNTIL XCode
-         IF XCode = KeyDN THEN
-           CALL PrintChar(2, 11, " ")
-           SetLcdPos 3, 11
-         ELSEIF XCode = KeyUP THEN
-           CALL PrintChar(2, 11, " ")
-           SetLcdPos 1, 11
-         ELSEIF XCode = KeyLft THEN
-           CALL PrintChar(2, 11, " ")
-           SetLcdPos 2, 1
-         ELSEIF XCode = KeyEnter THEN
-           CALL SetForAuto
-           JogXSpd
-           GOSUB PrintMainMenu
-           SetLcdPos 2, 11
-         END IF
-    END IF
-    IF mykey = 7 THEN  ' Manual Jog
-         CALL PrintChar(3, 11, ">")
-         DO: XCode = GetSelectKey
-         LOOP UNTIL XCode
-         IF XCode = KeyUP THEN
-           CALL PrintChar(3, 11, " ")
-           SetLcdPos 2, 11
-         ELSEIF XCode = KeyDN THEN
-           CALL PrintChar(3, 11, " ")
-           SetLcdPos 4, 11
-         ELSEIF XCode = KeyLft THEN
-            CALL PrintChar(3, 11, " ")
-            SetLcdPos 3, 1
-         ELSEIF XCode = KeyEnter THEN 'do menu
-            CALL SetForAuto
-            JogMan
-            GOSUB PrintMainMenu
-            SetLcdPos 3, 11
-         END IF
-    END IF
-    IF mykey = 8 THEN  ' Load setup
-       CALL PrintChar(4, 11, ">")
-       DO: XCode = GetSelectKey
-       LOOP UNTIL XCode
-       IF XCode = KeyUP THEN
+    ELSE
+
+       SELECT CASE RowPos
+         CASE 1 'begin scan
+           CALL PrintChar(1, 11, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyDN THEN
+         CALL PrintChar(1, 11, " ")
+         SetLcdPos 2, 11
+           ELSEIF XCode = KeyLft THEN
+         CALL PrintChar(1, 11, " ")
+         SetLcdPos 1, 1
+           ELSEIF XCode = KeyEnter THEN 'do menu
+         GOSUB ScanMenu
+         GOSUB PrintMainMenu
+         SetLcdPos 1, 1
+           END IF
+         CASE 2  'XSPD Cntrol
+           CALL PrintChar(2, 11, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyDN THEN
+         CALL PrintChar(2, 11, " ")
+         SetLcdPos 3, 11
+           ELSEIF XCode = KeyUP THEN
+         CALL PrintChar(2, 11, " ")
+         SetLcdPos 1, 11
+           ELSEIF XCode = KeyLft THEN
+         CALL PrintChar(2, 11, " ")
+         SetLcdPos 2, 1
+           ELSEIF XCode = KeyEnter THEN
+         CALL SetForAuto
+         JogXSpd
+         GOSUB PrintMainMenu
+         SetLcdPos 2, 11
+           END IF
+         CASE 3 ' Manual Jog
+           CALL PrintChar(3, 11, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyUP THEN
+         CALL PrintChar(3, 11, " ")
+         SetLcdPos 2, 11
+           ELSEIF XCode = KeyDN THEN
+         CALL PrintChar(3, 11, " ")
+         SetLcdPos 4, 11
+           ELSEIF XCode = KeyLft THEN
+         CALL PrintChar(3, 11, " ")
+         SetLcdPos 3, 1
+           ELSEIF XCode = KeyEnter THEN 'do menu
+         CALL SetForAuto
+         JogMan
+         GOSUB PrintMainMenu
+         SetLcdPos 3, 11
+           END IF
+         CASE 4 ' Load setup
+           CALL PrintChar(4, 11, ">")
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyUP THEN
          CALL PrintChar(4, 11, " ")
          SetLcdPos 3, 11
-       ELSEIF XCode = KeyLft THEN
+           ELSEIF XCode = KeyLft THEN
          CALL PrintChar(4, 11, " ")
          SetLcdPos 4, 1
-       ELSEIF XCode = KeyEnter THEN 'Load setup
+           ELSEIF XCode = KeyEnter THEN 'Load setup
          ClrLCD
          CursorON
          CALL PrintClrStr(1, 1, "LOAD SETUP Y/N:* ")
@@ -839,92 +825,89 @@ BaseMenu:
          END IF
          GOSUB PrintMainMenu
          SetLcdPos 4, 11
-       END IF
+           END IF
+       END SELECT
     END IF
+
   LOOP
 
 PrintMainMenu:
-  CALL ClrLCD
 
-  CALL PrintClrStr(0, 0, "    Select Option number ")
-  CALL PrintClrStr(1, 1, "1. SETUP     5. AUTOSCAN ")
-  CALL PrintClrStr(2, 1, "2. JOYSTK    6. XSPD CTRL")
-  CALL PrintClrStr(3, 1, "3. A-JOG     7. M-JOG    ")
-  CALL PrintClrStr(4, 1, "4. SAVE      8. LOAD     ")
-  CON.WAITKEY$ TO myinput
-  mykey = VAL(myinput)
+  CALL ClrLCD
+  CALL PrintClrStr(1, 1, " SETUP     AUTOSCAN ")
+  CALL PrintClrStr(2, 1, " JOYSTK    XSPD CTRL")
+  CALL PrintClrStr(3, 1, " A-JOG     M-JOG    ")
+  CALL PrintClrStr(4, 1, " SAVE      LOAD     ")
   RETURN
 
+
 SetDefaults:
-  SCANparm.YCtr = 14858 'cts per inch travel
-  SCANparm.XCtr = 62047
-  SCANparm.ACtr = 1000
+  SCANstruc.YCtr = 14858 'cts per inch travel
+  SCANstruc.XCtr = 62047
+  SCANstruc.ACtr = 1000
   GetXyPos  'load current encoder position
-  SCANparm.XLow = 0
-  SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
-  SCANparm.XHigh = 96
-  SCANparm.XHighStr = QStr(SCANparm.XHigh, 10)
-  SCANparm.YLow = 0: SCANparm.YLowStr = QStr(SCANparm.YLow, 10)
-  SCANparm.YHigh = 12: SCANparm.YHighStr = QStr(SCANparm.YHigh, 10)
-  SCANparm.XIndex = .25: SCANparm.XIndexSTR = QStr(SCANparm.XIndex, 10)
-  SCANparm.YIndex = .125: SCANparm.YIndexSTR = QStr(SCANparm.YIndex, 10)
-  SCANparm.IndexLow = FALSE
-  SCANparm. IndexLowStr = "LOW - HIGH"
-  SCANparm.XPlus = TRUE:  SCANparm.XPlusSTR = "POSITIVE  "
-  SCANparm.YPlus = FALSE: SCANparm.YPlusSTR = "NEGATIVE  "
-  SCANparm.XSpeed = 2: SCANparm.XSpeedSTR = QStr(SCANparm.XSpeed, 10)
-  SCANparm.YSpeed = 16: SCANparm.YSpeedSTR = QStr(SCANparm.YSpeed, 10)
-  SCANparm.XCtrStr = QStr(SCANparm.XCtr, 10)
-  SCANparm.YCtrStr = QStr(SCANparm.YCtr, 10)
-  SCANparm.ACtrStr = QStr(SCANparm.ACtr, 10)
-  SCANparm.XEnable = TRUE: SCANparm.XEnableSTR = "ON        "
-  SCANparm.YEnable = TRUE: SCANparm.YEnableSTR = "ON        "
-  SCANparm.XSpdDir = TRUE: SCANparm.XSpdDirSTR = "FORWARD*"
-  SCANparm.AutoHold = TRUE: SCANparm.AutoHoldSTR = "ON "
-  SCANparm.IndexY = FALSE: SCANparm.IndexYSTR = "X         "
-  SCANparm.OVERLAP = 1: SCANparm.OverLapStr = "1         "
-  SCANparm.DualRas = FALSE: SCANparm.DualRasSTR = "OFF       "
+  SCANstruc.XLow = 0: SCANstruc.XLowStr = QStr(SCANstruc.XLow, 10)
+  SCANstruc.XHigh = 96: SCANstruc.XHighStr = QStr(SCANstruc.XHigh, 10)
+  SCANstruc.YLow = 0: SCANstruc.YLowStr = QStr(SCANstruc.YLow, 10)
+  SCANstruc.YHigh = 12: SCANstruc.YHighStr = QStr(SCANstruc.YHigh, 10)
+  SCANstruc.XIndex = .25: SCANstruc.XIndexSTR = QStr(SCANstruc.XIndex, 10)
+  SCANstruc.YIndex = .125: SCANstruc.YIndexSTR = QStr(SCANstruc.YIndex, 10)
+  SCANstruc.IndexLow = FALSE: SCANstruc.IndexLowStr = "LOW - HIGH"
+  SCANstruc.XPlus = TRUE:  SCANstruc.XPlusSTR = "POSITIVE  "
+  SCANstruc.YPlus = FALSE: SCANstruc.YPlusSTR = "NEGATIVE  "
+  SCANstruc.XSpeed = 2: SCANstruc.XSpeedSTR = QStr(SCANstruc.XSpeed, 10)
+  SCANstruc.YSpeed = 16: SCANstruc.YSpeedSTR = QStr(SCANstruc.YSpeed, 10)
+  SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+  SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+  SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+  SCANstruc.XEnable = TRUE: SCANstruc.XEnableSTR = "ON        "
+  SCANstruc.YEnable = TRUE: SCANstruc.YEnableSTR = "ON        "
+  SCANstruc.XSpdDir = TRUE: SCANstruc.XSpdDirSTR = "FORWARD*"
+  SCANstruc.AutoHold = TRUE: SCANstruc.AutoHoldSTR = "ON "
+  SCANstruc.IndexY = FALSE: SCANstruc.IndexYSTR = "X         "
+  SCANstruc.OverLap = 1: SCANstruc.OverLapStr = "1         "
+  SCANstruc.DualRas = FALSE: SCANstruc.DualRasSTR = "OFF       "
   RETURN
 
 XScan:
-    DO WHILE IndexCt >= YDataStart AND IndexCt <= YDataEnd
-      UStop = DoY(YIndexCts * IndexCt)'index Y axis into position
+    DO WHILE SCANstruc.IndexCt >= SCANstruc.YDataStart AND SCANstruc.IndexCt <= SCANstruc.YDataEnd
+      UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
-      IF XCts > XStartCts + (XEndCts - XStartCts) / 2 THEN
-     MoveToPos1& = XStartCts
-     MoveToPos2& = XEndCts
+      IF SCANstruc.XCts > SCANstruc.XStartCts + (SCANstruc.XEndCts - SCANstruc.XStartCts) / 2 THEN
+     MoveToPos1& = SCANstruc.XStartCts
+     MoveToPos2& = SCANstruc.XEndCts
       ELSE
-     MoveToPos1& = XEndCts
-     MoveToPos2& = XStartCts
+     MoveToPos1& = SCANstruc.XEndCts
+     MoveToPos2& = SCANstruc.XStartCts
       END IF
       UStop = DoX(MoveToPos1&) 'put x axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
-      IF DualRas THEN
+      IF SCANstruc.DualRas THEN
     UStop = DoX(MoveToPos2&)'put x axis into position
     IF UStop THEN EXIT DO 'check if user hit stop
       END IF
-      IndexCt = IndexCt + IndexInc
+      SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
     LOOP
     RETURN
 
 YScan:
-    DO WHILE IndexCt >= XDataStart AND IndexCt <= XDataEnd
-      UStop = DoX(XIndexCts * IndexCt)'index X axis into position
+    DO WHILE SCANstruc.IndexCt >= SCANstruc.XDataStart AND SCANstruc.IndexCt <= SCANstruc.XDataEnd
+      UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
-      IF YCts > YStartCts + (YEndCts - YStartCts) / 2 THEN
-    MoveToPos1& = YStartCts
-    MoveToPos2& = YEndCts
+      IF SCANstruc.YCts > SCANstruc.YStartCts + (SCANstruc.YEndCts - SCANstruc.YStartCts) / 2 THEN
+    MoveToPos1& = SCANstruc.YStartCts
+    MoveToPos2& = SCANstruc.YEndCts
       ELSE
-    MoveToPos1& = YEndCts
-    MoveToPos2& = YStartCts
+    MoveToPos1& = SCANstruc.YEndCts
+    MoveToPos2& = SCANstruc.YStartCts
       END IF
       UStop = DoY(MoveToPos1&)'put y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
-      IF DualRas THEN
+      IF SCANstruc.DualRas THEN
     UStop = DoY(MoveToPos2&)'put y axis into position
     IF UStop THEN EXIT DO 'check if user hit stop
       END IF
-      IndexCt = IndexCt + IndexInc
+      SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
     LOOP
     RETURN
 
@@ -934,176 +917,177 @@ ScanMenu:
 
   GOSUB PrintScanMenu
 
-  'CALL SetLcdPos(1, 1)
+  CALL SetLcdPos(1, 1)
 
-  'CALL FlushKeys
+  CALL FlushKeys
 
   DO
 
-   ' RowPos = GetLcdRowPos
-   ' ColPos = GetLcdColPos
+    RowPos = GetLcdRowPos
+    ColPos = GetLcdColPos
 
-   ' IF RowPos = 1 THEN
-   IF mykey = 1 THEN  'Begin Scan
-     CALL PrintChar(1, 1, ">")
-'     SetLcdPos 1, 1
-     DO: XCode = GetSelectKey
-        LOOP UNTIL XCode
-     IF XCode = KeyDN THEN
-        CALL PrintChar(1, 1, " ")
- '       SetLcdPos 2, 1
-     ELSEIF XCode = KeyRgt THEN
-        CALL PrintChar(1, 1, " ")
-  '      SetLcdPos 1, 9
-     ELSEIF XCode = KeyEnter THEN 'begin scan
-       DO                     'Added 9/13/11
+    IF RowPos = 1 THEN
+
+       SELECT CASE ColPos
+         CASE 1  'Begin Scan
+           CALL PrintChar(1, 1, ">")
+           SetLcdPos 1, 1
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyDN THEN
+         CALL PrintChar(1, 1, " ")
+         SetLcdPos 2, 1
+           ELSEIF XCode = KeyRgt THEN
+         CALL PrintChar(1, 1, " ")
+         SetLcdPos 1, 9
+           ELSEIF XCode = KeyEnter THEN 'begin scan
+         DO                     'Added 9/13/11
          LOOP WHILE KeyDown     'problem with key double press
-      ' FlushKeys
-       GOSUB BeginScan
-       GOSUB PrintScanMenu
-       SetLcdPos 1, 1
-     END IF
-   END IF
-   IF mykey = 2 THEN  'Next
-      CALL PrintChar(1, 9, ">")
-   '   SetLcdPos 1, 9
-      DO: XCode = GetSelectKey
-         LOOP UNTIL XCode
-      IF XCode = KeyDN THEN
+         FlushKeys
+         GOSUB BeginScan
+         GOSUB PrintScanMenu
+         SetLcdPos 1, 1
+           END IF
+         CASE 9  'Next
+           CALL PrintChar(1, 9, ">")
+           SetLcdPos 1, 9
+           DO: XCode = GetSelectKey
+           LOOP UNTIL XCode
+           IF XCode = KeyDN THEN
          CALL PrintChar(1, 9, " ")
-   '      SetLcdPos 2, 1
-      ELSEIF XCode = KeyLft THEN
+         SetLcdPos 2, 1
+           ELSEIF XCode = KeyLft THEN
          CALL PrintChar(1, 9, " ")
-   '      SetLcdPos 1, 1
-      ELSEIF XCode = KeyRgt THEN
+         SetLcdPos 1, 1
+           ELSEIF XCode = KeyRgt THEN
          CALL PrintChar(1, 9, " ")
-   '      SetLcdPos 1, 16
-      ELSEIF XCode = KeyEnter THEN 'Set to Next Scan
-         ScanLength! = ABS(XHigh - XLow)
-         IF IndexLow THEN
-           IF XLow - ScanLength! >= 0 THEN
-             XLow = XLow - ScanLength!
-             XHigh = XHigh - ScanLength!
+         SetLcdPos 1, 16
+           ELSEIF XCode = KeyEnter THEN 'Set to Next Scan
+         ScanLength! = ABS(SCANstruc.XHigh - SCANstruc.XLow)
+         IF SCANstruc.IndexLow THEN
+           IF SCANstruc.XLow - ScanLength! >= 0 THEN
+             SCANstruc.XLow = SCANstruc.XLow - ScanLength!
+             SCANstruc.XHigh = SCANstruc.XHigh - ScanLength!
            END IF
          ELSE
-           XLow = XLow + ScanLength!
-           XHigh = XHigh + ScanLength!
+           SCANstruc.XLow = SCANstruc.XLow + ScanLength!
+           SCANstruc.XHigh = SCANstruc.XHigh + ScanLength!
          END IF
-         SCANparm.XLowStr = QStr$(SCANparm.XLow, 10)
-         SCANparm.XHighStr = QStr$(SCANparm.XHigh, 10)
-         NextFlag = TRUE
+         SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+         SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+         SCANstruc.NextFlag = TRUE
          CALL PrintChar(1, 9, " ")
-  '       SetLcdPos 1, 1
-      END IF
-   END IF
-   IF mykey = 3 THEN  ' All Zero
+         SetLcdPos 1, 1
+           END IF
+         CASE 16 ' All Zero
            CALL PrintChar(1, 16, ">")
-   '        SetLcdPos 1, 16
+           SetLcdPos 1, 16
            DO: XCode = GetSelectKey
            LOOP UNTIL XCode
            IF XCode = KeyLft THEN
-             CALL PrintChar(1, 16, " ")
-    '         SetLcdPos 1, 9
+         CALL PrintChar(1, 16, " ")
+         SetLcdPos 1, 9
            ELSEIF XCode = KeyDN THEN
-             CALL PrintChar(1, 16, " ")
-     '        SetLcdPos 2, 1
+         CALL PrintChar(1, 16, " ")
+         SetLcdPos 2, 1
            ELSEIF XCode = KeyEnter THEN 'Zero All ctrs
-           ClrLCD
-           CALL PrintClrStr(1, 1, "ENTER TO 0 ALL CTRS")
-           CALL PrintClrStr(2, 1, "ESC TO ABORT")
-           DO: XCode = GetSelectKey
-             LOOP UNTIL XCode
-             GOSUB PrintScanMenu
-             CALL PrintChar(1, 16, ">")
-           IF XCode = KeyEnter THEN
-             SCANparm.XPos = 0: SCANparm.YPos = 0: SCANparm.APos = 0
-             SCANparm.XPosStr = QStr$(SCANparm.XPos, 10)
-             SCANparm.YPosStr = QStr$(SCANparm.YPos, 10)
-             SCANparm.APosStr = QStr$(SCANparm.APos, 10)
-             SCANparm.XOffset = 0: SCANparm.YOffset = 0: SCANparm.AOffset = 0
-             CALL ResetPosition(Servo1)
-             CALL ResetPosition(Servo2)
-             CALL ResetPosition(Servo3)
-             CALL ResetPosition(Servo4)
-             PrintStr (2, 7, SCANparm.XPosStr)
-             PrintStr (3, 7, SCANparm.YPosStr)
-             PrintStr (4, 7, SCANparm.APosStr)
+         ClrLCD
+         CALL PrintClrStr(1, 1, "ENTER TO 0 ALL CTRS")
+         CALL PrintClrStr(2, 1, "ESC TO ABORT")
+         DO: XCode = GetSelectKey
+         LOOP UNTIL XCode
+         GOSUB PrintScanMenu
+         CALL PrintChar(1, 16, ">")
+         IF XCode = KeyEnter THEN
+           SCANstruc.XPos = 0: SCANstruc.YPos = 0: SCANstruc.APos = 0
+           SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+           SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+           SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+           SCANstruc.XOffset = 0: SCANstruc.YOffset = 0: SCANstruc.AOffset = 0
+           CALL ResetPosition(Servo1)
+           CALL ResetPosition(Servo2)
+           CALL ResetPosition(Servo3)
+           CALL ResetPosition(Servo4)
+           PrintStr 2, 7, SCANstruc.XPosStr
+           PrintStr 3, 7, SCANstruc.YPosStr
+           PrintStr 4, 7, SCANstruc.APosStr
+         END IF
+         XCode = 0
+         SetLcdPos 1, 16
            END IF
-           XCode = 0
-      '     SetLcdPos 1, 16
-           END IF
-   END IF
+       END SELECT
 
-   IF mykey = 4 THEN  ' XPos
+    ELSE
+
+       SELECT CASE RowPos
+         CASE 2 ' XPos
            CALL PrintChar(2, 1, ">")
-           SetLcdPos 2, 8
-           Temp$ = SCANparm.XPosStr
+           SetLcdPos 2, 8: Temp$ = SCANstruc.XPosStr
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
-             IF GoodSNG(Temp$) THEN
-               XPos = VAL(Temp$)
-               SCANparm.XPosStr = QStr$(SCANparm.XPos, 10)
-               SCANparm. XOffset = GetXCord(CLNG(SCANparm.XPos * SCANparm.XCtr))
-               CALL ResetPosition(Servo1)
-               CALL ResetPosition(Servo2)
-             END IF
+         IF GoodSNG(Temp$) THEN
+           SCANstruc.XPos = VAL(Temp$)
+           SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+           SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+           CALL ResetPosition(Servo1)
+           CALL ResetPosition(Servo2)
+         END IF
            END IF
-           PrintStr 2, 8, SCANparm.XPosStr
-           'SetLcdPos 2, 1
+           PrintStr 2, 8, SCANstruc.XPosStr
+           SetLcdPos 2, 1
            IF XCode = KeyUP THEN
-             CALL PrintChar(2, 1, " ")
-           '  SetLcdPos 1, 1
+         CALL PrintChar(2, 1, " ")
+         SetLcdPos 1, 1
            ELSEIF XCode = KeyDN THEN
-             CALL PrintChar(2, 1, " ")
-            ' SetLcdPos 3, 1
+         CALL PrintChar(2, 1, " ")
+         SetLcdPos 3, 1
            END IF
-   END IF
-    IF mykey = 5 THEN  'YPos
+         CASE 3  'YPos
            CALL PrintChar(3, 1, ">")
-           SetLcdPos 3, 8: Temp$ = SCANparm.YPosStr
+           SetLcdPos 3, 8: Temp$ = SCANstruc.YPosStr
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
-             IF GoodSNG(Temp$) THEN
-               SCANparm.YPos = VAL(Temp$)
-               SCANparm.YPosStr = QStr$(SCANparm.YPos, 10)
-               SCANparm.YOffset = GetYCord(CLNG(SCANparm.YPos * SCANparm.YCtr))
-               CALL ResetPosition(Servo3)
-             END IF
+         IF GoodSNG(Temp$) THEN
+           SCANstruc.YPos = VAL(Temp$)
+           SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+           SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
+           CALL ResetPosition(Servo3)
+         END IF
            END IF
-           PrintStr 3, 8, SCANparm.YPosStr
+           PrintStr 3, 8, SCANstruc.YPosStr
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
-             CALL PrintChar(3, 1, " ")
-             SetLcdPos 2, 1
+         CALL PrintChar(3, 1, " ")
+         SetLcdPos 2, 1
            ELSEIF XCode = KeyDN THEN
-             CALL PrintChar(3, 1, " ")
-             SetLcdPos 4, 1
+         CALL PrintChar(3, 1, " ")
+         SetLcdPos 4, 1
            END IF
-    END IF
-    IF mykey = 6 THEN  'APos
+         CASE 4 ' APos
            CALL PrintChar(4, 1, ">")
-           SetLcdPos 4, 8: Temp$ = SCANparm.APosStr
+           SetLcdPos 4, 8: Temp$ = SCANstruc.APosStr
            CursorON
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
-             IF GoodSNG(Temp$) THEN
-               SCANparm.APos = VAL(Temp$)
-               SCANparm.APosStr = QStr$(SCANparm.APos, 10)
-               SCANparm.AOffset = GetXCord(CLNG(SCANparm.APos * SCANparm.ACtr))
-               CALL ResetPosition(Servo4)
-             END IF
+         IF GoodSNG(Temp$) THEN
+           SCANstruc.APos = VAL(Temp$)
+           SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+           SCANstruc.AOffset = GetXCord(CLNG(SCANstruc.APos * SCANstruc.ACtr))
+           CALL ResetPosition(Servo4)
+         END IF
            END IF
-           PrintStr 4, 8, SCANparm.APosStr
+           PrintStr 4, 8, SCANstruc.APosStr
            SetLcdPos 4, 1
            IF XCode = KeyUP THEN
-             CALL PrintChar(4, 1, " ")
-             SetLcdPos 3, 1
+         CALL PrintChar(4, 1, " ")
+         SetLcdPos 3, 1
            END IF
+       END SELECT
     END IF
 
   LOOP UNTIL XCode = KeyEsc
@@ -1112,19 +1096,17 @@ ScanMenu:
 
 
 PrintScanMenu:
-  'GetXyPos
-  CALL ClrLCD
-  CALL PrintClrStr(1, 1, "1. BEGIN   2. NEXT   3. ALL0")
-  CALL PrintClrStr(2, 1, "4. XPOS: " + SCANparm.XPosStr)
-  CALL PrintClrStr(3, 1, "5. YPOS: " + SCANparm.YPosStr)
-  CALL PrintClrStr(4, 1, "6. APOS: " + SCANparm.APosStr)
-  CON.WAITKEY$ TO myinput
-  mykey = VAL(myinput)
+  GetXyPos
+  CALL PrintClrStr(1, 1, " BEGIN   NEXT   ALL0")
+  CALL PrintClrStr(2, 1, " XPOS: " + SCANstruc.XPosStr)
+  CALL PrintClrStr(3, 1, " YPOS: " + SCANstruc.YPosStr)
+  CALL PrintClrStr(4, 1, " APOS: " + SCANstruc.APosStr)
   RETURN
+
 
 BeginScan:
   GOSUB Profiler  'make sure scan ok before next scan add or subtract
-  IF ScanFlag = -1 THEN
+  IF SCANstruc.ScanFlag = -1 THEN
     CALL PrintClrStr(1, 1, "XPOS:")
     CALL PrintClrStr(2, 1, "YPOS:")
     CALL PrintClrStr(3, 1, "APOS:")
@@ -1133,15 +1115,15 @@ BeginScan:
     CALL SetForAuto
     ReSetMotors
     SetXCtrs  'set x encoder cts to match
-'    CALL FlushKeys    'added 9-1-02 Flash MPU seems to detect old keypress
-    IF IndexY THEN  'X Scan, Y Index
+    CALL FlushKeys    'added 9-1-02 Flash MPU seems to detect old keypress
+    IF SCANstruc.IndexY THEN  'X Scan, Y Index
       GOSUB XScan
     ELSE : GOSUB YScan   'Y Scan, X Index
     END IF
     IF UStop THEN   'user halted scan
       CALL StopMtrs
       CALL SetModeVel
-'      CALL FlushKeys
+      CALL FlushKeys
       UStop = FALSE
     END IF
     CALL GetXyPos
@@ -1155,22 +1137,22 @@ BeginScan:
 
 Profiler:
 
-  ScanFlag = 0
+  SCANstruc.ScanFlag = 0
 
   'check all scan cal parameters
-  IF XHigh > XLow THEN
-    IF YHigh > YLow THEN
-      IF XIndex > 0 AND YIndex > 0 THEN
-    IF XPlus = TRUE OR XPlus = FALSE THEN
-      IF YPlus = TRUE OR YPlus = FALSE THEN
-        IF XSpeed > 0 THEN
-          IF YSpeed > 0 THEN
-        IF XEnable THEN
-          IF YEnable THEN
+  IF SCANstruc.XHigh > SCANstruc.XLow THEN
+    IF SCANstruc.YHigh > SCANstruc.YLow THEN
+      IF SCANstruc.XIndex > 0 AND SCANstruc.YIndex > 0 THEN
+    IF SCANstruc.XPlus = TRUE OR SCANstruc.XPlus = FALSE THEN
+      IF SCANstruc.YPlus = TRUE OR SCANstruc.YPlus = FALSE THEN
+        IF SCANstruc.XSpeed > 0 THEN
+          IF SCANstruc.YSpeed > 0 THEN
+        IF SCANstruc.XEnable THEN
+          IF SCANstruc.YEnable THEN
             IF ProfileScan THEN
-              ScanFlag = -1
+              SCANstruc.ScanFlag = -1
             ELSE
-              ScanFlag = 0
+              SCANstruc.ScanFlag = 0
             END IF
           END IF
         END IF
@@ -1182,22 +1164,23 @@ Profiler:
     END IF
   END IF
   RETURN
-END FUNCTION
+END FUNCTION 'PBMain
+
 REM $STATIC
-SUB AlphaNumIN (EditStr AS STRING, ExitCode AS INTEGER)
+SUB AlphaNumIN (Edit$, ExitCode)
 
      'intialize values
-     DIM S AS STRING * 10
-     S = EditStr
+     LOCAL tempstr AS STRING * 10
+     tempstr = Edit$
      StrPos = 1 'cursur position within string
-     Length = LEN(EditStr)
+     Length = LEN(Edit$)
 
      ClrStr$ = SPACE$(Length)
      InFlag = TRUE
 
      y = GetLcdRowPos: x = GetLcdColPos
 
-     PrintStr (y, x, S)
+     PrintStr y, x, tempstr
 
      SetLcdPos y, x
 
@@ -1272,8 +1255,8 @@ SUB AlphaNumIN (EditStr AS STRING, ExitCode AS INTEGER)
          END IF
          END SELECT
        END IF
-
-       PrintStr y, x, S
+       tempstr = s$
+       PrintStr y, x, tempstr
        SetLcdPos y, x + (StrPos - 1)
 
      END IF
@@ -1325,16 +1308,16 @@ SUB CalEncoder (EncNum)
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     IF EncNum = Servo1 THEN
       CALL PrintStr(4, 1, "X Pos: ")
-      CALL PrintStr(4, 8, SCANparm.XPosStr)
+      CALL PrintStr(4, 8, SCANstruc.XPosStr)
     ELSE
       CALL PrintStr(4, 1, "A Pos: ")
-      CALL PrintStr(4, 8, SCANparm.APosStr)
+      CALL PrintStr(4, 8, SCANstruc.APosStr)
     END IF
   ELSE           'Servo3 Y
     CALL PrintStr(1, 1, "Move Y Axis to Start")
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     CALL PrintStr(4, 1, "Y Pos: ")
-    CALL PrintStr(4, 8, SCANparm.YPosStr)
+    CALL PrintStr(4, 8, SCANstruc.YPosStr)
   END IF
 
   MFlag = 1
@@ -1350,16 +1333,16 @@ SUB CalEncoder (EncNum)
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     IF EncNum = Servo1 THEN
       CALL PrintStr(4, 1, "X Pos: ")
-      CALL PrintStr(4, 8, SCANparm.XPosStr)
+      CALL PrintStr(4, 8, SCANstruc.XPosStr)
     ELSE
       CALL PrintStr(4, 1, "A Pos: ")
-      CALL PrintStr(4, 8, SCANparm.APosStr)
+      CALL PrintStr(4, 8, SCANstruc.APosStr)
     END IF
   ELSE
     CALL PrintStr(1, 1, "Move Y Axis to End  ")
     CALL PrintStr(2, 1, "Pos; Press Enter Key")
     CALL PrintStr(4, 1, "Y Pos: ")
-    CALL PrintStr(4, 8, SCANparm.YPosStr)
+    CALL PrintStr(4, 8, SCANstruc.YPosStr)
   END IF
 
   MFlag = 2
@@ -1386,28 +1369,28 @@ GetDis:
       IF VAL(Temp$) > 0 THEN
     IF AxisNum = Servo1 THEN
       IF EncNum = Servo1 THEN
-        SCANparm.XCal = VAL(Temp$)
-        SCANparm.XCalStr = QStr(SCANparm.XCal, 10)
+        SCANstruc.XCal = VAL(Temp$)
+        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
       ELSE
-        SCANparm.ACal = VAL(Temp$)
-        SCANparm.ACalStr = QStr(SCANparm.ACal, 10)
+        SCANstruc.ACal = VAL(Temp$)
+        SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
       END IF
     ELSE
-      SCANparm.YCal = VAL(Temp$)
-      SCANparm.YCalStr = QStr(SCANparm.YCal, 10)
+      SCANstruc.YCal = VAL(Temp$)
+      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
     END IF
     IF ABS(EndCts& - StartCts&) > 0 THEN
       IF AxisNum = Servo1 THEN
         IF EncNum = Servo1 THEN
-          SCANparm.XCtr = ABS(EndCts& - StartCts&) / SCANparm.XCal
-          SCANparm.XCtrStr = QStr(SCANparm.XCtr, 10)
+          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
         ELSE
-          SCANparm.ACtr = ABS(EndCts& - StartCts&) / SCANparm.ACal
-          SCANparm.ACtrStr = QStr(SCANparm.ACtr, 10)
+          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
+          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
         END IF
       ELSE
-        SCANparm.YCtr = ABS(EndCts& - StartCts&) / SCANparm.YCal
-        SCANparm.YCtrStr = QStr(SCANparm.YCtr, 10)
+        SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
+        SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
       END IF
     END IF
       END IF
@@ -1428,44 +1411,44 @@ MoveAxis:
     DO
        CALL GetXyPos
        IF EncNum = Servo1 THEN
-         CALL PrintStr(4, 8, SCANparm.XPosStr)
+         CALL PrintStr(4, 8, SCANstruc.XPosStr)
        ELSE
-         CALL PrintStr(4, 8, SCANparm.APosStr)
+         CALL PrintStr(4, 8, SCANstruc.APosStr)
        END IF
     LOOP WHILE KeyDown
     CALL StopMtrs
- '   FlushKeys
+    FlushKeys
 
       ELSEIF KeyPress = KeyDN AND AxisNum = 1 THEN
     CALL MoveXVel(NegDir)
     DO
        CALL GetXyPos
        IF EncNum = Servo1 THEN
-         CALL PrintStr(4, 8, SCANparm.XPosStr)
+         CALL PrintStr(4, 8, SCANstruc.XPosStr)
        ELSE
-         CALL PrintStr(4, 8, SCANparm.APosStr)
+         CALL PrintStr(4, 8, SCANstruc.APosStr)
        END IF
     LOOP WHILE KeyDown
     CALL StopMtrs
- '   FlushKeys
+    FlushKeys
 
       ELSEIF KeyPress = KeyLft AND AxisNum = 3 THEN
     CALL MoveYVel(NegDir)
     DO
        CALL GetXyPos
-       CALL PrintStr(4, 8, SCANparm.YPosStr)
+       CALL PrintStr(4, 8, SCANstruc.YPosStr)
     LOOP WHILE KeyDown
     CALL StopMtrs
- '   FlushKeys
+    FlushKeys
 
       ELSEIF KeyPress = KeyRgt AND AxisNum = 3 THEN
     CALL MoveYVel(PosDir)
     DO
        CALL GetXyPos
-       CALL PrintStr(4, 8, SCANparm.YPosStr)
+       CALL PrintStr(4, 8, SCANstruc.YPosStr)
     LOOP WHILE KeyDown
     CALL StopMtrs
-'    FlushKeys
+    FlushKeys
       END IF
   LOOP UNTIL KeyPress = KeyEsc OR KeyPress = KeyEnter
 
@@ -1498,34 +1481,32 @@ MoveAxis:
 END SUB
 
 FUNCTION CalLoad (FileNumber$)
-   LOCAL Temp AS header
-   Temp = HdrVer
-
-'   CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
-   'CALL FOpen(FileNumber$, 0, 0, Filler, ECode)
-   FOpen (filenum, 0,0, FileNumber$, ECode)
+   LOCAL TempStr AS header
+   TempStr.hdr = HdrVer
+   CALL FOpen (filenum, 0,0, FileNumber$, ECode)
+  ' CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
    IF ECode THEN
      CalLoad = FALSE
      EXIT FUNCTION
    END IF
 
    'read header label
-   'CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
-   CALL DFRead(filenum, temp, 0, BytesRead, ECode)
+'   CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
+   CALL DFRead(filenum, TempStr, 0, BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
    'Verify correct header
-   IF HdrVer.hdr <> Temp.hdr THEN
+   IF HdrVer <> TempStr THEN
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
-
-   CALL DFRead2(filenum, SCANparm, LEN(SCANparm), BytesRead, ECode)
+   CALL DFRead2(filenum, ScanStruc, LEN(SCANparm), BytesRead, ECode)
+   'CALL DFRead(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesRead&, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
 
 ExitCalLoad:
-   HdrVer = Temp 'in case of corrupt hdr read
+   HdrVer = TempStr 'in case of corrupt hdr read
    CALL FClose(filenum)
    IF ECode THEN
      CalLoad = FALSE
@@ -1540,20 +1521,22 @@ END FUNCTION
 
 FUNCTION CalSave (FILENAMEX$)
 
-   'CALL FCreate(FILENAMEX$, 0, HANDLE, ECode)
-  ' call FCreate (FILENAMEX$, 0,0, filenum, ECode)
+   'CALL FCreate(FILENAME$, 0, HANDLE, ECode)
    FCreate (filenumber, 0, FILENAMEX$, ECode)
    IF ECode THEN
      CalSave = FALSE
      EXIT FUNCTION
    END IF
+
+   'CALL DFWrite(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesWrote&, ECode)
+   'IF ECode THEN GOTO ExitCalSave
+
+   'CALL DFWrite(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesWrote&, ECode)
+   'IF ECode THEN GOTO ExitCalSave
    CALL DFWrite(filenum, BYVAL VARPTR(HdrVer), 0, BytesRead, ECode)
-  ' CALL DFWrite(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesWrote&, ECode)
    IF ECode THEN GOTO ExitCalSave
-  ' CALL DFWrite2(filenum, BYVAL VARPTR(SCANparm), VARPTR(HdrVer), LEN(SCANparm), BytesWrote&, ECode)
    CALL DFWrite2(filenum, BYVAL VARPTR(SCANparm),LEN(HdrVer), BytesRead, ECode)
    IF ECode THEN GOTO ExitCalSave
-
 ExitCalSave:
    CALL FClose(filenum)
    IF ECode THEN
@@ -1595,11 +1578,11 @@ FUNCTION CharsToLong& (BYVAL A AS INTEGER, B AS INTEGER, C AS INTEGER, D AS INTE
 END FUNCTION
 
 'FUNCTION CheckDisk (DataDir, Drv$, WriteLen&, FileNumber$)
-'
+
    'DataDir = Read from Disk or Write to Disk
-'
+
    'check drive
-'   DriveOK = WriteTest(Drv$)
+   'DriveOK = WriteTest(Drv$)
 '   IF NOT DriveOK THEN
 '      CheckDisk = 1
 '      EXIT FUNCTION
@@ -1607,12 +1590,12 @@ END FUNCTION
 
    'check disk space left
 '   IF DriveSpace&(Drv$) < WriteLen& THEN
-'      CheckDisk = 2
+''      CheckDisk = 2
 '      EXIT FUNCTION
-'   END IF
+ '  END IF
 
    'check filename
-'   GoodName = Valid(FileNumber$)
+ '  GoodName = Valid(FileNumber$)
 '   IF NOT GoodName THEN
 '      CheckDisk = 4
 '      EXIT FUNCTION
@@ -1625,7 +1608,7 @@ END FUNCTION
 '   END IF
 
 '   CheckDisk = 0  'Disk OK
-
+'
 '   EXIT FUNCTION
 
 'END FUNCTION
@@ -1641,25 +1624,27 @@ SUB ClearBits (address AS INTEGER)
 
 END SUB
 
-SUB CloseCommPort (comport AS STRING, ecode AS INTEGER)
+SUB CloseComPorts
 
+   CALL CloseCommPort(PICPort$,ecode%)
+   CALL DeleteCommBuffers(ECode%)
+   'FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
 
-  ' CALL CloseCommPort(PICPort, ECode)
-  ' CALL DeleteCommBuffers(ECode)
-  ' FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-  COMM CLOSE nComm
-  ecode = -1
+END SUB
+SUB DeleteCommBuffers (ecode%)
+END SUB
+SUB CloseCommPort (ComPortNum$,ecode%)
 END SUB
 
 SUB ClrLCD
-
+   CLS
    'CALL StrobeInstr(&H1)    ' clear display
-   CON.CLS
+
 END SUB
 
 SUB CursorOFF
 
-     'CALL StrobeInstr(&HC)     ' display on, cursor off
+     CALL StrobeInstr(&HC)     ' display on, cursor off
                    ' b7-b4 = 0, b3 = 1
                    ' b2, D = 1    (display on)
                    ' b1, C = 0    (cursor off)
@@ -1669,7 +1654,7 @@ END SUB
 
 SUB CursorON
 
-     'CALL StrobeInstr(&HE)    ' turn on display and cursor
+     CALL StrobeInstr(&HE)    ' turn on display and cursor
                    ' b7-b4 = 0, b3 = 1
                    ' b2, D = 1    (display on)
                    ' b1, C = 1    (cursor on)
@@ -1721,7 +1706,7 @@ FUNCTION DoX (MPos&)
 
    DO
      IF KeyDown <> 0 THEN 'user pressed KEYPAD
-  '     FlushKeys
+       FlushKeys
        DoX = TRUE: EXIT FUNCTION
      END IF
      IF (Glo.Stat(Servo1) AND HomeInProg) THEN
@@ -1732,7 +1717,7 @@ FUNCTION DoX (MPos&)
      PrintYPos
      PrintAPos
      PrintXPos
-   LOOP UNTIL ABS(XCts - ABS(MoveToCts&)) < (XCtr / 8) 'REM
+   LOOP UNTIL ABS(SCANstruc.XCts - ABS(MoveToCts&)) < (SCANstruc.XCtr / 8) 'REM
 
    DoX = FALSE: EXIT FUNCTION
 
@@ -1746,7 +1731,7 @@ FUNCTION DoY (MPos&)
 
    DO
      IF KeyDown <> 0 THEN 'User pressed KEYPAD
- '      FlushKeys
+       FlushKeys
        DoY = TRUE: EXIT FUNCTION
      END IF
      IF (Glo.Stat(Servo3) AND HomeInProg) THEN
@@ -1757,7 +1742,7 @@ FUNCTION DoY (MPos&)
      PrintAPos
      PrintXPos
      PrintYPos
-   LOOP UNTIL (ABS(YCts - ABS(MoveToCts&)) < (YCtr / 8))
+   LOOP UNTIL (ABS(SCANstruc.YCts - ABS(MoveToCts&)) < (SCANstruc.YCtr / 8))
 
    DoY = FALSE: EXIT FUNCTION
 
@@ -1788,13 +1773,12 @@ SUB EnableAmpl (Value AS INTEGER, address AS INTEGER)
 END SUB
 
 SUB FixSIOerror
-  LOCAL Recque AS STRING
-  LOCAL xmtque AS INTEGER
+
   NullStr$ = STRING$(16, 0)
 
   'spit out a bunch of zeros
-  CALL WriteToComm(PICPort, NullStr$, BytesWritten, ECode)
-  XmtQue = 0
+  CALL WriteToComm(comport$,   NullStr$, BytesWritten, ECode%)
+
   DO
      CALL GetCharsInBuffer(PICPort, RecQue, XmtQue, ECode)
      Cts& = Cts& + 1
@@ -1812,9 +1796,9 @@ END SUB
 SUB FlushKeys
 
    'keypad flush
-   'CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
-   'CALL ddelay(50): OUT BitReg, KeyStbOn  'enable
-   'CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
+   CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
+   CALL ddelay(50): OUT BitReg, KeyStbOn  'enable
+   CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
 
 END SUB
 
@@ -1823,25 +1807,27 @@ SUB GetAD
 END SUB
 
 FUNCTION GetKeys$
-LOCAL KeyNum AS STRING
+
  'get keypad press
-' IF INP(KeyReg) AND &H20 THEN   'keypress
-'   OUT BitReg, KeyStbOn  'enable
-'   KBuff = INP(KeyReg)    'input data
-'   OUT BitReg, KeyStbOff 'disable
-'   KBuff = KBuff AND &H1F 'remove data ready bit
-'   KeyNum = KBuff + 1       'return keypress
-'   IF KeyNum > 20 THEN KeyNum = 0
-' ELSE
-'   KeyNum = 0            'return no keypress
-' END IF
- CON.WAITKEY$ TO KeyNum
- GetKeys$ = KeyTable(keyNum)
+ IF INP(KeyReg) AND &H20 THEN   'keypress
+   OUT BitReg, KeyStbOn  'enable
+   KBuff = INP(KeyReg)    'input data
+   OUT BitReg, KeyStbOff 'disable
+   KBuff = KBuff AND &H1F 'remove data ready bit
+   KeyNum = KBuff + 1       'return keypress
+   IF KeyNum > 20 THEN KeyNum = 0
+ ELSE
+   KeyNum = 0            'return no keypress
+ END IF
+
+ GetKeys$ = KeyTable(KeyNum)
 
 END FUNCTION
 
 FUNCTION GetLcdColPos
-
+  'REMED
+  GetLcdColPos = POS(0)
+  EXIT FUNCTION
   Position = GetLcdMemPos
 
   'pull the present column position of the cursor
@@ -1878,7 +1864,9 @@ FUNCTION GetLcdMemPos
 END FUNCTION
 
 FUNCTION GetLcdRowPos
-
+   'REMED
+  GetLcdRowPos = CSRLIN
+  EXIT FUNCTION
   Position = GetLcdMemPos
 
   Position = Position AND LcdAddress
@@ -1902,10 +1890,10 @@ SUB GetScanCal
     SELECT CASE WindowNum
       CASE 1
     CursorON
-    CALL PrintClrStr(1, 1, " X START: " + XLowStr)
-    CALL PrintClrStr(2, 1, "   X END: " + XHighStr)
-    CALL PrintClrStr(3, 1, " Y START: " + YLowStr)
-    CALL PrintClrStr(4, 1, "   Y END: " + YHighStr)
+    CALL PrintClrStr(1, 1, " X START: " + SCANstruc.XLowStr)
+    CALL PrintClrStr(2, 1, "   X END: " + SCANstruc.XHighStr)
+    CALL PrintClrStr(3, 1, " Y START: " + SCANstruc.YLowStr)
+    CALL PrintClrStr(4, 1, "   Y END: " + SCANstruc.YHighStr)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP
@@ -1915,15 +1903,15 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1   'XStart
            PrintChar 1, 1, ">"
-           SetLcdPos 1, 11: Temp$ = XLowStr
+           SetLcdPos 1, 11: Temp$ = SCANstruc.XLowStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           XLow = ABS(VAL(Temp$))
-           XLowStr = QStr$(XLow, 10)
+           SCANstruc.XLow = ABS(VAL(Temp$))
+           SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
          END IF
            END IF
-           PrintStr 1, 11, XLowStr
+           PrintStr 1, 11, SCANstruc.XLowStr
            SetLcdPos 1, 1
            IF XCode = KeyUP THEN
          PrintChar 1, 1, " "
@@ -1934,15 +1922,15 @@ SUB GetScanCal
            END IF
          CASE 2  'XEnd
            PrintChar 2, 1, ">"
-           SetLcdPos 2, 11: Temp$ = XHighStr
+           SetLcdPos 2, 11: Temp$ = SCANstruc.XHighStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           XHigh = ABS(VAL(Temp$))
-           XHighStr = QStr$(XHigh, 10)
+           SCANstruc.XHigh = ABS(VAL(Temp$))
+           SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
          END IF
            END IF
-           PrintStr 2, 11, XHighStr
+           PrintStr 2, 11, SCANstruc.XHighStr
            SetLcdPos 2, 1
            IF XCode = KeyUP THEN
          PrintChar 2, 1, " "
@@ -1953,15 +1941,15 @@ SUB GetScanCal
            END IF
          CASE 3 ' Y START
            PrintChar 3, 1, ">"
-           SetLcdPos 3, 11: Temp$ = YLowStr
+           SetLcdPos 3, 11: Temp$ = SCANstruc.YLowStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           YLow = ABS(VAL(Temp$))
-           YLowStr = QStr$(YLow, 10)
+           SCANstruc.YLow = ABS(VAL(Temp$))
+           SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
          END IF
            END IF
-           PrintStr 3, 11, YLowStr
+           PrintStr 3, 11, SCANstruc.YLowStr
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
          PrintChar 3, 1, " "
@@ -1972,15 +1960,15 @@ SUB GetScanCal
            END IF
          CASE 4 ' Y END
            PrintChar 4, 1, ">"
-           SetLcdPos 4, 11: Temp$ = YHighStr
+           SetLcdPos 4, 11: Temp$ = SCANstruc.YHighStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           YHigh = ABS(VAL(Temp$))
-           YHighStr = QStr$(YHigh, 10)
+           SCANstruc.YHigh = ABS(VAL(Temp$))
+           SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
          END IF
            END IF
-           PrintStr 4, 11, YHighStr
+           PrintStr 4, 11, SCANstruc.YHighStr
            SetLcdPos 4, 1
            IF XCode = KeyUP THEN
          PrintChar 4, 1, " "
@@ -1993,10 +1981,10 @@ SUB GetScanCal
     LastKey = XCode
       CASE 2
     CursorON
-    CALL PrintClrStr(1, 1, " X INDEX: " + XIndexSTR)
-    CALL PrintClrStr(2, 1, " Y INDEX: " + YIndexSTR)
-    CALL PrintClrStr(3, 1, " X SPEED: " + XSpeedSTR)
-    CALL PrintClrStr(4, 1, " Y SPEED: " + YSpeedSTR)
+    CALL PrintClrStr(1, 1, " X INDEX: " + SCANstruc.XIndexSTR)
+    CALL PrintClrStr(2, 1, " Y INDEX: " + SCANstruc.YIndexSTR)
+    CALL PrintClrStr(3, 1, " X SPEED: " + SCANstruc.XSpeedSTR)
+    CALL PrintClrStr(4, 1, " Y SPEED: " + SCANstruc.YSpeedSTR)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP
@@ -2006,15 +1994,15 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1 ' X INDEX
            PrintChar 1, 1, ">"
-           SetLcdPos 1, 11: Temp$ = XIndexSTR
+           SetLcdPos 1, 11: Temp$ = SCANstruc.XIndexSTR
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           XIndex = ABS(VAL(Temp$))
-           XIndexSTR = QStr$(XIndex, 10)
+           SCANstruc.XIndex = ABS(VAL(Temp$))
+           SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
          END IF
            END IF
-           PrintStr 1, 11, XIndexSTR
+           PrintStr 1, 11, SCANstruc.XIndexSTR
            SetLcdPos 1, 1
            IF XCode = KeyUP THEN
          WindowNum = 1
@@ -2024,15 +2012,15 @@ SUB GetScanCal
            END IF
          CASE 2 ' Y INDEX
            PrintChar 2, 1, ">"
-           SetLcdPos 2, 11: Temp$ = YIndexSTR
+           SetLcdPos 2, 11: Temp$ = SCANstruc.YIndexSTR
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           YIndex = ABS(VAL(Temp$))
-           YIndexSTR = QStr$(YIndex, 10)
+           SCANstruc.YIndex = ABS(VAL(Temp$))
+           SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
          END IF
            END IF
-           PrintStr 2, 11, YIndexSTR
+           PrintStr 2, 11, SCANstruc.YIndexSTR
            SetLcdPos 2, 1
            IF XCode = KeyUP THEN
          PrintChar 2, 1, " "
@@ -2043,15 +2031,15 @@ SUB GetScanCal
            END IF
          CASE 3
            PrintChar 3, 1, ">"
-           SetLcdPos 3, 11: Temp$ = XSpeedSTR
+           SetLcdPos 3, 11: Temp$ = SCANstruc.XSpeedSTR
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           XSpeed = ABS(VAL(Temp$))
-           XSpeedSTR = QStr$(XSpeed, 10)
+           SCANstruc.XSpeed = ABS(VAL(Temp$))
+           SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
          END IF
            END IF
-           PrintStr 3, 11, XSpeedSTR
+           PrintStr 3, 11, SCANstruc.XSpeedSTR
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
          PrintChar 3, 1, " "
@@ -2062,15 +2050,15 @@ SUB GetScanCal
            END IF
          CASE 4
            PrintChar 4, 1, ">"
-           SetLcdPos 4, 11: Temp$ = YSpeedSTR
+           SetLcdPos 4, 11: Temp$ = SCANstruc.YSpeedSTR
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           YSpeed = ABS(VAL(Temp$))
-           YSpeedSTR = QStr$(YSpeed, 10)
+           SCANstruc.YSpeed = ABS(VAL(Temp$))
+           SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
          END IF
            END IF
-           PrintStr 4, 11, YSpeedSTR
+           PrintStr 4, 11, SCANstruc.YSpeedSTR
            SetLcdPos 4, 1
            IF XCode = KeyUP THEN
          PrintChar 4, 1, " "
@@ -2084,10 +2072,10 @@ SUB GetScanCal
       CASE 3
     GetXyPos  'load current encoder position
     CursorON
-    CALL PrintClrStr(1, 1, "   X POS: " + XPosStr)
-    CALL PrintClrStr(2, 1, "   Y POS: " + YPosStr)
-    CALL PrintClrStr(3, 1, " X CT/IN: " + XCtrStr)
-    CALL PrintClrStr(4, 1, " Y CT/IN: " + YCtrStr)
+    CALL PrintClrStr(1, 1, "   X POS: " + SCANstruc.XPosStr)
+    CALL PrintClrStr(2, 1, "   Y POS: " + SCANstruc.YPosStr)
+    CALL PrintClrStr(3, 1, " X CT/IN: " + SCANstruc.XCtrStr)
+    CALL PrintClrStr(4, 1, " Y CT/IN: " + SCANstruc.YCtrStr)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP
@@ -2097,18 +2085,18 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1
            PrintChar 1, 1, ">"
-           SetLcdPos 1, 11: Temp$ = XPosStr
+           SetLcdPos 1, 11: Temp$ = SCANstruc.XPosStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           XPos = ABS(VAL(Temp$))
-           XPosStr = QStr$(XPos, 10)
-           XOffset = GetXCord(CLNG(XPos * XCtr))
+           SCANstruc.XPos = ABS(VAL(Temp$))
+           SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+           SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
            CALL ResetPosition(Servo1)
            CALL ResetPosition(Servo2)
          END IF
            END IF
-           PrintStr 1, 11, XPosStr
+           PrintStr 1, 11, SCANstruc.XPosStr
            SetLcdPos 1, 1
            IF XCode = KeyUP THEN
          WindowNum = 2
@@ -2118,17 +2106,17 @@ SUB GetScanCal
            END IF
          CASE 2
            PrintChar 2, 1, ">"
-           SetLcdPos 2, 11: Temp$ = YPosStr
+           SetLcdPos 2, 11: Temp$ = SCANstruc.YPosStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           YPos = ABS(VAL(Temp$))
-           YPosStr = QStr$(YPos, 10)
-           YOffset = GetYCord(CLNG(YPos * YCtr))
+           SCANstruc.YPos = ABS(VAL(Temp$))
+           SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+           SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
            CALL ResetPosition(Servo3)
          END IF
            END IF
-           PrintStr 2, 11, YPosStr
+           PrintStr 2, 11, SCANstruc.YPosStr
            SetLcdPos 2, 1
            IF XCode = KeyUP THEN
          PrintChar 2, 1, " "
@@ -2137,17 +2125,17 @@ SUB GetScanCal
          PrintChar 2, 1, " "
          SetLcdPos 3, 1
            END IF
-         CASE 3 '" X CT/IN: " + XCtrSTR)
+         CASE 3 '" X CT/IN: " + SCANstruc.XCtrSTR)
            PrintChar 3, 1, ">"
-           SetLcdPos 3, 11: Temp$ = XCtrStr
+           SetLcdPos 3, 11: Temp$ = SCANstruc.XCtrStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodLNG(Temp$) THEN
-           XCtr = ABS(VAL(Temp$))
-           XCtrStr = QStr$(XCtr, 10)
+           SCANstruc.XCtr = ABS(VAL(Temp$))
+           SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
          END IF
            END IF
-           PrintStr 3, 11, XCtrStr
+           PrintStr 3, 11, SCANstruc.XCtrStr
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
          PrintChar 3, 1, " "
@@ -2158,15 +2146,15 @@ SUB GetScanCal
            END IF
          CASE 4
            PrintChar 4, 1, ">"
-           SetLcdPos 4, 11: Temp$ = YCtrStr
+           SetLcdPos 4, 11: Temp$ = SCANstruc.YCtrStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodLNG(Temp$) THEN
-           YCtr = ABS(VAL(Temp$))
-           YCtrStr = QStr$(YCtr, 10)
+           SCANstruc.YCtr = ABS(VAL(Temp$))
+           SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
          END IF
            END IF
-           PrintStr 4, 11, YCtrStr
+           PrintStr 4, 11, SCANstruc.YCtrStr
            SetLcdPos 4, 1
            IF XCode = KeyUP THEN
          PrintChar 4, 1, " "
@@ -2179,10 +2167,10 @@ SUB GetScanCal
     LastKey = XCode
       CASE 4
     CursorON
-    CALL PrintClrStr(1, 1, "   X +/-:*" + XPlusSTR)
-    CALL PrintClrStr(2, 1, "   Y +/-:*" + YPlusSTR)
-    CALL PrintClrStr(3, 1, "   INDEX:*" + IndexYSTR)
-    CALL PrintClrStr(4, 1, " IDX H/L:*" + IndexLowStr)
+    CALL PrintClrStr(1, 1, "   X +/-:*" + SCANstruc.XPlusSTR)
+    CALL PrintClrStr(2, 1, "   Y +/-:*" + SCANstruc.YPlusSTR)
+    CALL PrintClrStr(3, 1, "   INDEX:*" + SCANstruc.IndexYSTR)
+    CALL PrintClrStr(4, 1, " IDX H/L:*" + SCANstruc.IndexLowStr)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP
@@ -2192,7 +2180,7 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1   'no user input - picklist   (POSITIVE or NEGATIVE)
            PrintChar 1, 1, ">"
-           PrintStr 1, 11, XPlusSTR
+           PrintStr 1, 11, SCANstruc.XPlusSTR
            SetLcdPos 1, 1
            DO
          XCode = GetSelectKey
@@ -2204,14 +2192,14 @@ SUB GetScanCal
            SetLcdPos 2, 1
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           XPlus = TRUE
-           XPlusSTR = "POSITIVE  "
-           PrintStr 1, 11, XPlusSTR
+           SCANstruc.XPlus = TRUE
+           SCANstruc.XPlusSTR = "POSITIVE  "
+           PrintStr 1, 11, SCANstruc.XPlusSTR
            SetLcdPos 1, 1
          ELSEIF XCode = KeyRgt THEN
-           XPlus = FALSE
-           XPlusSTR = "NEGATIVE  "
-           PrintStr 1, 11, XPlusSTR
+           SCANstruc.XPlus = FALSE
+           SCANstruc.XPlusSTR = "NEGATIVE  "
+           PrintStr 1, 11, SCANstruc.XPlusSTR
            SetLcdPos 1, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2219,7 +2207,7 @@ SUB GetScanCal
            LOOP
          CASE 2   'no user input - picklist   (POSITIVE or NEGATIVE)
            PrintChar 2, 1, ">"
-           PrintStr 2, 11, YPlusSTR
+           PrintStr 2, 11, SCANstruc.YPlusSTR
            SetLcdPos 2, 1
            DO
          XCode = GetSelectKey
@@ -2232,14 +2220,14 @@ SUB GetScanCal
            SetLcdPos 3, 1
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           YPlus = TRUE
-           YPlusSTR = "POSITIVE  "
-           PrintStr 2, 11, YPlusSTR
+           SCANstruc.YPlus = TRUE
+           SCANstruc.YPlusSTR = "POSITIVE  "
+           PrintStr 2, 11, SCANstruc.YPlusSTR
            SetLcdPos 2, 1
          ELSEIF XCode = KeyRgt THEN
-           YPlus = FALSE
-           YPlusSTR = "NEGATIVE  "
-           PrintStr 2, 11, YPlusSTR
+           SCANstruc.YPlus = FALSE
+           SCANstruc.YPlusSTR = "NEGATIVE  "
+           PrintStr 2, 11, SCANstruc.YPlusSTR
            SetLcdPos 2, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2247,7 +2235,7 @@ SUB GetScanCal
            LOOP
          CASE 3   'no user input - picklist   (X or Y)
            PrintChar 3, 1, ">"
-           PrintStr 3, 11, IndexYSTR
+           PrintStr 3, 11, SCANstruc.IndexYSTR
            SetLcdPos 3, 1
            DO
          XCode = GetSelectKey
@@ -2260,14 +2248,14 @@ SUB GetScanCal
            SetLcdPos 4, 1
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           IndexY = TRUE
-           IndexYSTR = "Y         "
-           PrintStr 3, 11, IndexYSTR
+           SCANstruc.IndexY = TRUE
+           SCANstruc.IndexYSTR = "Y         "
+           PrintStr 3, 11, SCANstruc.IndexYSTR
            SetLcdPos 3, 1
          ELSEIF XCode = KeyRgt THEN
-           IndexY = FALSE
-           IndexYSTR = "X         "
-           PrintStr 3, 11, IndexYSTR
+           SCANstruc.IndexY = FALSE
+           SCANstruc.IndexYSTR = "X         "
+           PrintStr 3, 11, SCANstruc.IndexYSTR
            SetLcdPos 3, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2275,7 +2263,7 @@ SUB GetScanCal
            LOOP
          CASE 4   'no user input - picklist   (on or off)
            PrintChar 4, 1, ">"
-           PrintStr 4, 11, IndexLowStr
+           PrintStr 4, 11, SCANstruc.IndexLowStr
            SetLcdPos 4, 1
            DO
          XCode = GetSelectKey
@@ -2287,14 +2275,14 @@ SUB GetScanCal
            WindowNum = 5
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           IndexLow = TRUE
-           IndexLowStr = "HIGH - LOW"
-           PrintStr 4, 11, IndexLowStr
+           SCANstruc.IndexLow = TRUE
+           SCANstruc.IndexLowStr = "HIGH - LOW"
+           PrintStr 4, 11, SCANstruc.IndexLowStr
            SetLcdPos 4, 1
          ELSEIF XCode = KeyRgt THEN
-           IndexLow = FALSE
-           IndexLowStr = "LOW - HIGH"
-           PrintStr 4, 11, IndexLowStr
+           SCANstruc.IndexLow = FALSE
+           SCANstruc.IndexLowStr = "LOW - HIGH"
+           PrintStr 4, 11, SCANstruc.IndexLowStr
            SetLcdPos 4, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2305,10 +2293,10 @@ SUB GetScanCal
     LastKey = XCode
       CASE 5
     CursorOFF
-    CALL PrintClrStr(1, 1, " X ON/OF:*" + XEnableSTR)
-    CALL PrintClrStr(2, 1, " Y ON/OF:*" + YEnableSTR)
-    CALL PrintClrStr(3, 1, " AUTO HD:*" + AutoHoldSTR)
-    CALL PrintClrStr(4, 1, " DUALRAS:*" + DualRasSTR)
+    CALL PrintClrStr(1, 1, " X ON/OF:*" + SCANstruc.XEnableSTR)
+    CALL PrintClrStr(2, 1, " Y ON/OF:*" + SCANstruc.YEnableSTR)
+    CALL PrintClrStr(3, 1, " AUTO HD:*" + SCANstruc.AutoHoldSTR)
+    CALL PrintClrStr(4, 1, " DUALRAS:*" + SCANstruc.DualRasSTR)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP
@@ -2318,7 +2306,7 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1   'no user input - picklist   (on or off)
            PrintChar 1, 1, ">"
-           PrintStr 1, 11, XEnableSTR
+           PrintStr 1, 11, SCANstruc.XEnableSTR
            SetLcdPos 1, 1
            DO
          XCode = GetSelectKey
@@ -2330,19 +2318,19 @@ SUB GetScanCal
            SetLcdPos 2, 1
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           XEnable = TRUE
-           XEnableSTR = "ON        "
+           SCANstruc.XEnable = TRUE
+           SCANstruc.XEnableSTR = "ON        "
            CALL StopXMtrs
-           'CALL EnableAmpl(XEnable, Servo1)
-           'CALL EnableAmpl(XEnable, Servo2)
-           PrintStr 1, 11, XEnableSTR
+           'CALL EnableAmpl(SCANstruc.XEnable, Servo1)
+           'CALL EnableAmpl(SCANstruc.XEnable, Servo2)
+           PrintStr 1, 11, SCANstruc.XEnableSTR
            SetLcdPos 1, 1
          ELSEIF XCode = KeyRgt THEN
-           XEnable = FALSE
-           XEnableSTR = "OFF       "
-           CALL EnableAmpl(XEnable, Servo1)
-           CALL EnableAmpl(XEnable, Servo2)
-           PrintStr 1, 11, XEnableSTR
+           SCANstruc.XEnable = FALSE
+           SCANstruc.XEnableSTR = "OFF       "
+           CALL EnableAmpl(SCANstruc.XEnable, Servo1)
+           CALL EnableAmpl(SCANstruc.XEnable, Servo2)
+           PrintStr 1, 11, SCANstruc.XEnableSTR
            SetLcdPos 1, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2350,7 +2338,7 @@ SUB GetScanCal
            LOOP
          CASE 2   'no user input - picklist   (on or off)
            PrintChar 2, 1, ">"
-           PrintStr 2, 11, YEnableSTR
+           PrintStr 2, 11, SCANstruc.YEnableSTR
            SetLcdPos 2, 1
            DO
          XCode = GetSelectKey
@@ -2363,19 +2351,19 @@ SUB GetScanCal
            SetLcdPos 3, 1
            EXIT DO
          ELSEIF XCode = KeyLft THEN
-           YEnable = TRUE
-           YEnableSTR = "ON        "
+           SCANstruc.YEnable = TRUE
+           SCANstruc.YEnableSTR = "ON        "
            CALL StopYMtr
-           'CALL EnableAmpl(YEnable, Servo3)
-           'CALL EnableAmpl(YEnable, Servo3)
-           PrintStr 2, 11, YEnableSTR
+           'CALL EnableAmpl(SCANstruc.YEnable, Servo3)
+           'CALL EnableAmpl(SCANstruc.YEnable, Servo3)
+           PrintStr 2, 11, SCANstruc.YEnableSTR
            SetLcdPos 2, 1
          ELSEIF XCode = KeyRgt THEN
-           YEnable = FALSE
-           YEnableSTR = "OFF       "
-           CALL EnableAmpl(YEnable, Servo3)
-           CALL EnableAmpl(YEnable, Servo3)
-           PrintStr 2, 11, YEnableSTR
+           SCANstruc.YEnable = FALSE
+           SCANstruc.YEnableSTR = "OFF       "
+           CALL EnableAmpl(SCANstruc.YEnable, Servo3)
+           CALL EnableAmpl(SCANstruc.YEnable, Servo3)
+           PrintStr 2, 11, SCANstruc.YEnableSTR
            SetLcdPos 2, 1
          ELSEIF XCode = KeyEsc THEN
            EXIT DO
@@ -2383,7 +2371,7 @@ SUB GetScanCal
            LOOP
          CASE 3   'no user input - picklist   (true or false)
            PrintChar 3, 1, ">"
-           PrintStr 3, 11, AutoHoldSTR
+           PrintStr 3, 11, SCANstruc.AutoHoldSTR
            SetLcdPos 3, 1
            DO
           XCode = GetSelectKey
@@ -2396,14 +2384,14 @@ SUB GetScanCal
             SetLcdPos 4, 1
             EXIT DO
           ELSEIF XCode = KeyLft THEN
-            AutoHold = TRUE
-            AutoHoldSTR = "ON        "
-            PrintStr 3, 11, AutoHoldSTR
+            SCANstruc.AutoHold = TRUE
+            SCANstruc.AutoHoldSTR = "ON        "
+            PrintStr 3, 11, SCANstruc.AutoHoldSTR
             SetLcdPos 3, 1
           ELSEIF XCode = KeyRgt THEN
-            AutoHold = FALSE
-            AutoHoldSTR = "OFF       "
-            PrintStr 3, 11, AutoHoldSTR
+            SCANstruc.AutoHold = FALSE
+            SCANstruc.AutoHoldSTR = "OFF       "
+            PrintStr 3, 11, SCANstruc.AutoHoldSTR
             SetLcdPos 3, 1
           ELSEIF XCode = KeyEsc THEN
             EXIT DO
@@ -2411,7 +2399,7 @@ SUB GetScanCal
            LOOP
          CASE 4   'no user input - picklist   (On or Off)
            PrintChar 4, 1, ">"
-           PrintStr 4, 11, DualRasSTR
+           PrintStr 4, 11, SCANstruc.DualRasSTR
            SetLcdPos 4, 1
            DO
           XCode = GetSelectKey
@@ -2423,14 +2411,14 @@ SUB GetScanCal
             WindowNum = 6
             EXIT DO
           ELSEIF XCode = KeyLft THEN
-            DualRas = TRUE
-            DualRasSTR = "ON        "
-            PrintStr 4, 11, DualRasSTR
+            SCANstruc.DualRas = TRUE
+            SCANstruc.DualRasSTR = "ON        "
+            PrintStr 4, 11, SCANstruc.DualRasSTR
             SetLcdPos 4, 1
           ELSEIF XCode = KeyRgt THEN
-            DualRas = FALSE
-            DualRasSTR = "OFF       "
-            PrintStr 4, 11, DualRasSTR
+            SCANstruc.DualRas = FALSE
+            SCANstruc.DualRasSTR = "OFF       "
+            PrintStr 4, 11, SCANstruc.DualRasSTR
             SetLcdPos 4, 1
           ELSEIF XCode = KeyEsc THEN
             EXIT DO
@@ -2441,9 +2429,9 @@ SUB GetScanCal
     LastKey = XCode
       CASE 6
     CursorON
-    CALL PrintClrStr(1, 1, " OVERLAP: " + OverLapStr)
-    CALL PrintClrStr(2, 1, "   A POS: " + APosStr)
-    CALL PrintClrStr(3, 1, " A CT/IN: " + ACtrStr)
+    CALL PrintClrStr(1, 1, " OVERLAP: " + SCANstruc.OverLapStr)
+    CALL PrintClrStr(2, 1, "   A POS: " + SCANstruc.APosStr)
+    CALL PrintClrStr(3, 1, " A CT/IN: " + SCANstruc.ACtrStr)
     CALL PrintClrStr(4, 1, " ")
     IF LastKey = KeyUP THEN
       SetLcdPos 3, 1
@@ -2454,15 +2442,15 @@ SUB GetScanCal
        SELECT CASE GetLcdRowPos
          CASE 1     'OverLap
            PrintChar 1, 1, ">"
-           SetLcdPos 1, 11: Temp$ = OverLapStr
+           SetLcdPos 1, 11: Temp$ = SCANstruc.OverLapStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           OVERLAP = ABS(VAL(Temp$))
-           OverLapStr = QStr$(OVERLAP, 10)
+           SCANstruc.OverLap = ABS(VAL(Temp$))
+           SCANstruc.OverLapStr = QStr$(SCANstruc.OverLap, 10)
          END IF
            END IF
-           PrintStr 1, 11, OverLapStr
+           PrintStr 1, 11, SCANstruc.OverLapStr
            SetLcdPos 1, 1
            IF XCode = KeyUP THEN
          WindowNum = 5
@@ -2472,17 +2460,17 @@ SUB GetScanCal
            END IF
          CASE 2
            PrintChar 2, 1, ">"
-           SetLcdPos 2, 11: Temp$ = APosStr
+           SetLcdPos 2, 11: Temp$ = SCANstruc.APosStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodSNG(Temp$) THEN
-           APos = ABS(VAL(Temp$))
-           APosStr = QStr$(APos, 10)
-           AOffset = GetXCord(CLNG(APos * ACtr))
+           SCANstruc.APos = ABS(VAL(Temp$))
+           SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+           SCANstruc.AOffset = GetXCord(CLNG(SCANstruc.APos * SCANstruc.ACtr))
            CALL ResetPosition(Servo4)
          END IF
            END IF
-           PrintStr 2, 11, APosStr
+           PrintStr 2, 11, SCANstruc.APosStr
            SetLcdPos 2, 1
            IF XCode = KeyUP THEN
          PrintChar 2, 1, " "
@@ -2493,15 +2481,15 @@ SUB GetScanCal
            END IF
          CASE 3
            PrintChar 3, 1, ">"
-           SetLcdPos 3, 11: Temp$ = ACtrStr
+           SetLcdPos 3, 11: Temp$ = SCANstruc.ACtrStr
            CALL KEdit(Temp$, XCode)  'get input
            IF XCode = KeyEnter THEN
          IF GoodLNG(Temp$) THEN
-           ACtr = ABS(VAL(Temp$))
-           ACtrStr = QStr$(ACtr, 10)
+           SCANstruc.ACtr = ABS(VAL(Temp$))
+           SCANstruc.ACtrStr = QStr$(SCANstruc.ACtr, 10)
          END IF
            END IF
-           PrintStr 3, 11, ACtrStr
+           PrintStr 3, 11, SCANstruc.ACtrStr
            SetLcdPos 3, 1
            IF XCode = KeyUP THEN
          PrintChar 3, 1, " "
@@ -2593,13 +2581,13 @@ SUB GetScanCal
 
   CursorOFF
 
-  IF XHigh < XLow THEN
-    SWAP XHigh, XLow
-    SWAP XHighStr, XLowStr
+  IF SCANstruc.XHigh < SCANstruc.XLow THEN
+    SWAP SCANstruc.XHigh, SCANstruc.XLow
+    SWAP SCANstruc.XHighStr, SCANstruc.XLowStr
   END IF
-  IF YHigh < YLow THEN
-    SWAP YHigh, YLow
-    SWAP YHighStr, YLowStr
+  IF SCANstruc.YHigh < SCANstruc.YLow THEN
+    SWAP SCANstruc.YHigh, SCANstruc.YLow
+    SWAP SCANstruc.YHighStr, SCANstruc.YLowStr
   END IF
 
   EXIT SUB
@@ -2662,7 +2650,7 @@ SUB GetStatus (Num)
 END SUB
 
 FUNCTION GetXCord& (Cts&)
-  IF XPlus = TRUE THEN 'X positive direction
+  IF SCANstruc.XPlus = TRUE THEN 'X positive direction
     GetXCord& = Cts&
   ELSE
     GetXCord& = -Cts&   'X negative direction
@@ -2676,17 +2664,17 @@ SUB GetXyPos
 
     CALL GetStatus(&H255)   'get status of all servos (4)
 
-    XCts = ABS(Glo.Position(Servo1))
-    YCts = ABS(Glo.Position(Servo3))
-    ACts = ABS(Glo.Position(Servo4))
+    SCANstruc.XCts = ABS(Glo.Position(Servo1))
+    SCANstruc.YCts = ABS(Glo.Position(Servo3))
+    SCANstruc.ACts = ABS(Glo.Position(Servo4))
 
-    XPos = CLNG((XCts / XCtr) * 1000) / 1000
-    YPos = CLNG((YCts / YCtr) * 1000) / 1000
-    APos = CLNG((ACts / ACtr) * 1000) / 1000
+    SCANstruc.XPos = CLNG((SCANstruc.XCts / SCANstruc.XCtr) * 1000) / 1000
+    SCANstruc.YPos = CLNG((SCANstruc.YCts / SCANstruc.YCtr) * 1000) / 1000
+    SCANstruc.APos = CLNG((SCANstruc.ACts / SCANstruc.ACtr) * 1000) / 1000
 
-    XPosStr = QStr(XPos, 10)
-    YPosStr = QStr(YPos, 10)
-    APosStr = QStr(APos, 10)
+    SCANstruc.XPosStr = QStr(SCANstruc.XPos, 10)
+    SCANstruc.YPosStr = QStr(SCANstruc.YPos, 10)
+    SCANstruc.APosStr = QStr(SCANstruc.APos, 10)
 
     CALL GetStatus(InOut1)   'get status of IO
 
@@ -2694,7 +2682,7 @@ END SUB
 
 FUNCTION GetYCord& (Cts&)
 
-  IF YPlus = TRUE THEN 'Y positive cts
+  IF SCANstruc.YPlus = TRUE THEN 'Y positive cts
     GetYCord& = Cts&
   ELSE
     GetYCord& = -Cts&  'Y negative cts
@@ -2952,12 +2940,12 @@ SUB JogAuto
   'add limit switch stop; enable with 'stop on find home'
   CALL ClrLCD
 
-  IF NOT (XEnable AND YEnable) THEN
+  IF NOT (SCANstruc.XEnable AND SCANstruc.YEnable) THEN
     PrintClrStr 1, 1, "* Check Motors On *"
     PrintClrStr 2, 1, "*  Press Any Key  *"
     DO
     LOOP UNTIL KeyInBuff
-  '  FlushKeys
+    FlushKeys
     EXIT SUB
   END IF
 
@@ -3036,12 +3024,12 @@ SUB JogJoyStk
 
   CALL ClrLCD
 
-  IF NOT (XEnable) THEN
+  IF NOT (SCANstruc.XEnable) THEN
     PrintClrStr 1, 1, "* Check Motors On *"
     PrintClrStr 2, 1, "*  Press Any Key  *"
     DO
     LOOP UNTIL KeyInBuff
- '   FlushKeys
+    FlushKeys
     EXIT SUB
   END IF
 
@@ -3070,7 +3058,7 @@ SUB JogJoyStk
 
 
       IF Glo.CmdPwm(1) = 0 AND Glo.CmdPwm(2) = 0 THEN
-    IF AutoHold THEN
+    IF SCANstruc.AutoHold THEN
       IF NOT StopOn THEN
         CALL StopMtrs 'put into velocity mode and set velocity to 0
         SetModeVel 'sets vel to 0
@@ -3085,9 +3073,9 @@ SUB JogJoyStk
 
   LOOP
 
-  'FlushKeys
+  FlushKeys
 
-  IF AutoHold THEN
+  IF SCANstruc.AutoHold THEN
     CALL StopMtrs 'put into velocity mode and set velocity to 0
     SetModeVel 'sets vel to 0
   ELSE
@@ -3114,12 +3102,12 @@ SUB JogMan
 
   CALL ClrLCD
 
-  IF NOT (XEnable AND YEnable) THEN
+  IF NOT (SCANstruc.XEnable AND SCANstruc.YEnable) THEN
     PrintClrStr 1, 1, "* Check Motors On *"
     PrintClrStr 2, 1, "*  Press Any Key  *"
     DO
     LOOP UNTIL KeyInBuff
- '   FlushKeys
+    FlushKeys
     EXIT SUB
   END IF
 
@@ -3186,12 +3174,12 @@ SUB JogXSpd
 
   CALL ClrLCD
 
-  IF NOT (XEnable) THEN
+  IF NOT (SCANstruc.XEnable) THEN
     PrintClrStr 1, 1, "* Check Motors On *"
     PrintClrStr 2, 1, "*  Press Any Key  *"
     DO
     LOOP UNTIL KeyInBuff
- '   FlushKeys
+    FlushKeys
     EXIT SUB
   END IF
 
@@ -3199,13 +3187,13 @@ SUB JogXSpd
   PrintClrStr 2, 1, "  Press Any Key   "
   DO
   LOOP UNTIL KeyInBuff
- ' FlushKeys
+  FlushKeys
 
   CALL ClrLCD
   PrintStr 1, 1, "X Pos: "
   PrintStr 2, 1, "Y Pos: "
   PrintStr 3, 1, "A Pos: "
-  PrintStr 4, 1, XSpdDirSTR
+  PrintStr 4, 1, SCANstruc.XSpdDirSTR
 
   StopOn = FALSE
 
@@ -3218,7 +3206,7 @@ SUB JogXSpd
     CALL PrintPos   'get stats also
 
     'PWM output based on A/D 4
-    IF XSpdDir THEN 'forward direction
+    IF SCANstruc.XSpdDir THEN 'forward direction
       Glo.CmdPwm(1) = XSpd(Glo.AdVal(4))
       Glo.CmdPwm(2) = Glo.CmdPwm(1)
     ELSE 'reverse direction
@@ -3227,7 +3215,7 @@ SUB JogXSpd
     END IF
 
     IF Glo.CmdPwm(1) = 0 THEN  'glo.CmdPwm(2) = glo.CmdPwm(1)
-      IF AutoHold THEN
+      IF SCANstruc.AutoHold THEN
         IF NOT StopOn THEN
           CALL StopMtrs 'put into velocity mode and set velocity to 0
           SetModeVel 'sets vel to 0
@@ -3244,16 +3232,16 @@ SUB JogXSpd
 
      SELECT CASE GetSelectKey
        CASE KeyRgt
-     IF XSpdDir THEN
-       XSpdDir = FALSE
-       XSpdDirSTR = "REVERSE*"
-       PrintStr 4, 1, XSpdDirSTR
+     IF SCANstruc.XSpdDir THEN
+       SCANstruc.XSpdDir = FALSE
+       SCANstruc.XSpdDirSTR = "REVERSE*"
+       PrintStr 4, 1, SCANstruc.XSpdDirSTR
      END IF
        CASE KeyLft
-     IF NOT XSpdDir THEN
-       XSpdDir = TRUE
-       XSpdDirSTR = "FORWARD*"
-       PrintStr 4, 1, XSpdDirSTR
+     IF NOT SCANstruc.XSpdDir THEN
+       SCANstruc.XSpdDir = TRUE
+       SCANstruc.XSpdDirSTR = "FORWARD*"
+       PrintStr 4, 1, SCANstruc.XSpdDirSTR
      END IF
        CASE KeyEsc
      EXIT DO
@@ -3261,9 +3249,9 @@ SUB JogXSpd
 
   LOOP
 
- ' FlushKeys
+  FlushKeys
 
-  IF AutoHold THEN
+  IF SCANstruc.AutoHold THEN
     CALL StopMtrs 'put into velocity mode and set velocity to 0
     SetModeVel 'sets vel to 0
   ELSE
@@ -3407,19 +3395,15 @@ FUNCTION KeyDown
    '        until user releases key.
    '    3.) During this time we can tell if user released key.
 
-'   KeyState = INP(KeyReg) 'read keyboard port
-   a$ = CON.INKEY$
-   IF LEN(a$) THEN
-       keydown = -1
-   ELSE : keydown = 0
+   KeyState = INP(KeyReg) 'read keyboard port
+
+   IF KeyState AND (NOT &H20) THEN  'key not released or not been pushed
+     IF (KeyState AND &H40) THEN    'user holding Key down
+       KeyDown = -1
+     ELSE : KeyDown = 0
+     END IF
+   ELSE : KeyDown = 0
    END IF
-'   IF KeyState AND (NOT &H20) THEN  'key not released or not been pushed
-'     IF (KeyState AND &H40) THEN    'user holding Key down
-'       KeyDown = -1
-'     ELSE : KeyDown = 0
-'     END IF
-'   ELSE : KeyDown = 0
-'   END IF
 
 END FUNCTION
 
@@ -3439,7 +3423,7 @@ SUB KeyWait
      DO
      LOOP UNTIL KeyInBuff
 
-'    FlushKeys
+     FlushKeys
 
 END SUB
 
@@ -3519,7 +3503,7 @@ SUB MoveX (PosCts&)
    'When user changes current position the counters get zeroed.
    'Adjust move-to position offset accordingly
    '**********************************************************
-   ActPos& = PosCts& - XOffset
+   ActPos& = PosCts& - SCANstruc.XOffset
 
    'Build the command string
    Cmd$ = CHR$(&HD4) + CHR$(ControlByte) + LongToStr(ActPos&)
@@ -3568,7 +3552,7 @@ SUB MoveY (PosCts&)
   '**********************************************************
   'When user changes current position the counters get zeroed.
   'Adjust move-to position accordingly
-  ActPos& = PosCts& - YOffset
+  ActPos& = PosCts& - SCANstruc.YOffset
   '**********************************************************
 
   'Build the command string
@@ -3607,151 +3591,91 @@ SUB MoveYVel (MoveDir)
 END SUB
 
 SUB MtrOff (address AS INTEGER)
+
  IF address < 1 THEN EXIT SUB
+
  Cmd$ = CHR$(&H17) + CHR$(MotorOff)
+
  SendCmd address, Cmd$
-END SUB
-'''''''''''''''' Serial functions ''''''''''''''''''''''''''''''
-FUNCTION OpenComPorts AS INTEGER
-    LOCAL ECode AS INTEGER
-    LOCAL x AS INTEGER
-    nComm = FREEFILE
-    COMM OPEN PicPort AS #nComm
-    IF ERR THEN
-        OpenComPorts = FALSE
-        EXIT FUNCTION
-    END IF
-    XmitSize = 2048
-    RecvSize = 2048
-    COMM SET #nComm, TXBUFFER = xmitsize
-    COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
-    COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
-    COMM SET #nComm, BYTE   = 8     ' 8 bits
-    COMM SET #nComm, PARITY = 0     ' No parity
-    COMM SET #nComm, STOP   = 1     ' 1 stop bit
-    CALL FlushBuffers(PICPort, 0, ECode)
-    OpenComPorts = TRUE
-END FUNCTION
-SUB GetCharsInBuffer (PICPort AS STRING, RecvQue AS STRING, XmitQue AS INTEGER, ECode)
-    LOCAL ncbData AS LONG
-    ncbData = COMM(PICPort, RXQUE)
-    IF ncbData THEN
-            COMM RECV PICPort, ncbData, RecvQue
-    END IF
-    ncbData = COMM(PICPort, TXQUE)
-    IF ncbData THEN
-            COMM RECV PICPort, ncbData, XmitQue
-    END IF
 
 END SUB
 
-SUB FlushBuffers (PICPort AS STRING, zero AS INTEGER, ECode AS INTEGER)
-    LOCAL buffer_clear AS STRING
-    buffer_clear = STRING$(2048, zero)
-    COMM SEND #nComm, buffer_clear
-END SUB
-
-SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
-    COMM SEND #nComm, SendStr
-END SUB
-
-
-'FUNCTION OpenComPorts
+FUNCTION OpenComPorts
 
    REM Changed to PC Serial routines
 
-'   NumPorts = 1: RecvSize = 2048: XmitSize = 2048
+   NumPorts = 1: RecvSize = 2048: XmitSize = 2048
 
-'   PortSeg = VARSEG(PICPort): PortOff = VARPTR(PICPort)
-'   RecvSeg = VARSEG(RecvSize): RecvOff = VARPTR(RecvSize)
-'   XmitSeg = VARSEG(XmitSize): XmitOff = VARPTR(XmitSize)
+   PortSeg = VARSEG(PICPort): PortOff = VARPTR(PICPort)
+   RecvSeg = VARSEG(RecvSize): RecvOff = VARPTR(RecvSize)
+   XmitSeg = VARSEG(XmitSize): XmitOff = VARPTR(XmitSize)
 
-'   CALL CalcRequiredMem(PortSeg, PortOff, RecvSeg, RecvOff, XmitSeg, XmitOff, NumPorts, MemSize, ECode)
-'   IF ECode THEN
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
+   CALL CalcRequiredMem(PortSeg, PortOff, RecvSeg, RecvOff, XmitSeg, XmitOff, NumPorts, MemSize, ECode)
+   IF ECode THEN
+     OpenComPorts = FALSE
+     EXIT FUNCTION
+   END IF
 
-'   FarHeapSize& = SETMEM(-(MemSize))  'take some far heap
+   FarHeapSize& = SETMEM(-(MemSize))  'take some far heap
 
-'   CALL InitCommBuffers(ECode)
-'   IF ECode THEN
-'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
+   CALL InitCommBuffers(ECode)
+   IF ECode THEN
+     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+     OpenComPorts = FALSE
+     EXIT FUNCTION
+   END IF
 
    ' Set the flow control to no flow control
-'   CALL SetFlowControl(PICPort, 3, 3, 0, 0, 0, 0, ECode)
-'   IF ECode THEN
-'     CALL DeleteCommBuffers(ECode)
-'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
+   CALL SetFlowControl(PICPort, 3, 3, 0, 0, 0, 0, ECode)
+   IF ECode THEN
+     CALL DeleteCommBuffers(ECode)
+     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+     OpenComPorts = FALSE
+     EXIT FUNCTION
+   END IF
 
-'   CALL SetFIFOTriggerLevel(PICPort, 14, ECode)
+   CALL SetFIFOTriggerLevel(PICPort, 14, ECode)
 
-'   DataBits = 8: PARITY = 4: StopBits = 1
+   DataBits = 8: PARITY = 4: StopBits = 1
 
-'   CALL OpenCommPort(PICPort, PICBaud, DataBits, PARITY, StopBits, ECode)
-'   IF ECode THEN
-'     CALL DeleteCommBuffers(ECode)
-'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
+   CALL OpenCommPort(PICPort, PICBaud, DataBits, PARITY, StopBits, ECode)
+   IF ECode THEN
+     CALL DeleteCommBuffers(ECode)
+     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+     OpenComPorts = FALSE
+     EXIT FUNCTION
+   END IF
 
-'   OpenComPorts = TRUE
+   OpenComPorts = TRUE
 
-'   CALL FlushBuffers(PICPort, 0, ECode)
+   CALL FlushBuffers(PICPort, 0, ECode)
 
-'   EXIT FUNCTION
+   EXIT FUNCTION
 
-'END FUNCTION
+END FUNCTION
 
 SUB PrintAPos
 
     CALL GetStatus(Servo4)   'get status of aux encoder
-    ACts = ABS(Glo.Position(Servo4))
-    APos = CLNG((ACts / ACtr) * 1000) / 1000
-    APosStr = QStr(APos, 10)
-    CALL PrintStr(3, 7, APosStr)
+    SCANstruc.ACts = ABS(Glo.Position(Servo4))
+    SCANstruc.APos = CLNG((SCANstruc.ACts / SCANstruc.ACtr) * 1000) / 1000
+    SCANstruc.APosStr = QStr(SCANstruc.APos, 10)
+    CALL PrintStr(3, 7, SCANstruc.APosStr)
 
 END SUB
 
 SUB PrintChar (y, x, char$)
 
 
-   ' CALL SetLcdPos(y, x) 'position cursor
-   ' CALL StrobeData(ASC(char$))
-   PRINT ASC(char$)
+    CALL SetLcdPos(y, x) 'position cursor
+    CALL StrobeData(ASC(char$))
 
 END SUB
 
 SUB PrintClrStr (y, x, Text$)
-
-    YY = y: XX = x
-
-    'CALL SetLcdPos(YY, XX) 'position cursor
-
-    'FOR i = 1 TO LEN(Text$)
-    '  IF XX <= LcdColumns THEN
-    '    CALL StrobeData(ASC(MID$(Text$, i, 1))) 'print the char
-    '    XX = XX + 1
-    '  END IF
-    'NEXT
-
-    'WHILE XX <= LcdColumns ' clear rest of line
-    '  CALL StrobeData(32) 'print spaces
-    '  XX = XX + 1
-    'WEND
-    CON.CLS
-    CON.PRINT Text$
-END SUB
-#IF 0
-SUB PrintClrStr (y, x, Text$)
-
+     LOCATE Y, 1: PRINT SPACE$(80);
+     LOCATE Y, X: PRINT text$;
+     EXIT SUB
     YY = y: XX = x
 
     CALL SetLcdPos(YY, XX) 'position cursor
@@ -3769,28 +3693,29 @@ SUB PrintClrStr (y, x, Text$)
     WEND
 
 END SUB
-#ENDIF
-
 
 SUB PrintPos
 
     CALL GetXyPos
 
-    CALL PrintClrStr(1, 7, XPosStr)
-    CALL PrintClrStr(2, 7, YPosStr)
-    CALL PrintClrStr(3, 7, APosStr)
+    CALL PrintClrStr(1, 7, SCANstruc.XPosStr)
+    CALL PrintClrStr(2, 7, SCANstruc.YPosStr)
+    CALL PrintClrStr(3, 7, SCANstruc.APosStr)
 
 END SUB
 
-SUB PrintStr (y, x , ptrstr AS STRING * 10)
+SUB PrintStr (y, x, prtstr AS STRING * 10)
+    'REMED
+    LOCATE Y, X: PRINT prtstr
+    EXIT SUB
 
     YY = y: XX = x
 
     CALL SetLcdPos(YY, XX) 'position cursor
 
-    FOR i = 1 TO LEN(ptrstr)
+    FOR i = 1 TO LEN(Text$)
       IF XX <= LcdColumns THEN
-        CALL StrobeData(ASC(MID$(ptrstr, i, 1))) 'print the char
+        CALL StrobeData(ASC(MID$(Text$, i, 1))) 'print the char
         XX = XX + 1
       END IF
     NEXT
@@ -3801,74 +3726,74 @@ END SUB
 SUB PrintXPos
 
     CALL GetStatus(Servo1)   'get status of X servo
-    XCts = ABS(Glo.Position(Servo1))
-    XPos = CLNG((XCts / XCtr) * 1000) / 1000
-    XPosStr = QStr(XPos, 10)
-    CALL PrintStr(1, 7, XPosStr)
+    SCANstruc.XCts = ABS(Glo.Position(Servo1))
+    SCANstruc.XPos = CLNG((SCANstruc.XCts / SCANstruc.XCtr) * 1000) / 1000
+    SCANstruc.XPosStr = QStr(SCANstruc.XPos, 10)
+    CALL PrintStr(1, 7, SCANstruc.XPosStr)
 
 END SUB
 
 SUB PrintYPos
 
     CALL GetStatus(Servo3)   'get status of Y servo
-    YCts = ABS(Glo.Position(Servo3))
-    YPos = CLNG((YCts / YCtr) * 1000) / 1000
-    YPosStr = QStr(YPos, 10)
-    CALL PrintStr(2, 7, YPosStr)
+    SCANstruc.YCts = ABS(Glo.Position(Servo3))
+    SCANstruc.YPos = CLNG((SCANstruc.YCts / SCANstruc.YCtr) * 1000) / 1000
+    SCANstruc.YPosStr = QStr(SCANstruc.YPos, 10)
+    CALL PrintStr(2, 7, SCANstruc.YPosStr)
 
 END SUB
 
 FUNCTION ProfileScan
 
-   IF GoodLNG(STR$(XLow * XCtr + 1)) THEN
-     XStartCts = CLNG(XLow * XCtr)
+   IF GoodLNG(STR$(SCANstruc.XLow * SCANstruc.XCtr + 1)) THEN
+     SCANstruc.XStartCts = CLNG(SCANstruc.XLow * SCANstruc.XCtr)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   IF GoodLNG(STR$((XHigh + OVERLAP) * XCtr + 1)) THEN
-     XEndCts = CLNG((XHigh + OVERLAP) * XCtr)
+   IF GoodLNG(STR$((SCANstruc.XHigh + SCANstruc.OverLap) * SCANstruc.XCtr + 1)) THEN
+     SCANstruc.XEndCts = CLNG((SCANstruc.XHigh + SCANstruc.OverLap) * SCANstruc.XCtr)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   IF GoodLNG(STR$(YLow * YCtr + 1)) THEN
-     YStartCts = CLNG(YLow * YCtr)
+   IF GoodLNG(STR$(SCANstruc.YLow * SCANstruc.YCtr + 1)) THEN
+     SCANstruc.YStartCts = CLNG(SCANstruc.YLow * SCANstruc.YCtr)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   IF GoodLNG(STR$(YHigh * YCtr + 1)) THEN
-     YEndCts = CLNG(YHigh * YCtr)
+   IF GoodLNG(STR$(SCANstruc.YHigh * SCANstruc.YCtr + 1)) THEN
+     SCANstruc.YEndCts = CLNG(SCANstruc.YHigh * SCANstruc.YCtr)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   IF GoodLNG(STR$(XCtr * XIndex + 1)) THEN
-     XIndexCts = CLNG(XCtr * XIndex)
+   IF GoodLNG(STR$(SCANstruc.XCtr * SCANstruc.XIndex + 1)) THEN
+     SCANstruc.XIndexCts = CLNG(SCANstruc.XCtr * SCANstruc.XIndex)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   IF GoodLNG(STR$(YCtr * YIndex + 1)) THEN
-     YIndexCts = CLNG(YCtr * YIndex)
+   IF GoodLNG(STR$(SCANstruc.YCtr * SCANstruc.YIndex + 1)) THEN
+     SCANstruc.YIndexCts = CLNG(SCANstruc.YCtr * SCANstruc.YIndex)
    ELSE
      ProfileScan = FALSE
      EXIT FUNCTION
    END IF
 
-   XDataStart = CLNG(XStartCts / XIndexCts)
-   XDataEnd = CLNG(XEndCts / XIndexCts)
+   SCANstruc.XDataStart = CLNG(SCANstruc.XStartCts / SCANstruc.XIndexCts)
+   SCANstruc.XDataEnd = CLNG(SCANstruc.XEndCts / SCANstruc.XIndexCts)
 
-   YDataStart = CLNG(YStartCts / YIndexCts)
-   YDataEnd = CLNG(YEndCts / YIndexCts)
+   SCANstruc.YDataStart = CLNG(SCANstruc.YStartCts / SCANstruc.YIndexCts)
+   SCANstruc.YDataEnd = CLNG(SCANstruc.YEndCts / SCANstruc.YIndexCts)
 
-   IndexCt = XDataStart
+   SCANstruc.IndexCt = SCANstruc.XDataStart
 
    ProfileScan = TRUE
 
@@ -3886,89 +3811,89 @@ SUB ReSetMotors
 
   CALL GetStatus(AllServos)
 
-  IF IndexY THEN 'X Scan, Y Index
-    IF IndexLow THEN    'indexing towards low position
-      IndexInc = -1
-      IF YPlus = TRUE THEN 'scanning positive direction
+  IF SCANstruc.IndexY THEN 'X Scan, Y Index
+    IF SCANstruc.IndexLow THEN    'indexing towards low position
+      SCANstruc.IndexInc = -1
+      IF SCANstruc.YPlus = TRUE THEN 'scanning positive direction
     IndexSet = 1
       ELSE
     IndexSet = -1
       END IF
     ELSE   'POSDIR
-      IndexInc = 1
-      IF YPlus = TRUE THEN 'scanning positive direction
+      SCANstruc.IndexInc = 1
+      IF SCANstruc.YPlus = TRUE THEN 'scanning positive direction
     IndexSet = -1
       ELSE
     IndexSet = 1
       END IF
     END IF
 
-    LoopPos = CLNG(Glo.Position(3) / YIndexCts) + IndexSet
+    LoopPos = CLNG(Glo.Position(3) / SCANstruc.YIndexCts) + IndexSet
 
-    IF YPlus THEN  'Y positive direction
-       IF LoopPos > YDataEnd THEN
-     IndexCt = YDataEnd
-       ELSEIF LoopPos < YDataStart THEN
-     IndexCt = YDataStart
+    IF SCANstruc.YPlus THEN  'Y positive direction
+       IF LoopPos > SCANstruc.YDataEnd THEN
+     SCANstruc.IndexCt = SCANstruc.YDataEnd
+       ELSEIF LoopPos < SCANstruc.YDataStart THEN
+     SCANstruc.IndexCt = SCANstruc.YDataStart
        ELSE
-     IndexCt = LoopPos
+     SCANstruc.IndexCt = LoopPos
        END IF
     ELSE               'Y negative direction
-       IF LoopPos < -YDataEnd THEN
-     IndexCt = YDataEnd
-       ELSEIF LoopPos > -YDataStart THEN
-     IndexCt = YDataStart
+       IF LoopPos < -SCANstruc.YDataEnd THEN
+     SCANstruc.IndexCt = SCANstruc.YDataEnd
+       ELSEIF LoopPos > -SCANstruc.YDataStart THEN
+     SCANstruc.IndexCt = SCANstruc.YDataStart
        ELSE
-     IndexCt = ABS(LoopPos)
+     SCANstruc.IndexCt = ABS(LoopPos)
        END IF
      END IF
 
   ELSE  'Y Scan, X Index
 
     'IndexSet is used to backup 1 raster for overlap of scan restarts
-    IF IndexLow THEN  'Index towards low position
-      IndexInc = -1
-      IF XPlus = TRUE THEN 'scanning positive counts direction
+    IF SCANstruc.IndexLow THEN  'Index towards low position
+      SCANstruc.IndexInc = -1
+      IF SCANstruc.XPlus = TRUE THEN 'scanning positive counts direction
     IndexSet = 1
       ELSE
     IndexSet = -1
       END IF
     ELSE                   'Index towards high position
-      IndexInc = 1
-      IF XPlus = TRUE THEN 'scanning positive counts direction
+      SCANstruc.IndexInc = 1
+      IF SCANstruc.XPlus = TRUE THEN 'scanning positive counts direction
     IndexSet = -1
       ELSE
     IndexSet = 1
       END IF
     END IF
 
-    LoopPos = CLNG(Glo.Position(1) / XIndexCts) + IndexSet
+    LoopPos = CLNG(Glo.Position(1) / SCANstruc.XIndexCts) + IndexSet
 
-    IF XPlus THEN  'X positive direction
-      IF LoopPos > XDataEnd THEN
-    IndexCt = XDataEnd
-      ELSEIF LoopPos < XDataStart THEN
-    IndexCt = XDataStart
+    IF SCANstruc.XPlus THEN  'X positive direction
+      IF LoopPos > SCANstruc.XDataEnd THEN
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
+      ELSEIF LoopPos < SCANstruc.XDataStart THEN
+    SCANstruc.IndexCt = SCANstruc.XDataStart
       ELSE
-    IndexCt = LoopPos
+    SCANstruc.IndexCt = LoopPos
       END IF
     ELSE               'X negative direction
-      IF LoopPos < -XDataEnd THEN
-    IndexCt = XDataEnd
-      ELSEIF LoopPos > -XDataStart THEN
-    IndexCt = XDataStart
+      IF LoopPos < -SCANstruc.XDataEnd THEN
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
+      ELSEIF LoopPos > -SCANstruc.XDataStart THEN
+    SCANstruc.IndexCt = SCANstruc.XDataStart
       ELSE
-    IndexCt = ABS(LoopPos)
+    SCANstruc.IndexCt = ABS(LoopPos)
       END IF
     END IF
 
-    IF NextFlag THEN
-      IF IndexLow THEN  'Index towards low position
-    IndexCt = XDataEnd
+    IF SCANstruc.NextFlag THEN
+      IF SCANstruc.IndexLow THEN  'Index towards low position
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
       ELSE                   'Index towards high position
-    IndexCt = XDataStart
+    SCANstruc.IndexCt = SCANstruc.XDataStart
       END IF
-      NextFlag = FALSE
+      SCANstruc.NextFlag = FALSE
     END IF
 
   END IF
@@ -4044,11 +3969,11 @@ SUB SendCmd (address AS INTEGER, CmdString AS STRING)
       'changed to adjust for user counter offset
       '****************************************
       IF address = 1 OR address = 2 THEN   'X Axis
-    Glo.Position(address) = ActPos& + XOffset
+    Glo.Position(address) = ActPos& + SCANstruc.XOffset
       ELSEIF address = 3 THEN  'Y Axis
-    Glo.Position(address) = ActPos& + YOffset
+    Glo.Position(address) = ActPos& + SCANstruc.YOffset
       ELSEIF address = 4 THEN  'A Axis
-    Glo.Position(address) = ActPos& + AOffset
+    Glo.Position(address) = ActPos& + SCANstruc.AOffset
       ELSE
       END IF
     END IF
@@ -4229,19 +4154,19 @@ END SUB
 
 SUB SetForAuto
 
-  IF XSpeed = 0 THEN XSpeed = 2
-  IF YSpeed = 0 THEN YSpeed = 1
+  IF SCANstruc.XSpeed = 0 THEN SCANstruc.XSpeed = 2
+  IF SCANstruc.YSpeed = 0 THEN SCANstruc.YSpeed = 1
 
   'determine cts/millisec needed based on inches travel/sec
-  XVelocity& = XSpeed * XCtr * (1 / 1953) * 65536
-  YVelocity& = YSpeed * YCtr * (1 / 1953) * 65536
+  XVelocity& = SCANstruc.XSpeed * SCANstruc.XCtr * (1 / 1953) * 65536
+  YVelocity& = SCANstruc.YSpeed * SCANstruc.YCtr * (1 / 1953) * 65536
 
   'set length of time in seconds to reach specified maximum velocity
   XTime! = .1: YTime! = .1
 
   'x & y acceleration, deceleration  calc's
-  XCel& = (XSpeed / XTime!) * XCtr * (1 / 1953) * (1 / 1953) * 65536
-  YCel& = (YSpeed / YTime!) * YCtr * (1 / 1953) * (1 / 1953) * 65536
+  XCel& = (SCANstruc.XSpeed / XTime!) * SCANstruc.XCtr * (1 / 1953) * (1 / 1953) * 65536
+  YCel& = (SCANstruc.YSpeed / YTime!) * SCANstruc.YCtr * (1 / 1953) * (1 / 1953) * 65536
 
   Glo.CmdVelocity(Servo1) = XVelocity&
   Glo.CmdVelocity(Servo2) = XVelocity&
@@ -4321,12 +4246,12 @@ SUB SetLcdPos (ROW, COL)
   C = COL - 1: R = ROW - 1
 
   'Sets lcd position to line 'row', column 'col' (if in lcd range)
-  'IF ((C < LcdColumns) AND (R < LcdLines)) THEN
-  '  IF C >= 0 AND R >= 0 THEN
-  '    CALL StrobeInstr((LcdAddrSet OR StartLPos(R)) + C)
-  '  END IF
- ' END IF
- CON.CLS
+  IF ((C < LcdColumns) AND (R < LcdLines)) THEN
+    IF C >= 0 AND R >= 0 THEN
+      CALL StrobeInstr((LcdAddrSet OR StartLPos(R)) + C)
+    END IF
+  END IF
+
 END SUB
 
 SUB SetModePos
@@ -4367,6 +4292,7 @@ SUB SetModeVel
 END SUB
 
 SUB SetPorts
+
   'intialize port mode registers to input or output
   OUT KeyModeReg, DataPortIn  'port 0
   OUT LcdModeReg, DataPortOut 'port 2
@@ -4485,8 +4411,8 @@ END SUB
 SUB SetXCtrs
 
   CALL GetXyPos
-  XPosStr = QStr$(XPos, 10)
-  XOffset = GetXCord(CLNG(XPos * XCtr))
+  SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+  SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
   CALL ResetPosition(Servo1)
   CALL ResetPosition(Servo2)
 
@@ -4607,15 +4533,14 @@ SUB StrobeInstr (insb)
   OUT LcdModeReg, DataPortOut 'set Port 1 as output
 
   CALL ddelay(D20)
+
 END SUB
-
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
      ECode = -1
 END SUB
-SUB DFRead2 (filenum AS INTEGER, passrec AS scanprams , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
+SUB DFRead2 (filenum AS INTEGER, passrec AS scanparms , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
     ECode = -1
 END SUB
@@ -4623,7 +4548,7 @@ SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, Byteswri
         PUT filenum,  offset ,PASSREC
         ECode = -1
 END SUB
-SUB DFWrite2 (filenum AS INTEGER, passrec AS scanprams , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
+SUB DFWrite2 (filenum AS INTEGER, passrec AS scanparms , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
         PUT filenum,  offset ,PASSREC
         ECode = -1
 END SUB

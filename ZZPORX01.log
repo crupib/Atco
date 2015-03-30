@@ -3,5 +3,5 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Error 477 in C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01.BAS(1554:017):  Syntax error
-  Line 1554:    CALL DFWrite(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesWrote&, ECode)  
+Error 420 in C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01.BAS(1840:028):  Relational operator expected
+  Line 1840:  GetKeys$ = KeyTable(keyNum)  

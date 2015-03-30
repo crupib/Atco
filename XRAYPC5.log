@@ -1,0 +1,7 @@
+PowerBASIC 6 Console Compiler
+Copyright (c) 1998-2011 PowerBasic Inc.
+Englewood, Florida USA
+All Rights Reserved
+
+Error 414 in C:\Users\crupib\Documents\GitHub\Atco\XRAYPC5.BAS(64:031):  ")" expected
+  Line 64:    DECLARE FUNCTION Ascii (Any$)  

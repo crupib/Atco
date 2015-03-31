@@ -45,8 +45,13 @@ FUNCTION PBMAIN () AS LONG
  DIM myinput AS STRING
  DIM aa AS STRING
  DIM KeyTable(20) AS STRING
-' LOCAL hWin AS DWORD
-' GRAPHIC WINDOW "Box", 300, 300, 130, 130 TO hWin
+ LOCAL hWin AS DWORD
+ LOCAL widthvar AS INTEGER
+ LOCAL Heightvar AS INTEGER
+ GRAPHIC GET CLIENT TO widthvar, Heightvar
+ GRAPHIC WINDOW "Atco MCU Test",widthvar/2, Heightvar/2, 130, 130 TO hWin
+ GRAPHIC ATTACH hWin, 0
+
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -71,7 +76,7 @@ FUNCTION PBMAIN () AS LONG
   KeyTable(20) = CHR$(49)          '1
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
- CON.SCREEN = 8,80
+ CON.SCREEN = 4,20
  CON.PRINT "       ATCO         "
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"
@@ -152,8 +157,9 @@ FUNCTION PBMAIN () AS LONG
     CALL FlushBuffers(PICPort, 0, ECode)
 END FUNCTION
 SUB flushbuffers (PICPort AS STRING, zero AS INTEGER, ECode AS INTEGER)
-    LOCAL buffer_clear AS STRING
-    buffer_clear = STRING$(2048, zero)
+   ' LOCAL buffer_clear AS STRING
+   ' buffer_clear = STRING$(2048, zero)
+   FLUSH #nComm
 END SUB
 SUB WriteToComm (PICPort AS STRING, SendStr AS STRING, BytesWritten AS INTEGER, ECode AS INTEGER)
     COMM SEND #nComm, SendStr

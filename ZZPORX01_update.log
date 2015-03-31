@@ -3,18 +3,18 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01_update.BAS   {4619 total lines}
+Primary source:  C:\Users\crupib\Documents\GitHub\Atco\ZZPORX01_update.BAS   {4639 total lines}
 Target compilation:  ZZPORX01_update.EXE
-Compile time:  0.1 seconds, at 5542800 lines/minute
+Compile time:  0.1 seconds, at 5566800 lines/minute
 
-68592 bytes compiled code, 43940 bytes RTLibrary,
-1548 bytes string literals, and 5724 bytes dgroup.
+68912 bytes compiled code, 47144 bytes RTLibrary,
+1548 bytes string literals, and 5728 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 125440 bytes   Memory image: 51212 bytes.
+Disk image: 129024 bytes   Memory image: 54420 bytes.
 
 Component Files:
 ----------------
-C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01_update.BAS
+C:\Users\crupib\Documents\GitHub\Atco\ZZPORX01_update.BAS
 
 
 Code Extracted:

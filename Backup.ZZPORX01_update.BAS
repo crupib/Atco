@@ -507,6 +507,7 @@ CONST HomeFlagMask = &HFE0F
  GLOBAL filenum AS INTEGER
  GLOBAL HdrVer AS STRING * 20
  GLOBAL KeyTable() AS STRING
+ GLOBAL nComm AS LONG
 
  FUNCTION PBMAIN  () AS LONG
 
@@ -608,12 +609,12 @@ CONST HomeFlagMask = &HFE0F
   CALL PrintClrStr(4, 1, " ")
 
   'for debug with PC Keyboard to exit program
-  FOR VV = 1 TO 1000
-    GG$ = INKEY$
-    IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN
-       END
-    END IF
-  NEXT
+  'FOR VV = 1 TO 1000
+  '  GG$ = INKEY$
+  '  IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN
+  '     END
+  '  END IF
+  'NEXT
 
   '***********************************************
   'Open & Check Com Buffers, Report & Fix errors
@@ -1642,6 +1643,7 @@ END SUB
 SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
 SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
+    FLUSH #nComm
 END SUB
 
 SUB ClrLCD
@@ -1797,11 +1799,12 @@ SUB FixSIOerror
   CALL DelayX(75)
 
   'flush the input buffer
-  CALL FlushBuffers(comport$, 0, ECode%)
+  CALL FlushBuffers(PICPort$, 0, ECode%)
 
 END SUB
 
 SUB FlushKeys
+    GRAPHIC INPUT FLUSH
 
    'keypad flush
    'CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
@@ -2872,7 +2875,7 @@ FUNCTION InitNetWork
   'start network
 
   'flush the input buffer
-  CALL FlushBuffers(comport$, 0, ECode%)
+  CALL FlushBuffers(PICPort$, 0, ECode%)
 
   Glo.SIOErrorMode = DoNothing
 
@@ -2938,7 +2941,7 @@ FUNCTION InitNetWork
   'disable amp on Servo 4 since enabling disables servo
   CALL EnableAmpl(0, 4)
 
-  CALL FlushBuffers(comport$, 0, ECode%)
+  CALL FlushBuffers(PICPort$, 0, ECode%)
 
   InitNetWork = TRUE
 
@@ -3630,6 +3633,23 @@ SUB MtrOff (address AS INTEGER)
 
 END SUB
 FUNCTION OpenComPorts
+    LOCAL x AS INTEGER
+    nComm = FREEFILE
+    COMM OPEN PicPort$ AS #nComm
+    IF ERR THEN
+        OpenComPorts = FALSE
+        EXIT FUNCTION
+    END IF
+    XmitSize = 2048
+    RecvSize = 2048
+    COMM SET #nComm, TXBUFFER = xmitsize
+    COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
+    COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
+    COMM SET #nComm, BYTE   = 8     ' 8 bits
+    COMM SET #nComm, PARITY = 0     ' No parity
+    COMM SET #nComm, STOP   = 1     ' 1 stop bit
+    CALL FlushBuffers(PICPort$, 0, ECode%)
+    OpenComPorts = TRUE
 END FUNCTION
 'FUNCTION OpenComPorts
 
@@ -3967,7 +3987,7 @@ SUB SendCmd (address AS INTEGER, CmdString AS STRING)
     'CALL xputchar(ASC(MID$(SendStr$, i, 1)))
       'NEXT i
 
-  CALL WriteToComm(comport$, SendStr$, BytesWritten, ECode%)
+  CALL WriteToComm(PICPort$, SendStr$, BytesWritten, ECode%)
 
   'no reply if group command
   IF address = &HFF THEN
@@ -4460,7 +4480,7 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
  'loop till we get a byte from the serial port or timeout
  DO
 
-    CALL ReadFromComm(comport$, OneChr$, BytesRead, ECode%)
+    CALL ReadFromComm(PICPort$, OneChr$, BytesRead, ECode%)
 
     IF BytesRead > 0 THEN
       Character = ASC(OneChr$)

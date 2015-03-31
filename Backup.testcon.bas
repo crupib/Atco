@@ -45,6 +45,8 @@ FUNCTION PBMAIN () AS LONG
  DIM myinput AS STRING
  DIM aa AS STRING
  DIM KeyTable(20) AS STRING
+' LOCAL hWin AS DWORD
+' GRAPHIC WINDOW "Box", 300, 300, 130, 130 TO hWin
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -77,7 +79,7 @@ FUNCTION PBMAIN () AS LONG
  CON.LOCATE 4, 4
  CON.PRINT "X"
 ' con.print KeyTable(1)
- gg = keyTable(10)
+ 'gg = keyTable(10)
  'CON.CLS
  'con.input("Hello",II)
  'con.print II

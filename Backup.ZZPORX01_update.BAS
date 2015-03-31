@@ -1,13 +1,14 @@
-
 #COMPILE EXE
 #COMPILER PBCC 6
-
+#OPTION LARGEMEM32
+#OPTIMIZE CODE ON
+#OPTIMIZE SIZE
 ' The resource gives the EXE program the "hello" icon in Explorer,
 ' and provides it with Windows version information.
-#RESOURCE ICON, 100, "Atco.ico"
-#RESOURCE VERSIONINFO
-#RESOURCE FILEVERSION 6, 0, 0, 0
-#RESOURCE PRODUCTVERSION 6, 0, 0, 0
+'#RESOURCE ICON, 100, "Atco.ico"
+'#RESOURCE VERSIONINFO
+'#RESOURCE FILEVERSION 6, 0, 0, 0
+'#RESOURCE PRODUCTVERSION 6, 0, 0, 0
 DEFINT A-Z
 
 REM new RS232 PC compatible
@@ -284,7 +285,7 @@ DECLARE SUB SetLcdPos (y, x)
 DECLARE FUNCTION GetLcdRowPos ()
 DECLARE FUNCTION GetLcdColPos ()
 DECLARE SUB PrintChar (y, x, char$)    'print single char
-DECLARE SUB PrintClrStr (y, x, Text$)  'print string & clear line
+DECLARE SUB PrintClrStr (y, x, Textstr AS STRING * 10)  'print string & clear line
 DECLARE SUB PrintStr (y , x , ptrstr AS STRING * 10)     'print string
 DECLARE SUB ddelay (Nval)
 DECLARE FUNCTION GetKeys$ ()
@@ -458,8 +459,6 @@ CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
 
-
-
   TYPE glorecord
    NumModules AS INTEGER
    StatusDef(5) AS INTEGER
@@ -508,7 +507,9 @@ CONST HomeFlagMask = &HFE0F
  GLOBAL filenum AS INTEGER
  GLOBAL HdrVer AS STRING * 20
  GLOBAL KeyTable() AS STRING
-FUNCTION PBMAIN
+
+ FUNCTION PBMAIN  () AS LONG
+
   DIM HdrVer AS STRING * 20
   HdrVer = "SCU-1.00            "
   DIM ThumbDisk AS STRING * 2
@@ -527,7 +528,7 @@ FUNCTION PBMAIN
 
   'set com port numbers & baud
   PICPort ="\\.\COM31"
-  PICBaud = 19200
+  PICBaud = 9600
 
   DelayCtr = DelayFact
   WaitX = 1   'delay used in comm
@@ -595,9 +596,9 @@ FUNCTION PBMAIN
   '*********************************************************************
   ' intialize LCD, KeyPad, & Ports
   '*********************************************************************
-  CALL SetPorts
+ ' CALL SetPorts
 
-  CALL InitDisplay
+ ' CALL InitDisplay
 
   ClrLCD
 
@@ -2937,7 +2938,7 @@ FUNCTION InitNetWork
   'disable amp on Servo 4 since enabling disables servo
   CALL EnableAmpl(0, 4)
 
-  CALL FlushBuffers(PICPort, 0, ECode)
+  CALL FlushBuffers(comport$, 0, ECode%)
 
   InitNetWork = TRUE
 
@@ -3293,6 +3294,7 @@ END SUB
 SUB KEdit (Edit$, ExitCode)
 
      'intialize values
+     DIM s AS STRING * 10
      s$ = Edit$
      StrPos = 1 'cursur position within string
      Length = LEN(Edit$)
@@ -3414,26 +3416,35 @@ FUNCTION KeyDown
    '        until user releases key.
    '    3.) During this time we can tell if user released key.
 
-   KeyState = INP(KeyReg) 'read keyboard port
 
-   IF KeyState AND (NOT &H20) THEN  'key not released or not been pushed
-     IF (KeyState AND &H40) THEN    'user holding Key down
-       KeyDown = -1
-     ELSE : KeyDown = 0
-     END IF
-   ELSE : KeyDown = 0
+   IF INSTAT THEN
+       KEYDOWN = -1
+   ELSE
+       KEYDOWN = 0
    END IF
+  ' KeyState = INP(KeyReg) 'read keyboard port
+  ' IF KeyState AND (NOT &H20) THEN  'key not released or not been pushed
+  '   IF (KeyState AND &H40) THEN    'user holding Key down
+  '     KeyDown = -1
+  '   ELSE : KeyDown = 0
+  '   END IF
+  ' ELSE : KeyDown = 0
+  ' END IF
 
 END FUNCTION
 
 FUNCTION KeyInBuff
-
+  IF INSTAT THEN
+       KeyInBuff = -1
+   ELSE
+       KeyInBuff = 0
+   END IF
  'check if key in buffer
- IF (INP(KeyReg) AND &H20) THEN   'yes
-   KeyInBuff = TRUE
- ELSE
-   KeyInBuff = FALSE            'no key in buffer
- END IF
+ 'IF (INP(KeyReg) AND &H20) THEN   'yes
+ '  KeyInBuff = TRUE
+'ELSE
+'   KeyInBuff = FALSE            'no key in buffer
+' END IF
 
 END FUNCTION
 
@@ -3618,60 +3629,61 @@ SUB MtrOff (address AS INTEGER)
  SendCmd address, Cmd$
 
 END SUB
-
 FUNCTION OpenComPorts
+END FUNCTION
+'FUNCTION OpenComPorts
 
    REM Changed to PC Serial routines
 
-   NumPorts = 1: RecvSize = 2048: XmitSize = 2048
+'   NumPorts = 1: RecvSize = 2048: XmitSize = 2048
 
-   PortSeg = VARSEG(PICPort): PortOff = VARPTR(PICPort)
-   RecvSeg = VARSEG(RecvSize): RecvOff = VARPTR(RecvSize)
-   XmitSeg = VARSEG(XmitSize): XmitOff = VARPTR(XmitSize)
+'   PortSeg = VARSEG(PICPort): PortOff = VARPTR(PICPort)
+'   RecvSeg = VARSEG(RecvSize): RecvOff = VARPTR(RecvSize)
+'   XmitSeg = VARSEG(XmitSize): XmitOff = VARPTR(XmitSize)
 
-   CALL CalcRequiredMem(PortSeg, PortOff, RecvSeg, RecvOff, XmitSeg, XmitOff, NumPorts, MemSize, ECode)
-   IF ECode THEN
-     OpenComPorts = FALSE
-     EXIT FUNCTION
-   END IF
+'   CALL CalcRequiredMem(PortSeg, PortOff, RecvSeg, RecvOff, XmitSeg, XmitOff, NumPorts, MemSize, ECode)
+'   IF ECode THEN
+'     OpenComPorts = FALSE
+'     EXIT FUNCTION
+'   END IF
 
-   FarHeapSize& = SETMEM(-(MemSize))  'take some far heap
+'   FarHeapSize& = SETMEM(-(MemSize))  'take some far heap
 
-   CALL InitCommBuffers(ECode)
-   IF ECode THEN
-     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-     OpenComPorts = FALSE
-     EXIT FUNCTION
-   END IF
+'   CALL InitCommBuffers(ECode)
+'   IF ECode THEN
+'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+'     OpenComPorts = FALSE
+'     EXIT FUNCTION
+'   END IF
 
    ' Set the flow control to no flow control
-   CALL SetFlowControl(PICPort, 3, 3, 0, 0, 0, 0, ECode)
-   IF ECode THEN
-     CALL DeleteCommBuffers(ECode)
-     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-     OpenComPorts = FALSE
-     EXIT FUNCTION
-   END IF
+'   CALL SetFlowControl(PICPort, 3, 3, 0, 0, 0, 0, ECode)
+'   IF ECode THEN
+'     CALL DeleteCommBuffers(ECode)
+'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+'     OpenComPorts = FALSE
+'     EXIT FUNCTION
+'   END IF
 
-   CALL SetFIFOTriggerLevel(PICPort, 14, ECode)
+'   CALL SetFIFOTriggerLevel(PICPort, 14, ECode)
 
-   DataBits = 8: PARITY = 4: StopBits = 1
+'   DataBits = 8: PARITY = 4: StopBits = 1
 
-   CALL OpenCommPort(PICPort, PICBaud, DataBits, PARITY, StopBits, ECode)
-   IF ECode THEN
-     CALL DeleteCommBuffers(ECode)
-     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-     OpenComPorts = FALSE
-     EXIT FUNCTION
-   END IF
+'   CALL OpenCommPort(PICPort, PICBaud, DataBits, PARITY, StopBits, ECode)
+'   IF ECode THEN
+'     CALL DeleteCommBuffers(ECode)
+ '    FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
+'     OpenComPorts = FALSE
+'     EXIT FUNCTION
+'   END IF
 
-   OpenComPorts = TRUE
+'   OpenComPorts = TRUE
 
-   CALL FlushBuffers(PICPort, 0, ECode)
+'   CALL FlushBuffers(PICPort, 0, ECode)
 
-   EXIT FUNCTION
+'   EXIT FUNCTION
 
-END FUNCTION
+'END FUNCTION
 
 SUB PrintAPos
 
@@ -3691,7 +3703,7 @@ SUB PrintChar (y, x, char$)
 
 END SUB
 
-SUB PrintClrStr (y, x, Text$)
+SUB PrintClrStr (y, x, prtText AS STRING * 10)
      LOCATE Y, 1: PRINT SPACE$(80);
      LOCATE Y, X: PRINT text$;
      EXIT SUB
@@ -3955,7 +3967,7 @@ SUB SendCmd (address AS INTEGER, CmdString AS STRING)
     'CALL xputchar(ASC(MID$(SendStr$, i, 1)))
       'NEXT i
 
-  CALL WriteToComm(PICPort, SendStr$, BytesWritten, ECode)
+  CALL WriteToComm(comport$, SendStr$, BytesWritten, ECode%)
 
   'no reply if group command
   IF address = &HFF THEN
@@ -4313,9 +4325,9 @@ END SUB
 SUB SetPorts
 
   'intialize port mode registers to input or output
-  OUT KeyModeReg, DataPortIn  'port 0
-  OUT LcdModeReg, DataPortOut 'port 2
-  OUT BitModeReg, DataPortOut 'port 3 - output LCD/Keypad control lines
+  'OUT KeyModeReg, DataPortIn  'port 0
+ 'OUT LcdModeReg, DataPortOut 'port 2
+  'OUT BitModeReg, DataPortOut 'port 3 - output LCD/Keypad control lines
 
 END SUB
 
@@ -4448,7 +4460,7 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
  'loop till we get a byte from the serial port or timeout
  DO
 
-    CALL ReadFromComm(PICPort, OneChr$, BytesRead, ECode)
+    CALL ReadFromComm(comport$, OneChr$, BytesRead, ECode%)
 
     IF BytesRead > 0 THEN
       Character = ASC(OneChr$)
@@ -4509,49 +4521,49 @@ END SUB
 SUB StrobeData (datab)
 
   'Strobes datab to the lcd
-  OUT BitReg, DataStbOff ' strobe off
-  CALL ddelay(D20)
-  OUT LcdReg, datab      ' send data
-  CALL ddelay(D20)
-  OUT BitReg, DataStbOn  ' strobe on
-  CALL ddelay(D50)
-  OUT BitReg, DataStbOff ' strobe off
-  CALL ddelay(D20)
-  OUT LcdModeReg, DataPortIn ' set data port as input
-  CALL ddelay(D20)
-  OUT BitReg, LcdBusy  ' set up lcd to test busy flag (BF)
-  CALL ddelay(D20)
+  'OUT BitReg, DataStbOff ' strobe off
+  'CALL ddelay(D20)
+  'OUT LcdReg, datab      ' send data
+  'CALL ddelay(D20)
+  'OUT BitReg, DataStbOn  ' strobe on
+  'CALL ddelay(D50)
+  'OUT BitReg, DataStbOff ' strobe off
+  'CALL ddelay(D20)
+  'OUT LcdModeReg, DataPortIn ' set data port as input
+  'CALL ddelay(D20)
+  'OUT BitReg, LcdBusy  ' set up lcd to test busy flag (BF)
+  'CALL ddelay(D20)
 
-  WHILE (INP(LcdReg) AND BusyFlag)    ' loop while BF=1
-  WEND
+  'WHILE (INP(LcdReg) AND BusyFlag)    ' loop while BF=1
+  'WEND
 
-  OUT LcdModeReg, DataPortOut ' set data port as output
-  CALL ddelay(D20)
+  'OUT LcdModeReg, DataPortOut ' set data port as output
+  'CALL ddelay(D20)
 
 END SUB
 
 SUB StrobeInstr (insb)
 
   'Strobes instructions to the lcd, also tests the busy flag
-  OUT BitReg, InstrStbOff 'strobe off
-  CALL ddelay(D20)
-  OUT LcdReg, insb        'send data
-  CALL ddelay(D20)
-  OUT BitReg, InstrStbOn  'strobe on
-  CALL ddelay(D50)
-  OUT BitReg, InstrStbOff 'strobe off
-  CALL ddelay(D20)
-  OUT LcdModeReg, DataPortIn 'set data Port 1 as input
-  CALL ddelay(D20)
-  OUT BitReg, LcdBusy 'set up lcd to test busy flag (BF)
-  CALL ddelay(D20)
+  'OUT BitReg, InstrStbOff 'strobe off
+  'CALL ddelay(D20)
+  'OUT LcdReg, insb        'send data
+  'CALL ddelay(D20)
+  'OUT BitReg, InstrStbOn  'strobe on
+  'CALL ddelay(D50)
+  'OUT BitReg, InstrStbOff 'strobe off
+  'CALL ddelay(D20)
+  'OUT LcdModeReg, DataPortIn 'set data Port 1 as input
+  'CALL ddelay(D20)
+  'OUT BitReg, LcdBusy 'set up lcd to test busy flag (BF)
+  'CALL ddelay(D20)
 
-  WHILE INP(LcdReg) AND BusyFlag  'loop while BF=1
-  WEND
+  'WHILE INP(LcdReg) AND BusyFlag  'loop while BF=1
+  'WEND
 
-  OUT LcdModeReg, DataPortOut 'set Port 1 as output
+  'OUT LcdModeReg, DataPortOut 'set Port 1 as output
 
-  CALL ddelay(D20)
+  'CALL ddelay(D20)
 
 END SUB
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -4596,5 +4608,10 @@ END SUB
 SUB FClose (filenumber AS INTEGER)
     CLOSE filenumber
 END SUB
-
+FUNCTION GetTick& ()
+END FUNCTION
+SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
+END SUB
+SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
+END SUB
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

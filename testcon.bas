@@ -45,6 +45,8 @@ FUNCTION PBMAIN () AS LONG
  DIM myinput AS STRING
  DIM aa AS STRING
  DIM KeyTable(20) AS STRING
+' LOCAL hWin AS DWORD
+' GRAPHIC WINDOW "Box", 300, 300, 130, 130 TO hWin
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -69,7 +71,7 @@ FUNCTION PBMAIN () AS LONG
   KeyTable(20) = CHR$(49)          '1
  ThumbDisk = "C:\Users\Bill\Documents\GitHub\Atco\"
  CON.CAPTION$ = "Atco Motor controllor"
- CON.SCREEN = 8,80
+ CON.SCREEN = 4,20
  CON.PRINT "       ATCO         "
  CON.PRINT "MCU-P3000      V1.00"
  CON.PRINT "COPYRIGHT 1997- 2015"

@@ -3,9 +3,9 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\crupib\Documents\GitHub\Atco\testcon.bas   {212 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {214 total lines}
 Target compilation:  testcon.EXE
-Compile time:  0.1 seconds, at 254400 lines/minute
+Compile time:  0.1 seconds, at 256800 lines/minute
 
 3584 bytes compiled code, 18048 bytes RTLibrary,
 308 bytes string literals, and 3356 bytes dgroup.
@@ -14,7 +14,7 @@ Disk image: 27136 bytes   Memory image: 21712 bytes.
 
 Component Files:
 ----------------
-C:\Users\crupib\Documents\GitHub\Atco\testcon.bas
+C:\Users\Bill\Documents\GitHub\Atco\testcon.bas
 
 
 Code Extracted:

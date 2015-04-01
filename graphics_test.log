@@ -1,0 +1,22 @@
+PowerBASIC 6 Console Compiler
+Copyright (c) 1998-2011 PowerBasic Inc.
+Englewood, Florida USA
+All Rights Reserved
+
+Primary source:  C:\Users\crupib\Documents\GitHub\Atco\graphics_test.bas   {29 total lines}
+Target compilation:  graphics_test.EXE
+Compile time:  0.1 seconds, at 34800 lines/minute
+
+864 bytes compiled code, 29248 bytes RTLibrary,
+32 bytes string literals, and 2704 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 36864 bytes   Memory image: 31984 bytes.
+
+Component Files:
+----------------
+C:\Users\crupib\Documents\GitHub\Atco\graphics_test.bas
+
+
+Code Extracted:
+---------------
+<NONE>

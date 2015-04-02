@@ -520,6 +520,7 @@ CONST HomeFlagMask = &HFE0F
  GLOBAL XAcel() AS LONG
  GLOBAL YAcel() AS LONG
  GLOBAL XSpd()  AS LONG
+ GLOBAL YSpd()  AS LONG
 
  FUNCTION PBMAIN  () AS LONG
 
@@ -616,8 +617,8 @@ CONST HomeFlagMask = &HFE0F
   ClrLCD
 
   CALL PrintClrStr(1, 1, "       ATCO         ")
-  CALL PrintClrStr(2, 1, "MCU-P2000      V1.01")
-  CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2011")
+  CALL PrintClrStr(2, 1, "MCU-P2000      V2.01")
+  CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2015")
   CALL PrintClrStr(4, 1, " ")
 
   'for debug with PC Keyboard to exit program
@@ -1651,6 +1652,7 @@ END SUB
 SUB CloseCommPort (ComPortNum$,ecode%)
 END SUB
 SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
+    COMM SEND #nComm, WriteBuffer$
 END SUB
 SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
@@ -4492,7 +4494,7 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
  'loop till we get a byte from the serial port or timeout
  DO
 
-    CALL ReadFromComm(PICPort$, OneChr$, BytesRead, ECode%)
+    CALL ReadFromComm(PICPort, OneChr$, BytesRead, ECode%)
 
     IF BytesRead > 0 THEN
       Character = ASC(OneChr$)
@@ -4643,6 +4645,12 @@ END SUB
 FUNCTION GetTick& ()
 END FUNCTION
 SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
+      LOCAL ncbData AS LONG    ' bytes of data waiting
+      ncbData = COMM(#nComm, RXQUE)
+      IF ncbData THEN
+            COMM RECV #nComm, ncbData, sData
+            STDOUT sData;
+        END IF
 END SUB
 SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
 END SUB

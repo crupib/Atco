@@ -36,7 +36,7 @@ DECLARE FUNCTION GetKeys$
 GLOBAL myrecord AS HEADER
 GLOBAL inrecord AS mytype
 GLOBAL hdrrecord AS HEADER
-GLOBAL  KeyTable() AS STRING
+'GLOBAL  KeyTable() AS STRING
 
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
@@ -51,7 +51,7 @@ FUNCTION PBMAIN () AS LONG
  GRAPHIC GET CLIENT TO widthvar, Heightvar
  GRAPHIC WINDOW "Atco MCU Test",widthvar/2, Heightvar/2, 130, 130 TO hWin
  GRAPHIC ATTACH hWin, 0
-
+ 'SLEEP 5000
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow

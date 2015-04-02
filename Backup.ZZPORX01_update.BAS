@@ -28,7 +28,8 @@ DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
 DECLARE SUB SetFlowControl (ComPortNum$, InFlow%, OutFlow%, InMin%, InMax%, XonChar%, XoffChar%, ECode%)
 DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
 DECLARE SUB ChangeCommSettings (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
-DECLARE SUB OpenCommPort (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
+'DECLARE SUB OpenCommPort (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
+DECLARE FUNCTION OpenComPorts ()
 DECLARE SUB UARTType (ComPortNum$, UART%, ECode%)
 DECLARE SUB SetFIFOTriggerLevel (ComPortNum$, TriggerLevel%, ECode%)
 DECLARE SUB CalcRequiredMem (PortSeg%, PortOfs%, RecvSeg%, RecvOfs%, XmitSeg%, XmitOfs%, NumPorts%, MemSize&, ECode%)
@@ -243,7 +244,7 @@ DECLARE FUNCTION DelayFact& ()
 
 DECLARE SUB GetScanCal ()
 
-DECLARE FUNCTION OpenComPorts ()
+
 DECLARE SUB CalEncoder (YXAxis)
 DECLARE SUB ManYRGT ()
 DECLARE SUB ManXUP ()
@@ -285,7 +286,7 @@ DECLARE SUB SetLcdPos (y, x)
 DECLARE FUNCTION GetLcdRowPos ()
 DECLARE FUNCTION GetLcdColPos ()
 DECLARE SUB PrintChar (y, x, char$)    'print single char
-DECLARE SUB PrintClrStr (y, x, Textstr AS STRING * 10)  'print string & clear line
+DECLARE SUB PrintClrStr (y, x, BYVAL Textstr AS STRING )  'print string & clear line
 DECLARE SUB PrintStr (y , x , ptrstr AS STRING * 10)     'print string
 DECLARE SUB ddelay (Nval)
 DECLARE FUNCTION GetKeys$ ()
@@ -508,6 +509,17 @@ CONST HomeFlagMask = &HFE0F
  GLOBAL HdrVer AS STRING * 20
  GLOBAL KeyTable() AS STRING
  GLOBAL nComm AS LONG
+ GLOBAL PicPort AS STRING
+ GLOBAL PicBaud AS LONG
+ GLOBAL Corr1()  AS BYTE
+ GLOBAL Corr2()  AS BYTE
+ GLOBAL LF() AS BYTE
+ GLOBAL LU() AS BYTE
+ GLOBAL XVel() AS LONG
+ GLOBAL YVel() AS LONG
+ GLOBAL XAcel() AS LONG
+ GLOBAL YAcel() AS LONG
+ GLOBAL XSpd()  AS LONG
 
  FUNCTION PBMAIN  () AS LONG
 
@@ -522,7 +534,7 @@ CONST HomeFlagMask = &HFE0F
   DIM  MemSize AS LONG
   DIM  PICPort AS STRING
   DIM  PICBaud AS LONG
-
+  DIM KeyTable(20) AS STRING
   'delay timer
   DIM  DelayCtr AS LONG
   DIM  WaitX AS INTEGER
@@ -537,8 +549,8 @@ CONST HomeFlagMask = &HFE0F
   'joystick to pwm conversion table
   DIM  LF(0 TO 255)
   DIM  LU(0 TO 255)
-  DIM  Corr1(0 TO 255)
-  DIM  Corr2(0 TO 255)
+  DIM  Corr1(0 TO 255) AS BYTE
+  DIM  Corr2(0 TO 255) AS BYTE
 
   'Vel & Accel pot tables
   DIM  XVel(255) AS LONG
@@ -3635,7 +3647,7 @@ END SUB
 FUNCTION OpenComPorts
     LOCAL x AS INTEGER
     nComm = FREEFILE
-    COMM OPEN PicPort$ AS #nComm
+    COMM OPEN PicPort AS #nComm
     IF ERR THEN
         OpenComPorts = FALSE
         EXIT FUNCTION
@@ -3647,7 +3659,7 @@ FUNCTION OpenComPorts
     COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
     COMM SET #nComm, BYTE   = 8     ' 8 bits
     COMM SET #nComm, PARITY = 0     ' No parity
-    COMM SET #nComm, STOP   = 1     ' 1 stop bit
+    COMM SET #nComm, STOP   = 0     ' 1 stop bit
     CALL FlushBuffers(PICPort$, 0, ECode%)
     OpenComPorts = TRUE
 END FUNCTION
@@ -3723,9 +3735,9 @@ SUB PrintChar (y, x, char$)
 
 END SUB
 
-SUB PrintClrStr (y, x, prtText AS STRING * 10)
+SUB PrintClrStr (y, x, BYVAL prtText AS STRING)
      LOCATE Y, 1: PRINT SPACE$(80);
-     LOCATE Y, X: PRINT text$;
+     LOCATE Y, X: PRINT prtText;
      EXIT SUB
     YY = y: XX = x
 

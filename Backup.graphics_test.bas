@@ -1,8 +1,11 @@
 #COMPILE EXE
 #DIM ALL
 #CONSOLE OFF
-#INCLUDE "C:\PBCC60\WinAPI\WIN32API.INC"
+#INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
 FUNCTION PBMAIN () AS LONG
+  LOCAL hFont&
+  FONT NEW "Times New Roman", 8, 4,0,0 TO hFont&
+  GRAPHIC SET FONT hFont&
   DIM MousePoint AS POINTAPI
   LOCAL hWin AS DWORD
   LOCAL widthvar AS INTEGER
@@ -40,7 +43,7 @@ FUNCTION PBMAIN () AS LONG
             'GRAPHIC PRINT "x"
             IF cp > (GRAPHIC(CHR.SIZE.X) * 10) THEN
                 GRAPHIC SET POS (cp,rp)
-                GRAPHIC PRINT "x"
+                GRAPHIC PRINT "_"  SET FONT hFont&
             END IF
         END IF
     END IF

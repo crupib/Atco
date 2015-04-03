@@ -3,6 +3,8 @@
 #CONSOLE OFF
 #INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
 FUNCTION PBMAIN () AS LONG
+  LOCAL hFont&
+
   DIM MousePoint AS POINTAPI
   LOCAL hWin AS DWORD
   LOCAL widthvar AS INTEGER
@@ -14,6 +16,8 @@ FUNCTION PBMAIN () AS LONG
   LOCAL cp, Q, rp AS LONG
   GRAPHIC WINDOW  "Atco MCU Test",400, 400,600, 400 TO hWin
   GRAPHIC ATTACH hWin, 0
+  FONT NEW "Times New Roman", 8, 4,0,0 TO hFont&
+  GRAPHIC SET FONT hFont&
   GRAPHIC PRINT "Hello atco  test" POS(1)
   CP = 0
   RP = 0
@@ -40,7 +44,7 @@ FUNCTION PBMAIN () AS LONG
             'GRAPHIC PRINT "x"
             IF cp > (GRAPHIC(CHR.SIZE.X) * 10) THEN
                 GRAPHIC SET POS (cp,rp)
-                GRAPHIC PRINT "x"
+                GRAPHIC PRINT "_"
             END IF
         END IF
     END IF

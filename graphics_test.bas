@@ -60,17 +60,28 @@ FUNCTION PBMAIN () AS LONG
                s$  = MID$(mystring, curpt-1, 1)
                GRAPHIC PRINT s$ POS(cp)
                curpt = curpt + 1
-
                cp = cp+GRAPHIC(CHR.SIZE.X)
                IF curpt > LEN(mystring) THEN
                     curpt = curpt -1
                     cp = cp-GRAPHIC(CHR.SIZE.X)
                END IF
-             END IF
-'            IF cp > (GRAPHIC(CHR.SIZE.X) * 10) THEN
-'                GRAPHIC SET POS (cp,rp)
-'                GRAPHIC PRINT "_"
-'            END IF
+            END IF
+            IF Q = 75 THEN
+               GRAPHIC SET FONT hFont&
+               GRAPHIC SET POS(cp,rp)
+               s$  = MID$(mystring, curpt, 1)
+               GRAPHIC PRINT s$ POS(cp)
+               GRAPHIC SET FONT hFont1&
+               GRAPHIC SET POS(cp+GRAPHIC(CHR.SIZE.X),rp)
+               s$  = MID$(mystring, curpt+1, 1)
+               GRAPHIC PRINT s$ POS(cp)
+               curpt = curpt - 1
+               cp = cp-GRAPHIC(CHR.SIZE.X)
+               IF curpt > LEN(mystring) THEN
+                    curpt = curpt + 1
+                    cp = cp+GRAPHIC(CHR.SIZE.X)
+               END IF
+            END IF
         END IF
     END IF
   LOOP

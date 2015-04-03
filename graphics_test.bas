@@ -19,8 +19,8 @@ FUNCTION PBMAIN () AS LONG
   GRAPHIC WINDOW  "Atco MCU Test",widthvar/4, Heightvar/4,600, 400 TO hWin
   GRAPHIC ATTACH hWin, 0
   mystring = "Hello atco  test"
-  FONT NEW "myfont", 20, 4, 0, 1 TO hFont&
-  FONT NEW "myfont1",20 , 0, 0, 1 TO hFont1&
+  FONT NEW "myfont", 10, 4, 0, 1 TO hFont&
+  FONT NEW "myfont1",10 , 0, 0, 1 TO hFont1&
   GRAPHIC SET FONT hFont1&
   GRAPHIC PRINT mystring POS(1)
   FONT END hfont1&
@@ -54,6 +54,12 @@ FUNCTION PBMAIN () AS LONG
                GRAPHIC SET FONT hFont&
                GRAPHIC SET POS(cp,rp)
                s$  = MID$(mystring, curpt, 1)
+               GRAPHIC PRINT s$ POS(cp)
+
+
+               GRAPHIC SET FONT hFont1&
+               GRAPHIC SET POS(cp-GRAPHIC(CHR.SIZE.X),rp)
+               s$  = MID$(mystring, curpt-1, 1)
                GRAPHIC PRINT s$ POS(cp)
                curpt = curpt + 1
                cp = cp+GRAPHIC(CHR.SIZE.X)

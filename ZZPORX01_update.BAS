@@ -1552,7 +1552,11 @@ END SUB
 SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
 SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
+    LOCAL dummy AS STRING
     FLUSH #nComm
+    IF COMM(#nComm, RXQUE) THEN
+        COMM RECV #nComm, COMM(#nComm, RXQUE), dummy
+    END IF
 END SUB
 
 SUB ClrLCD

@@ -15,7 +15,7 @@ DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
 DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
 DECLARE FUNCTION OpenComPorts ()
 DECLARE SUB DeleteCommBuffers (ECode%)
-\
+
 'REM new routines for Joe Loyd Drive
 DECLARE SUB KeyWait ()
 DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
@@ -1553,6 +1553,9 @@ SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
 SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
     FLUSH #nComm
+    IF COMM(#nComm, RXQUE) THEN
+        COMM RECV #nComm, COMM(#nComm, RXQUE), dummy
+    END IF
 END SUB
 
 SUB ClrLCD

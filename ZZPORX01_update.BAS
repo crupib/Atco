@@ -3,41 +3,20 @@
 #OPTION LARGEMEM32
 #OPTIMIZE CODE ON
 #OPTIMIZE SIZE
-' The resource gives the EXE program the "hello" icon in Explorer,
-' and provides it with Windows version information.
-'#RESOURCE ICON, 100, "Atco.ico"
-'#RESOURCE VERSIONINFO
-'#RESOURCE FILEVERSION 6, 0, 0, 0
-'#RESOURCE PRODUCTVERSION 6, 0, 0, 0
+#RESOURCE ICON, 100, "Atco.ico"
+
 DEFINT A-Z
 
 REM new RS232 PC compatible
-DECLARE SUB SetIRQ (ComPortNum$, IRQ%, ECode%)
-DECLARE SUB SetPortAddr (ComPortNum$, PortAddress%, ECode%)
 DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
-DECLARE SUB CommError (ComPortNum$, ECode%)
 DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
 DECLARE SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
-DECLARE SUB LineStatus (ComPortNum$, Cts%, DSR%, CD%, RI%, ECode%)
-DECLARE SUB GetDTRState (ComPortNum$, DTRState%, ECode%)
-DECLARE SUB GetRTSState (ComPortNum$, DTRState%, ECode%)
-DECLARE SUB SetDTRSignal (ComPortNum$, DTRState%, ECode%)
-DECLARE SUB SetRTSSignal (ComPortNum$, DTRState%, ECode%)
 DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
-DECLARE SUB SetFlowControl (ComPortNum$, InFlow%, OutFlow%, InMin%, InMax%, XonChar%, XoffChar%, ECode%)
 DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
-DECLARE SUB ChangeCommSettings (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
 DECLARE FUNCTION OpenComPorts ()
-DECLARE SUB UARTType (ComPortNum$, UART%, ECode%)
-DECLARE SUB SetFIFOTriggerLevel (ComPortNum$, TriggerLevel%, ECode%)
-DECLARE SUB CalcRequiredMem (PortSeg%, PortOfs%, RecvSeg%, RecvOfs%, XmitSeg%, XmitOfs%, NumPorts%, MemSize&, ECode%)
-DECLARE SUB InitCommBuffers (ECode%)
 DECLARE SUB DeleteCommBuffers (ECode%)
-DECLARE SUB InitSharedHandler (PortSeg%, PortOfs%, NumPorts%, IRQ%, StatusRegisterAddr%, ECode%)
 
 'REM new routines for Joe Loyd Drive
-DECLARE SUB LoadInfo ()
-DECLARE SUB SaveInfo ()
 DECLARE SUB KeyWait ()
 DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
 DECLARE FUNCTION GetDiskFile$ (FSpec$)
@@ -88,7 +67,6 @@ DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAttrib%)
 DECLARE FUNCTION DirNext ()
 DECLARE FUNCTION DirFileName$ ()
 DECLARE FUNCTION DirFileSize& ()
-'DECLARE SUB SCROLL (Ulr, Ulc, Lrr, Lrc, Tnum)
 DECLARE FUNCTION CalcAttr2% (FORE, BACK)
 DECLARE SUB IPtrSort (DSeg, DOfs1, DSeg2, DOfs2, Elements)
 DECLARE SUB InitPtr (DSeg, DOfs, COUNT)
@@ -194,19 +172,10 @@ DECLARE SUB DFWrite2 (filenum AS INTEGER, passrec AS ScanParms , OFFSET AS INTEG
 DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
-
-'DECLARE SUB FCreate (FileNumber$, ATTR, HANDLE, ECode)
-'DECLARE SUB FOpen (FileNumber$, ReadWrite, Sharing, HANDLE, ECode)
-'DECLARE SUB FClose (HANDLE)
-'DECLARE SUB DFWrite (HANDLE, DSeg, DOfs, BYTES&, BytesWrote&, ECode)
-'DECLARE SUB DFRead (HANDLE, DSeg, DOfs, BYTES&, BytesRed&, ECode)
 DECLARE FUNCTION Exist2 (FileNumber$)
 
 REM 'added from crescent
-'DECLARE FUNCTION Ascii (ANY$)
 DECLARE FUNCTION FUsing$ (Num$, Image$)
-'DECLARE SUB InitInt (SEG segm, Value, NumEls)
-'DECLARE SUB ISortI (SEG segm1, SEG segm2, NumEls, diri)
 DECLARE FUNCTION WriteTest (DRIVE$)
 DECLARE FUNCTION DriveSpace& (Drv$)
 DECLARE FUNCTION Valid (FileNumber$)
@@ -329,14 +298,12 @@ CONST LcdAddress = &H7F
 CONST LcdAddrSet = &H80
 
 'miss const values
-'CONST TRUE = -1, FALSE = NOT TRUE, gain = 0, NegDir = 0, PosDir = -1
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
 CONST gain = 0
 CONST NegDir = 0
 CONST PosDir = -1
 'Number of servos in system, change as needed.
-'CONST Servo1 = 1, Servo2 = 2, Servo3 = 3, Servo4 = 4, AllServos = &HFF, LastServo = 4
 CONST Servo1 = 1
 CONST Servo2 = 2
 CONST Servo3 = 3
@@ -347,8 +314,6 @@ CONST InOut1 = 5
 
 
 'Key codes
-'CONST KeyUP = 72, KeyDN = 80, KeyLft = 75, KeyRgt = 77
-'CONST KeyBKSPC = 8, KeySPC = 32, KeyEnter = 13, KeyEsc = 27
 CONST KeyUP = 72
 CONST KeyDN = 80
 CONST KeyLft = 75
@@ -361,7 +326,6 @@ CONST KeyEsc = 27
 
 
 'Sio error mode difinitions
-'CONST DoNothing = 0, ErrorBox = 1, AbortCom = 2, ExitProgram = 3
 CONST DoNothing = 0
 CONST ErrorBox = 1
 CONST AbortCom = 2
@@ -370,8 +334,6 @@ CONST ExitProgram = 3
 CONST PicServoType = 0
 
 'Status definitions bits for servo
-'CONST SendPos = 1, SendAD = 2, SendVel = 4, SendAux = 8
-'CONST SendHome = 16, SendID = 32
 CONST SendPos = 1
 CONST SendAD = 2
 CONST SendVel = 4
@@ -381,8 +343,6 @@ CONST SendID = 32
 
 
 'Status definitions bits for io (SendID is shared with PIC)
-'CONST SendIO = 1, SendAD1 = 2, SendAD2 = 4, SendAD3 = 8
-'CONST SendCtr = 16, SendSyncIO = 64, SendSyncCtr = 128
 CONST SendIO = 1
 CONST SendAD1 = 2
 CONST SendAD2 = 4
@@ -392,8 +352,6 @@ CONST SendSyncIO = 64
 CONST SendSyncCtr = 128
 
 'Load Trajectory control byte
-'CONST LoadPos = 1, LoadVel = 2, LoadAcc = 4, LoadPWM = 8, PosMode = 16
-'CONST VelMode = 32, RevDir = 64, StartNow = 128, PWMMode = 0'PWM added KJL
 CONST LoadPos = 1
 CONST LoadVel = 2
 CONST LoadAcc = 4
@@ -404,22 +362,17 @@ CONST RevDir = 64
 CONST StartNow = 128
 CONST PWMMode = 0 'PWM added KJL
 'Stop control byte
-'CONST EnableAmp = 1, MotorOff = 2, StopAbrupt = 5, StopSmooth = 9
 CONST EnableAmp = 1
 CONST MotorOff = 2
 CONST StopAbrupt = 5
 CONST StopSmooth = 9
 'Homing control byte
-'CONST HomeOnLimit1 = 1, HomeOnLimit2 = 2, HomeOnIndex = 8, HomeOnPerr = 64
-'CONST HomeOnCerr = 128
 CONST HomeOnLimit1 = 1
 CONST HomeOnLimit2 = 2
 CONST HomeOnIndex = 8
 CONST HomeOnPerr = 64
 CONST HomeOnCerr = 128
 'Status byte
-'CONST MoveDone = 1, CksumErr = 2, OverCurrent = 4, PowerOn = 8, PosError = 16
-'CONST Limit1 = 32, Limit2 = 64, HomeInProg = 128
 CONST MoveDone = 1
 CONST CksumErr = 2
 CONST OverCurrent = 4
@@ -430,8 +383,6 @@ CONST Limit2 = 64
 CONST HomeInProg = 128
 
 'Auxiliary status byte
-'CONST IndexPulse = 1, PositionWrap = 2, ServoOn = 4, AccelDone = 8
-'CONST SlewDone = 16, ServoOverrun = 32
 CONST IndexPulse = 1
 CONST PositionWrap = 2
 CONST ServoOn = 4
@@ -441,10 +392,7 @@ CONST ServoOverrun = 32
 
 
 'MiscMode bit definitions
-'CONST AmpEnabled = 1, PWMSelected = 2, VelSelected = 4, PosSelected = 8
-'CONST OnL1Selected = 16, OnL2Selected = 32, OnIndexSelected = 64
-'CONST OnPeSelected = 128, OnCeSelected = 256, HomeFlagMask = &HFE0F
-'MiscMode bit definitions
+
 CONST AmpEnabled = 1
 CONST PWMSelected = 2
 CONST VelSelected = 4
@@ -523,7 +471,7 @@ CONST HomeFlagMask = &HFE0F
   DIM HdrVer AS STRING * 20
   HdrVer = "SCU-1.00            "
   DIM ThumbDisk AS STRING * 2
-  ThumbDisk = "A:\UCALS\"
+  ThumbDisk = "C:\UCALS\"
 
   'COM PORTS
   DIM  RecvSize AS LONG
@@ -616,14 +564,6 @@ CONST HomeFlagMask = &HFE0F
   CALL PrintClrStr(2, 1, "MCU-P2000      V2.01")
   CALL PrintClrStr(3, 1, "COPYRIGHT 1997- 2015")
   CALL PrintClrStr(4, 1, " ")
-
-  'for debug with PC Keyboard to exit program
-  'FOR VV = 1 TO 1000
-  '  GG$ = INKEY$
-  '  IF LEFT$(GG$, 1) = "Q" OR LEFT$(GG$, 1) = "q" THEN
-  '     END
-  '  END IF
-  'NEXT
 
   '***********************************************
   'Open & Check Com Buffers, Report & Fix errors
@@ -1585,45 +1525,7 @@ FUNCTION CharsToLong& (BYVAL A AS INTEGER, B AS INTEGER, C AS INTEGER, D AS INTE
     CharsToLong = A * 16777216 + B * 65536 + C * 256& + D
     EXIT FUNCTION
  END IF
-
-
 END FUNCTION
-
-'FUNCTION CheckDisk (DataDir, Drv$, WriteLen&, FileNumber$)
-
-   'DataDir = Read from Disk or Write to Disk
-
-   'check drive
-   'DriveOK = WriteTest(Drv$)
-'   IF NOT DriveOK THEN
-'      CheckDisk = 1
-'      EXIT FUNCTION
-'   END IF
-
-   'check disk space left
-'   IF DriveSpace&(Drv$) < WriteLen& THEN
-''      CheckDisk = 2
-'      EXIT FUNCTION
- '  END IF
-
-   'check filename
- '  GoodName = Valid(FileNumber$)
-'   IF NOT GoodName THEN
-'      CheckDisk = 4
-'      EXIT FUNCTION
-'   END IF
-
-   'check exist
-'   IF Exist2(FileNumber$) THEN
-'      CheckDisk = 8
-'      EXIT FUNCTION
-'   END IF
-
-'   CheckDisk = 0  'Disk OK
-'
-'   EXIT FUNCTION
-
-'END FUNCTION
 
 SUB ClearBits (address AS INTEGER)
 
@@ -1637,11 +1539,8 @@ SUB ClearBits (address AS INTEGER)
 END SUB
 
 SUB CloseComPorts
-
    CALL CloseCommPort(PICPort$,ecode%)
    CALL DeleteCommBuffers(ECode%)
-   'FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-
 END SUB
 SUB DeleteCommBuffers (ecode%)
 END SUB
@@ -1658,28 +1557,14 @@ END SUB
 
 SUB ClrLCD
    CLS
-   'CALL StrobeInstr(&H1)    ' clear display
-
 END SUB
 
 SUB CursorOFF
-
      CALL StrobeInstr(&HC)     ' display on, cursor off
-                   ' b7-b4 = 0, b3 = 1
-                   ' b2, D = 1    (display on)
-                   ' b1, C = 0    (cursor off)
-                   ' b0, B = 0    (blink off)
-
 END SUB
 
 SUB CursorON
-
      CALL StrobeInstr(&HE)    ' turn on display and cursor
-                   ' b7-b4 = 0, b3 = 1
-                   ' b2, D = 1    (display on)
-                   ' b1, C = 1    (cursor on)
-                   ' b0, B = 0    (blink off)
-
 END SUB
 
 SUB ddelay (Nval)
@@ -1800,7 +1685,7 @@ SUB FixSIOerror
   CALL WriteToComm(picport$,   NullStr$, BytesWritten, ECode%)
 
   DO
-     CALL GetCharsInBuffer(comport$, RecQue, XmtQue, ECode%)
+     CALL GetCharsInBuffer(picport$, RecQue, XmtQue, ECode%)
      Cts& = Cts& + 1
      IF Cts& > 100 * DelayCtr THEN EXIT DO
   LOOP UNTIL (XmtQue = XmitSize - 1)

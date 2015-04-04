@@ -14,7 +14,6 @@ DEFINT A-Z
 REM new RS232 PC compatible
 DECLARE SUB SetIRQ (ComPortNum$, IRQ%, ECode%)
 DECLARE SUB SetPortAddr (ComPortNum$, PortAddress%, ECode%)
-'DECLARE SUB CloseCommPort (ComPortNum$, ECode%)
 DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
 DECLARE SUB CommError (ComPortNum$, ECode%)
 DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
@@ -28,7 +27,6 @@ DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
 DECLARE SUB SetFlowControl (ComPortNum$, InFlow%, OutFlow%, InMin%, InMax%, XonChar%, XoffChar%, ECode%)
 DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
 DECLARE SUB ChangeCommSettings (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
-'DECLARE SUB OpenCommPort (ComPortNum$, BaudRate&, DataBits%, Parity%, StopBits%, ECode%)
 DECLARE FUNCTION OpenComPorts ()
 DECLARE SUB UARTType (ComPortNum$, UART%, ECode%)
 DECLARE SUB SetFIFOTriggerLevel (ComPortNum$, TriggerLevel%, ECode%)
@@ -43,8 +41,6 @@ DECLARE SUB SaveInfo ()
 DECLARE SUB KeyWait ()
 DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
 DECLARE FUNCTION GetDiskFile$ (FSpec$)
-'DECLARE FUNCTION CheckDisk (DataDir, Drv$, WriteLen&, FileNumber$)
-
 'motor soft controls
 DECLARE FUNCTION GetXCord& (Cts&)
 DECLARE FUNCTION ProfileScan ()
@@ -1801,7 +1797,7 @@ SUB FixSIOerror
   NullStr$ = STRING$(16, 0)
 
   'spit out a bunch of zeros
-  CALL WriteToComm(comport$,   NullStr$, BytesWritten, ECode%)
+  CALL WriteToComm(picport$,   NullStr$, BytesWritten, ECode%)
 
   DO
      CALL GetCharsInBuffer(comport$, RecQue, XmtQue, ECode%)
@@ -4649,8 +4645,8 @@ SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       ncbData = COMM(#nComm, RXQUE)
       IF ncbData THEN
             COMM RECV #nComm, ncbData, ReadBuffer$
-            'STDOUT sData;
-        END IF
+      END IF
+      BytesRead% = ncbData
 END SUB
 SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
 END SUB

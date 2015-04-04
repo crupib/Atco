@@ -1801,7 +1801,7 @@ SUB FixSIOerror
   NullStr$ = STRING$(16, 0)
 
   'spit out a bunch of zeros
-  CALL WriteToComm(comport$,   NullStr$, BytesWritten, ECode%)
+  CALL WriteToComm(picport$,   NullStr$, BytesWritten, ECode%)
 
   DO
      CALL GetCharsInBuffer(comport$, RecQue, XmtQue, ECode%)
@@ -4648,9 +4648,9 @@ SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       LOCAL ncbData AS LONG    ' bytes of data waiting
       ncbData = COMM(#nComm, RXQUE)
       IF ncbData THEN
-            COMM RECV #nComm, ncbData, sData
-            STDOUT sData;
-        END IF
+            COMM RECV #nComm, ncbData, ReadBuffer$
+      END IF
+      BytesRead% = ncbData
 END SUB
 SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
 END SUB

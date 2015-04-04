@@ -7,10 +7,10 @@ Primary source:  C:\Users\Bill\Documents\GitHub\Atco\ZZPORX01_update.BAS   {4658
 Target compilation:  ZZPORX01_update.EXE
 Compile time:  0.1 seconds, at 5589600 lines/minute
 
-73968 bytes compiled code, 47280 bytes RTLibrary,
+68464 bytes compiled code, 47144 bytes RTLibrary,
 1548 bytes string literals, and 6896 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 134656 bytes   Memory image: 55724 bytes.
+Disk image: 129024 bytes   Memory image: 55588 bytes.
 
 Component Files:
 ----------------

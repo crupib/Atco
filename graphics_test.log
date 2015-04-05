@@ -3,14 +3,14 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\graphics_test.bas   {194712 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\graphics_test.bas   {194719 total lines}
 Target compilation:  graphics_test.EXE
-Compile time:  0.6 seconds, at 19471200 lines/minute
+Compile time:  0.7 seconds, at 16690200 lines/minute
 
-2672 bytes compiled code, 30988 bytes RTLibrary,
-96 bytes string literals, and 2780 bytes dgroup.
+2816 bytes compiled code, 30988 bytes RTLibrary,
+120 bytes string literals, and 2808 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 40448 bytes   Memory image: 33864 bytes.
+Disk image: 40960 bytes   Memory image: 33916 bytes.
 
 Component Files:
 ----------------

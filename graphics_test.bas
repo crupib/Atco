@@ -14,23 +14,30 @@ FUNCTION PBMAIN () AS LONG
   LOCAL myclick AS LONG
   LOCAL myint AS INTEGER
   LOCAL cp, Q, rp, colpt,rowpt AS LONG
-  DIM mystrings$(2)
+  LOCAL temppt AS LONG
+  DIM mystrings$(3)
   LOCAL numrows AS LONG
-  LOCAL mystring, s, mystring1 AS STRING
+  LOCAL mystring, s, mystring1, mystring3 AS STRING
   DESKTOP GET SIZE TO widthvar, Heightvar
   GRAPHIC WINDOW  "Atco MCU Test",widthvar/4, Heightvar/4,600, 400 TO hWin
   GRAPHIC ATTACH hWin, 0
-  numrows = 2
+  numrows = 3
   mystring  = "Hello atco  test"
   mystring1 = "Hello junk  test"
+  mystring3 = "Hello shit  test"
   mystrings$(1) = mystring
   mystrings$(2) = mystring1
+  mystrings$(3) = mystring3
   FONT NEW "myfont", 10, 4, 0, 1 TO underline&
   FONT NEW "myfont1",10 , 0, 0, 1 TO NormalFont&
   GRAPHIC SET FONT NormalFont&
   GRAPHIC PRINT mystrings$(1) POS(1)
   GRAPHIC SET POS(1,GRAPHIC(CHR.SIZE.Y))
   GRAPHIC PRINT mystrings$(2)POS(1)
+  temppt =  GRAPHIC(CHR.SIZE.Y)
+  temppt = temppt+GRAPHIC(CHR.SIZE.Y)
+  GRAPHIC SET POS(1,temppt)
+  GRAPHIC PRINT mystrings$(3)POS(1)
   'FONT END NormalFont&
   GRAPHIC SET FONT underline&
   GRAPHIC SET POS(1,0)
@@ -90,7 +97,7 @@ FUNCTION PBMAIN () AS LONG
             IF Q=80 THEN
                rowpt = rowpt + 1
                rp = rp+GRAPHIC(CHR.SIZE.Y)
-               IF rowpt > LEN(numrows) THEN
+               IF rowpt > numrows THEN
                     rowpt = rowpt - 1
                     rp = rp-GRAPHIC(CHR.SIZE.Y)
                END IF

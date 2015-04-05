@@ -4,6 +4,7 @@
 #INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
 FUNCTION PBMAIN () AS LONG
   LOCAL underline&, NormalFont&
+  LOCAL mystrings() AS STRING
   DIM MousePoint AS POINTAPI
   LOCAL hWin AS DWORD
   LOCAL widthvar AS LONG
@@ -13,22 +14,25 @@ FUNCTION PBMAIN () AS LONG
   LOCAL myclick AS LONG
   LOCAL myint AS INTEGER
   LOCAL cp, Q, rp, curpt AS LONG
+  DIM mystrings$(3)
   LOCAL mystring, s, mystring1 AS STRING
   DESKTOP GET SIZE TO widthvar, Heightvar
   GRAPHIC WINDOW  "Atco MCU Test",widthvar/4, Heightvar/4,600, 400 TO hWin
   GRAPHIC ATTACH hWin, 0
   mystring  = "Hello atco  test"
   mystring1 = "Hello junk  test"
+  mystrings$(1) = mystring
+  mystrings$(2) = mystring1
   FONT NEW "myfont", 10, 4, 0, 1 TO underline&
   FONT NEW "myfont1",10 , 0, 0, 1 TO NormalFont&
   GRAPHIC SET FONT NormalFont&
-  GRAPHIC PRINT mystring POS(1)
+  GRAPHIC PRINT mystrings$(1) POS(1)
   GRAPHIC SET POS(1,GRAPHIC(CHR.SIZE.Y))
-  GRAPHIC PRINT mystring1 POS(1)
+  GRAPHIC PRINT mystrings$(2)POS(1)
   FONT END NormalFont&
   GRAPHIC SET FONT underline&
   GRAPHIC SET POS(1,0)
-  s$  = MID$(mystring, 1, 1)
+  s$  = MID$(mystrings$(1), 1, 1)
   GRAPHIC PRINT s$ POS(1)
   FONT END underline&
   CP = 0 'GRAPHIC(CHR.SIZE.X)
@@ -56,11 +60,11 @@ FUNCTION PBMAIN () AS LONG
                END IF
                GRAPHIC SET FONT underline&
                GRAPHIC SET POS(cp,rp)
-               s$  = MID$(mystring, curpt, 1)
+               s$  = MID$(mystrings$(1), curpt, 1)
                GRAPHIC PRINT s$ POS(cp)
                GRAPHIC SET FONT NormalFont&
                GRAPHIC SET POS(cp-GRAPHIC(CHR.SIZE.X),rp)
-               s$  = MID$(mystring, curpt-1, 1)
+               s$  = MID$(mystrings$(1), curpt-1, 1)
                GRAPHIC PRINT s$ POS(cp)
 
             END IF
@@ -73,11 +77,11 @@ FUNCTION PBMAIN () AS LONG
                END IF
                GRAPHIC SET FONT underline&
                GRAPHIC SET POS(cp,rp)
-               s$  = MID$(mystring, curpt, 1)
+               s$  = MID$(mystrings$(1), curpt, 1)
                GRAPHIC PRINT s$ POS(cp)
                GRAPHIC SET FONT NormalFont&
                GRAPHIC SET POS(cp+GRAPHIC(CHR.SIZE.X),rp)
-               s$  = MID$(mystring, curpt+1, 1)
+               s$  = MID$(mystrings$(1), curpt+1, 1)
                GRAPHIC PRINT s$ POS(cp)
             END IF
             IF Q=80 THEN

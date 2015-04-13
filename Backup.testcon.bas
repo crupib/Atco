@@ -36,7 +36,7 @@ DECLARE FUNCTION GetKeys$
 GLOBAL myrecord AS HEADER
 GLOBAL inrecord AS mytype
 GLOBAL hdrrecord AS HEADER
-'GLOBAL  KeyTable() AS STRING
+GLOBAL  KeyTable() AS STRING
 
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
@@ -128,6 +128,7 @@ FUNCTION PBMAIN () AS LONG
  CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
  CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
+ CALL OpenComPorts
 
  PRINT hdrrecord.hdr
  PRINT inrecord.id
@@ -151,7 +152,7 @@ FUNCTION PBMAIN () AS LONG
     COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
     COMM SET #nComm, BYTE   = 8     ' 8 bits
     COMM SET #nComm, PARITY = 0     ' No parity
-    COMM SET #nComm, STOP   = 1     ' 1 stop bit
+    COMM SET #nComm, STOP   = 0     ' 1 stop bit
 '    COMM SEND #nComm, buffer_clear
     OpenComPorts = TRUE
     CALL FlushBuffers(PICPort, 0, ECode)

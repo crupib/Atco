@@ -4,7 +4,7 @@
 #OPTIMIZE CODE ON
 #OPTIMIZE SIZE
 #RESOURCE ICON, 100, "Atco.ico"
-
+#INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
 DEFINT A-Z
 
 REM new RS232 PC compatible
@@ -75,7 +75,7 @@ DECLARE SUB SFWrite (HANDLE, St$, BW, ECode)
 DECLARE SUB ClrKbd ()
 DECLARE SUB Delay18th (MiniDelay)
 DECLARE FUNCTION SETDRV (Drv$)
-DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
+'DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
 
 TYPE ScanParms
    YCtr          AS SINGLE       'YCts/inch
@@ -198,7 +198,7 @@ DECLARE FUNCTION IntToStr$ (x AS INTEGER)
 DECLARE FUNCTION LongToStr$ (x AS LONG)
 DECLARE SUB MtrOff (address AS INTEGER)
 DECLARE SUB ResetPosition (address AS INTEGER)
-DECLARE SUB SendCmd (address AS INTEGER, CmdString AS STRING)
+DECLARE SUB SendCmd (address AS WORD, CmdString AS STRING)
 DECLARE SUB SetGain (address AS INTEGER)
 DECLARE FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
 DECLARE SUB StopMtrs ()
@@ -308,7 +308,7 @@ CONST Servo1 = 1
 CONST Servo2 = 2
 CONST Servo3 = 3
 CONST Servo4 = 4
-CONST AllServos = &HFF
+'CONST AllServos = &HFF
 CONST LastServo = 4
 CONST InOut1 = 5
 
@@ -465,6 +465,7 @@ CONST HomeFlagMask = &HFE0F
  GLOBAL YAcel() AS LONG
  GLOBAL XSpd()  AS LONG
  GLOBAL YSpd()  AS LONG
+ GLOBAL AllServos AS INTEGER
 
  FUNCTION PBMAIN  () AS LONG
 
@@ -472,7 +473,7 @@ CONST HomeFlagMask = &HFE0F
   HdrVer = "SCU-1.00            "
   DIM ThumbDisk AS STRING * 2
   ThumbDisk = "C:\UCALS\"
-
+  DIM AllServos AS INTEGER
   'COM PORTS
   DIM  RecvSize AS LONG
   DIM  XmitSize AS LONG
@@ -483,11 +484,11 @@ CONST HomeFlagMask = &HFE0F
   'delay timer
   DIM  DelayCtr AS LONG
   DIM  WaitX AS INTEGER
-
+  AllServos = &HFF
   'set com port numbers & baud
-  PICPort ="\\.\COM31"
-  PICBaud = 9600
-
+  PICPort ="COM1"
+  PICBaud = 19200
+  nComm = FREEFILE
   DelayCtr = DelayFact
   WaitX = 1   'delay used in comm
 
@@ -1536,27 +1537,6 @@ SUB ClearBits (address AS INTEGER)
 
  SendCmd address, Cmd$
 
-END SUB
-
-SUB CloseComPorts
-   CALL CloseCommPort(PICPort$,ecode%)
-   CALL DeleteCommBuffers(ECode%)
-END SUB
-SUB DeleteCommBuffers (ecode%)
-END SUB
-SUB CloseCommPort (ComPortNum$,ecode%)
-END SUB
-SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
-    COMM SEND #nComm, WriteBuffer$
-END SUB
-SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
-END SUB
-SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
-    LOCAL dummy AS STRING
-    FLUSH #nComm
-    IF COMM(#nComm, RXQUE) THEN
-        COMM RECV #nComm, COMM(#nComm, RXQUE), dummy
-    END IF
 END SUB
 
 SUB ClrLCD
@@ -3531,25 +3511,7 @@ SUB MtrOff (address AS INTEGER)
  SendCmd address, Cmd$
 
 END SUB
-FUNCTION OpenComPorts
-    LOCAL x AS INTEGER
-    nComm = FREEFILE
-    COMM OPEN PicPort AS #nComm
-    IF ERR THEN
-        OpenComPorts = FALSE
-        EXIT FUNCTION
-    END IF
-    XmitSize = 2048
-    RecvSize = 2048
-    COMM SET #nComm, TXBUFFER = xmitsize
-    COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
-    COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
-    COMM SET #nComm, BYTE   = 8     ' 8 bits
-    COMM SET #nComm, PARITY = 0     ' No parity
-    COMM SET #nComm, STOP   = 0     ' 1 stop bit
-    CALL FlushBuffers(PICPort$, 0, ECode%)
-    OpenComPorts = TRUE
-END FUNCTION
+
 'FUNCTION OpenComPorts
 
    REM Changed to PC Serial routines
@@ -3860,7 +3822,7 @@ SUB ResetPosition (address AS INTEGER)
 
 END SUB
 
-SUB SendCmd (address AS INTEGER, CmdString AS STRING)
+SUB SendCmd (address AS WORD, CmdString AS STRING)
 
   Cksum = address
 
@@ -4034,7 +3996,8 @@ SUB SendCmd (address AS INTEGER, CmdString AS STRING)
 
   IF (Cksum AND 255) <> CCksum THEN
     Glo.SIOError = TRUE
-    'PRINT "Bad ChkSum"
+   ' PRINT "Bad ChkSum"
+    CALL PrintClrStr(3, 1, "Bad ChkSum")
     FixSIOerror
     'CALL Delayx(500)
     'CALL PrintClrStr(3, 1, " ")
@@ -4047,7 +4010,7 @@ SUB SendCmd (address AS INTEGER, CmdString AS STRING)
 
 NoStatExit:
   Glo.SIOError = TRUE
-  'CALL PrintClrStr(3, 1, "No Status")
+  CALL PrintClrStr(3, 1, "No Status")
   'PRINT "No Status"
   FixSIOerror
   'CALL Delayx(500)
@@ -4057,7 +4020,7 @@ NoStatExit:
 
 NoChkSum:
   Glo.SIOError = TRUE
-  'CALL PrintClrStr(3, 1, "No ChkSum")
+  CALL PrintClrStr(3, 1, "No ChkSum")
   'PRINT "No ChkSum"
   FixSIOerror
   'CALL Delayx(500)
@@ -4068,7 +4031,7 @@ NoChkSum:
 
 SendCmdExit:
   Glo.SIOError = TRUE
-  'CALL PrintClrStr(3, 1, "SER IN FAILED")
+  CALL PrintClrStr(3, 1, "SER IN FAILED")
   'PRINT "SER IN FAILED"
   FixSIOerror
   'CALL Delayx(500)
@@ -4375,7 +4338,6 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
  OneChr$ = " "
 
  STime& = GetTick&
-
  'loop till we get a byte from the serial port or timeout
  DO
 
@@ -4386,8 +4348,8 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
       SIOGetByte = TRUE
       EXIT FUNCTION
     END IF
-
-    IF (ABS(GetTick& - STime&) > 18) THEN
+    Stime2& = getTick&
+    IF (ABS(Stime2& - STime&) > 1000) THEN
       SIOGetByte = FALSE
       EXIT FUNCTION
     END IF
@@ -4490,14 +4452,17 @@ SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead
     GET filenum, offset ,PASSREC
      ECode = -1
 END SUB
+
 SUB DFRead2 (filenum AS INTEGER, passrec AS scanparms , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
     GET filenum, offset ,PASSREC
     ECode = -1
 END SUB
+
 SUB DFWrite (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
         PUT filenum,  offset ,PASSREC
         ECode = -1
 END SUB
+
 SUB DFWrite2 (filenum AS INTEGER, passrec AS scanparms , OFFSET AS INTEGER, Byteswritten AS INTEGER, ECode AS INTEGER)
         PUT filenum,  offset ,PASSREC
         ECode = -1
@@ -4514,6 +4479,7 @@ SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING, ECode A
         OPEN filename FOR BINARY AS filenumber BASE = 0
     END IF
 END SUB
+
 SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
     LOCAL FileExists AS INTEGER
     FileExists = ISFILE(FileName)
@@ -4524,11 +4490,15 @@ SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, file
         ecode = 0
     END IF
 END SUB
+
 SUB FClose (filenumber AS INTEGER)
     CLOSE filenumber
 END SUB
+
 FUNCTION GetTick& ()
+    GetTick& = GetTickCount()
 END FUNCTION
+
 SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       LOCAL ncbData AS LONG    ' bytes of data waiting
       ncbData = COMM(#nComm, RXQUE)
@@ -4537,6 +4507,66 @@ SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       END IF
       BytesRead% = ncbData
 END SUB
+
+FUNCTION OpenComPorts
+    LOCAL x AS INTEGER
+    COMM OPEN PicPort AS #nComm
+    IF ERR THEN
+        OpenComPorts = FALSE
+        EXIT FUNCTION
+    END IF
+    XmitSize = 2048
+    RecvSize = 2048
+    COMM SET #nComm, TXBUFFER = xmitsize
+    COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
+    COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
+    COMM SET #nComm, BYTE   = 8     ' 8 bits
+    COMM SET #nComm, PARITY = %FALSE        ' No parity
+    COMM SET #nComm, STOP   = 0     ' 1 stop bit
+
+    COMM SET #nComm, XINPFLOW = 0
+    COMM SET #nComm, XOUTFLOW = 0
+    CALL FlushBuffers(PICPort$, 0, ECode%)
+    OpenComPorts = TRUE
+END FUNCTION
+
+SUB CloseComPorts
+   CALL CloseCommPort(PICPort$,ecode%)
+   CALL DeleteCommBuffers(ECode%)
+END SUB
+
+SUB DeleteCommBuffers (ecode%)
+END SUB
+
+SUB CloseCommPort (ComPortNum$,ecode%)
+END SUB
+
+SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
+    LOCAL qty AS INTEGER
+    COMM SEND #nComm, WriteBuffer$
+    'qty = COMM(#nComm,BYTE)
+END SUB
+
+SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
+END SUB
+
+SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
+    LOCAL dummy AS STRING
+
+    FOR i = 0 TO 20
+        COMM SEND #nComm, "\0"
+    NEXT
+
+    delayx(200)
+
+    Qty& = COMM(#nComm, RXQUE)
+    IF ISTRUE qty THEN
+        COMM RECV #nComm, Qty&, dummy
+    END IF
+
+
+END SUB
+
 SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
 END SUB
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

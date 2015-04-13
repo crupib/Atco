@@ -36,7 +36,7 @@ DECLARE FUNCTION GetKeys$
 GLOBAL myrecord AS HEADER
 GLOBAL inrecord AS mytype
 GLOBAL hdrrecord AS HEADER
-'GLOBAL  KeyTable() AS STRING
+GLOBAL  KeyTable() AS STRING
 
 FUNCTION PBMAIN () AS LONG
  DIM II AS INTEGER
@@ -108,7 +108,7 @@ FUNCTION PBMAIN () AS LONG
  IF II = 1 THEN
      PRINT "Setup"
  END IF
-
+ CALL OpenComPorts
 ' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
  IF ecode = 0 THEN
@@ -128,6 +128,7 @@ FUNCTION PBMAIN () AS LONG
  CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
  CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
+
 
  PRINT hdrrecord.hdr
  PRINT inrecord.id

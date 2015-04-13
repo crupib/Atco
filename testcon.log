@@ -3,5 +3,20 @@ Copyright (c) 1998-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Error 519 in C:\Users\Bill\Documents\GitHub\Atco\testcon.bas(217:013):  Missing declaration: KEYTABLE
-  Line 217:  GetKeys$ = KeyTable(KeyNum)  
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\testcon.bas   {221 total lines}
+Target compilation:  testcon.EXE
+Compile time:  0.1 seconds, at 265200 lines/minute
+
+4544 bytes compiled code, 45280 bytes RTLibrary,
+328 bytes string literals, and 3384 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 58880 bytes   Memory image: 48992 bytes.
+
+Component Files:
+----------------
+C:\Users\Bill\Documents\GitHub\Atco\testcon.bas
+
+
+Code Extracted:
+---------------
+WRITETOCOMM

@@ -4503,7 +4503,7 @@ SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       LOCAL ncbData AS LONG    ' bytes of data waiting
       ncbData = COMM(#nComm, RXQUE)
       IF ncbData THEN
-            COMM RECV #nComm, ncbData, ReadBuffer$
+            COMM RECV #nComm, 1, ReadBuffer$
       END IF
       BytesRead% = ncbData
 END SUB
@@ -4560,7 +4560,9 @@ SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
     delayx(200)
 
     Qty& = COMM(#nComm, RXQUE)
-    COMM RECV #nComm, Qty&, dummy
+    IF ISTRUE qty THEN
+        COMM RECV #nComm, Qty&, dummy
+    END IF
 
 
 END SUB

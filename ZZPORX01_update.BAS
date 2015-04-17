@@ -1580,10 +1580,11 @@ END FUNCTION
 
 SUB DelayX (Millisec) '
 
-   ct& = DelayCtr * Millisec
+  ' ct& = DelayCtr * Millisec
 
-   FOR Ctr& = 1 TO ct&
-   NEXT
+   'FOR Ctr& = 1 TO ct&
+  ' NEXT
+   SLEEP Millisec
 
 END SUB
 

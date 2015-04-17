@@ -4551,18 +4551,18 @@ SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
 
 SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
-    LOCAL dummy AS STRING
+   ' LOCAL dummy AS STRING
 
-    FOR i = 0 TO 20
-        COMM SEND #nComm, "\0"
-    NEXT
+   ' FOR i = 0 TO 20
+   '     COMM SEND #nComm, "\0"
+   ' NEXT
 
-    delayx(200)
+   ' delayx(200)
 
-    Qty& = COMM(#nComm, RXQUE)
-    IF ISTRUE qty THEN
-        COMM RECV #nComm, Qty&, dummy
-    END IF
+    'Qty& = COMM(#nComm, RXQUE)
+   ' IF ISTRUE qty THEN
+   '     COMM RECV #nComm, Qty&, dummy
+  '  END IF
 
 
 END SUB

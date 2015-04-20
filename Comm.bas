@@ -17,8 +17,8 @@
 ' Com port settings
 '
 ' Set this to the desired comm port.
-$COMPORT = "\\.\COM33"
-
+'$COMPORT = "\\.\COM33"
+$COMPORT = "COM3"
 
 '------------------------------------------------------------------------------
 ' Main program entry point...
@@ -58,27 +58,22 @@ FUNCTION PBMAIN () AS LONG
     DO
 
         ' Handle data from the serial port.
+        WAITKEY$
         ncbData = COMM(#nComm, RXQUE)
         IF ncbData THEN
             COMM RECV #nComm, ncbData, sData
             STDOUT sData;
         END IF
-
         ' Handle data from the keyboard.
+
         IF INSTAT THEN
             sData = INKEY$
             IF sData = $ESC THEN
                 EXIT DO
             END IF
         END IF
-            sData = HEX$(&HAA010001)
+            sData = CHR$(&HAA)+CHR$(&H01)+CHR$(&H00)+CHR$(&H01)
             COMM SEND #nComm, sData
-'            IF fEcho THEN
-'                STDOUT sData;
-'            END IF
-'        END IF
-
-        ' Give other processes a chance to run.
         SLEEP 100
 
     LOOP

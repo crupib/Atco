@@ -11,10 +11,13 @@ GLOBAL ECODE AS INTEGER
 MACRO CONST = MACRO
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
+CONST = &hff
+
 DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
 GLOBAL mystring AS STRING * 20
+
 
 TYPE MYTYPE
   id AS INTEGER
@@ -53,6 +56,9 @@ FUNCTION PBMAIN () AS LONG
  GRAPHIC ATTACH hWin, 0
  'SLEEP 5000
   'new keypad layout
+  widthvar  =   KeyStbOn
+
+  PRINT widthvar
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
   KeyTable(2) = CHR$(0) + CHR$(75) 'LftArrow
@@ -108,7 +114,7 @@ FUNCTION PBMAIN () AS LONG
  IF II = 1 THEN
      PRINT "Setup"
  END IF
-
+ CALL OpenComPorts
 ' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
  IF ecode = 0 THEN
@@ -128,7 +134,7 @@ FUNCTION PBMAIN () AS LONG
  CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
  CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
- CALL OpenComPorts
+
 
  PRINT hdrrecord.hdr
  PRINT inrecord.id

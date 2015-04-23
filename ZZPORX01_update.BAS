@@ -262,6 +262,7 @@ DECLARE SUB SetPorts ()
 DECLARE FUNCTION GetLcdMemPos ()
 DECLARE SUB CursorON ()
 DECLARE SUB CursorOFF ()
+
 MACRO CONST = MACRO
 
 CONST D10 = 150   ' ~ 1 usec (compiled code) x10 uncompiled
@@ -300,109 +301,112 @@ CONST LcdAddrSet = &H80
 'miss const values
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
-CONST gain = 0
-CONST NegDir = 0
-CONST PosDir = -1
+%gain = 0
+%NegDir = 0
+%PosDir = -1
 'Number of servos in system, change as needed.
-CONST Servo1 = 1
-CONST Servo2 = 2
-CONST Servo3 = 3
-CONST Servo4 = 4
+'CONST Servo1 = 1
+'CONST Servo2 = 2
+'CONST Servo3 = 3
+'CONST Servo4 = 4
 'CONST AllServos = &HFF
-CONST LastServo = 4
-CONST InOut1 = 5
-
+%LastServo  = 4
+%InOut1 = 5
+%Servo1 = 1
+%Servo2 = 2
+%Servo3 = 3
+%Servo4 = 4
 
 'Key codes
-CONST KeyUP = 72
-CONST KeyDN = 80
-CONST KeyLft = 75
-CONST KeyRgt = 77
-CONST KeyBKSPC = 8
-CONST KeySPC = 32
-CONST KeyEnter = 13
-CONST KeyEsc = 27
+%KeyUP = 72
+%KeyDN = 80
+%KeyLft = 75
+%KeyRgt = 77
+%KeyBKSPC = 8
+%KeySPC = 32
+%KeyEnter = 13
+%KeyEsc = 27
 
 
 
 'Sio error mode difinitions
-CONST DoNothing = 0
-CONST ErrorBox = 1
-CONST AbortCom = 2
-CONST ExitProgram = 3
+%DoNothing = 0
+%ErrorBox = 1
+%AbortCom = 2
+%ExitProgram = 3
 'Module type definitions
-CONST PicServoType = 0
+%PicServoType = 0
 
 'Status definitions bits for servo
-CONST SendPos = 1
-CONST SendAD = 2
-CONST SendVel = 4
-CONST SendAux = 8
-CONST SendHome = 16
-CONST SendID = 32
+%SendPos = 1
+%SendAD = 2
+%SendVel = 4
+%SendAux = 8
+%SendHome = 16
+%SendID = 32
 
 
 'Status definitions bits for io (SendID is shared with PIC)
-CONST SendIO = 1
-CONST SendAD1 = 2
-CONST SendAD2 = 4
-CONST SendAD3 = 8
-CONST SendCtr = 16
-CONST SendSyncIO = 64
-CONST SendSyncCtr = 128
+%SendIO = 1
+%SendAD1 = 2
+%SendAD2 = 4
+%SendAD3 = 8
+%SendCtr = 16
+%SendSyncIO = 64
+%SendSyncCtr = 128
 
 'Load Trajectory control byte
-CONST LoadPos = 1
-CONST LoadVel = 2
-CONST LoadAcc = 4
-CONST LoadPWM = 8
-CONST PosMode = 16
-CONST VelMode = 32
-CONST RevDir = 64
-CONST StartNow = 128
-CONST PWMMode = 0 'PWM added KJL
+%LoadPos = 1
+%LoadVel = 2
+%LoadAcc = 4
+%LoadPWM = 8
+%PosMode = 16
+%VelMode = 32
+%RevDir = 64
+%StartNow = 128
+%PWMMode = 0 'PWM added KJL
 'Stop control byte
-CONST EnableAmp = 1
-CONST MotorOff = 2
-CONST StopAbrupt = 5
-CONST StopSmooth = 9
+%EnableAmp = 1
+%MotorOff = 2
+%StopAbrupt = 5
+%StopSmooth = 9
 'Homing control byte
-CONST HomeOnLimit1 = 1
-CONST HomeOnLimit2 = 2
-CONST HomeOnIndex = 8
-CONST HomeOnPerr = 64
-CONST HomeOnCerr = 128
+%HomeOnLimit1 = 1
+%HomeOnLimit2 = 2
+%HomeOnIndex = 8
+%HomeOnPerr = 64
+%HomeOnCerr = 128
 'Status byte
-CONST MoveDone = 1
-CONST CksumErr = 2
-CONST OverCurrent = 4
-CONST PowerOn = 8
-CONST PosError = 16
-CONST Limit1 = 32
-CONST Limit2 = 64
-CONST HomeInProg = 128
+%MoveDone = 1
+%CksumErr = 2
+%OverCurrent = 4
+%PowerOn = 8
+%PosError = 16
+%Limit1 = 32
+%Limit2 = 64
+%HomeInProg = 128
 
 'Auxiliary status byte
-CONST IndexPulse = 1
-CONST PositionWrap = 2
-CONST ServoOn = 4
-CONST AccelDone = 8
-CONST SlewDone = 16
-CONST ServoOverrun = 32
+%IndexPulse = 1
+%PositionWrap = 2
+%ServoOn = 4
+%AccelDone = 8
+%SlewDone = 16
+%ServoOverrun = 32
 
 
 'MiscMode bit definitions
 
-CONST AmpEnabled = 1
-CONST PWMSelected = 2
-CONST VelSelected = 4
-CONST PosSelected = 8
-CONST OnL1Selected = 16
-CONST OnL2Selected = 32
-CONST OnIndexSelected = 64
-CONST OnPeSelected = 128
-CONST OnCeSelected = 256
-CONST HomeFlagMask = &HFE0F
+%AmpEnabled = 1
+%PWMSelected = 2
+%VelSelected = 4
+%PosSelected = 8
+%OnL1Selected = 16
+%OnL2Selected = 32
+%OnIndexSelected = 64
+%OnPeSelected = 128
+%OnCeSelected = 256
+%HomeFlagMask = &HFE0F
 
   TYPE glorecord
    NumModules AS INTEGER
@@ -2002,7 +2006,7 @@ SUB GetScanCal
            PrintStr 1, 11, SCANstruc.XPosStr
            SetLcdPos 1, 1
            IF XCode = KeyUP THEN
-         WindowNum = 2
+             WindowNum = 2
            ELSEIF XCode = KeyDN THEN
          PrintChar 1, 1, " "
          SetLcdPos 2, 1
@@ -2679,35 +2683,6 @@ SUB GoYMtr
 END SUB
 
 SUB InitDisplay
-
-  'Sets up lcd display and 8255
-  'OUT LcdModeReg, DataPortOut  ' set port as output
-  'CALL StrobeInstr(&H1)    ' clear display
-  'CALL StrobeInstr(&H38)   ' function set
-                ' b7,b6 = 0, b5 = 1
-                ' b4, DL = 1   (8 bit data)
-                ' b3, N = 1    (4 lines)
-                ' b2, F = 0    (5 x 7 char font)
-                ' b1,b0 = 0    (dont care)
-  'CALL StrobeInstr(&HC)    ' turn on display and cursor
-                ' b7-b4 = 0, b3 = 1
-                ' b2, D = 1    (display on)
-                ' b1, C = 0    (cursor off)
-                ' b0, B = 0    (blink off)
-  'CALL StrobeInstr(&H6)    ' set entry mode increment right
-                ' b7-b3 = 0, b2 = 1
-                ' b1, I/D = 1  (increment)
-                ' b0, S = 0    (shift off)
-
-   'CALL StrobeInstr(&H40)   ' set cg ram address
-   'CALL StrobeData(&H0)     ' 1 row
-   'CALL StrobeData(&H10)    ' 2 row
-   'CALL StrobeData(&H8)     ' 3 row
-   ''CALL StrobeData(&H4)     ' 4 row
-   'CALL StrobeData(&H2)     ' 5 row
-   'CALL StrobeData(&H1)     ' 6 row
-   'CALL StrobeData(&H0)     ' 7 row
-   'CALL StrobeData(&H0)     ' 8 row
 
 END SUB
 
@@ -4403,50 +4378,11 @@ END SUB
 SUB StrobeData (datab)
 
   'Strobes datab to the lcd
-  'OUT BitReg, DataStbOff ' strobe off
-  'CALL ddelay(D20)
-  'OUT LcdReg, datab      ' send data
-  'CALL ddelay(D20)
-  'OUT BitReg, DataStbOn  ' strobe on
-  'CALL ddelay(D50)
-  'OUT BitReg, DataStbOff ' strobe off
-  'CALL ddelay(D20)
-  'OUT LcdModeReg, DataPortIn ' set data port as input
-  'CALL ddelay(D20)
-  'OUT BitReg, LcdBusy  ' set up lcd to test busy flag (BF)
-  'CALL ddelay(D20)
-
-  'WHILE (INP(LcdReg) AND BusyFlag)    ' loop while BF=1
-  'WEND
-
-  'OUT LcdModeReg, DataPortOut ' set data port as output
-  'CALL ddelay(D20)
-
 END SUB
 
 SUB StrobeInstr (insb)
 
   'Strobes instructions to the lcd, also tests the busy flag
-  'OUT BitReg, InstrStbOff 'strobe off
-  'CALL ddelay(D20)
-  'OUT LcdReg, insb        'send data
-  'CALL ddelay(D20)
-  'OUT BitReg, InstrStbOn  'strobe on
-  'CALL ddelay(D50)
-  'OUT BitReg, InstrStbOff 'strobe off
-  'CALL ddelay(D20)
-  'OUT LcdModeReg, DataPortIn 'set data Port 1 as input
-  'CALL ddelay(D20)
-  'OUT BitReg, LcdBusy 'set up lcd to test busy flag (BF)
-  'CALL ddelay(D20)
-
-  'WHILE INP(LcdReg) AND BusyFlag  'loop while BF=1
-  'WEND
-
-  'OUT LcdModeReg, DataPortOut 'set Port 1 as output
-
-  'CALL ddelay(D20)
-
 END SUB
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
@@ -4502,6 +4438,7 @@ END FUNCTION
 
 SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       LOCAL ncbData AS LONG    ' bytes of data waiting
+
       ncbData = COMM(#nComm, RXQUE)
       IF ncbData THEN
             COMM RECV #nComm, 1, ReadBuffer$
@@ -4545,27 +4482,18 @@ END SUB
 SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
     LOCAL qty AS INTEGER
     COMM SEND #nComm, WriteBuffer$
-    'qty = COMM(#nComm,BYTE)
+    SLEEP 200
 END SUB
 
 SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
 END SUB
 
 SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
-   ' LOCAL dummy AS STRING
-
-   ' FOR i = 0 TO 20
-   '     COMM SEND #nComm, "\0"
-   ' NEXT
-
-   ' delayx(200)
-
-    'Qty& = COMM(#nComm, RXQUE)
-   ' IF ISTRUE qty THEN
-   '     COMM RECV #nComm, Qty&, dummy
-  '  END IF
-
-
+      LOCAL emptybuffer AS STRING
+      Qty& = COMM(#nComm, RXQUE)
+      IF Qty& THEN
+            COMM RECV #nComm, Qty&, emptybuffer
+      END IF
 END SUB
 
 SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler

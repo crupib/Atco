@@ -17,6 +17,9 @@ DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
 GLOBAL mystring AS STRING * 20
+%myid = 1
+GLOBAL  crap AS INTEGER
+GLOBAL shit AS INTEGER
 
 
 TYPE MYTYPE
@@ -54,6 +57,8 @@ FUNCTION PBMAIN () AS LONG
  GRAPHIC GET CLIENT TO widthvar, Heightvar
  GRAPHIC WINDOW "Atco MCU Test",widthvar/2, Heightvar/2, 130, 130 TO hWin
  GRAPHIC ATTACH hWin, 0
+ shit = 1
+ crap = 32
  'SLEEP 5000
   'new keypad layout
   widthvar  =   KeyStbOn
@@ -89,6 +94,12 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "--------------------"
  CON.LOCATE 4, 4
  CON.PRINT "X"
+ CON.PRINT %myid
+ IF (shit AND crap) THEN
+     PRINT "Fuck"
+ ELSE
+     PRINT "good"
+ END IF
 ' con.print KeyTable(1)
  'gg = keyTable(10)
  'CON.CLS

@@ -1,12 +1,105 @@
 #COMPILE EXE
 #DIM ALL
-#INCLUDE "circle.inc"
+#INCLUDE "ATCO.inc"
 #INCLUDE "Win32API.inc"
 #RESOURCE ICON, exeICON, "ATCO.ico"
 DEFINT A-Z
 
 GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
+MACRO CONST = MACRO
+'****************************************************************************************************
+'misc const values
+CONST TRUE = -1
+CONST FALSE = NOT TRUE
+'Number of servos in system, change as needed.
+CONST Servo1 = 1
+CONST Servo2 = 2
+CONST Servo3 = 3
+CONST Servo4 = 4
+CONST AllServos = &HFF
+CONST LastServo  = 4
+CONST InOut1 = 5
+'Key codes
+CONST KeyUP = 72
+CONST KeyDN = 80
+CONST KeyLft = 75
+CONST KeyRgt = 77
+CONST KeyBKSPC = 8
+CONST KeySPC = 32
+CONST KeyEnter = 13
+CONST KeyEsc = 27
+'Sio error mode difinitions
+CONST DoNothing = 0
+CONST ErrorBox = 1
+CONST AbortCom = 2
+CONST ExitProgram = 3
+'Module type definitions
+CONST PicServoType = 0
+'Status definitions bits for servo
+CONST SendPos = 1
+CONST SendAD = 2
+CONST SendVel = 4
+CONST SendAux = 8
+CONST SendHome = 16
+CONST SendID = 32
+'Status definitions bits for io (SendID is shared with PIC)
+CONST SendIO = 1
+CONST SendAD1 = 2
+CONST SendAD2 = 4
+CONST SendAD3 = 8
+CONST SendCtr = 16
+CONST SendSyncIO = 64
+CONST SendSyncCtr = 128
+'Load Trajectory control byte
+CONST LoadPos = 1
+CONST LoadVel = 2
+CONST LoadAcc = 4
+CONST LoadPWM = 8
+CONST PosMode = 16
+CONST VelMode = 32
+CONST RevDir = 64
+CONST StartNow = 128
+CONST PWMMode = 0 'PWM added KJL
+'Stop control byte
+CONST EnableAmp = 1
+CONST MotorOff = 2
+CONST StopAbrupt = 5
+CONST StopSmooth = 9
+'Homing control byte
+CONST HomeOnLimit1 = 1
+CONST HomeOnLimit2 = 2
+CONST HomeOnIndex = 8
+CONST HomeOnPerr = 64
+CONST HomeOnCerr = 128
+'Status byte
+CONST MoveDone = 1
+CONST CksumErr = 2
+CONST OverCurrent = 4
+CONST PowerOn = 8
+CONST PosError = 16
+CONST Limit1 = 32
+CONST Limit2 = 64
+CONST HomeInProg = 128
+'Auxiliary status byte
+CONST IndexPulse = 1
+CONST PositionWrap = 2
+CONST ServoOn = 4
+CONST AccelDone = 8
+CONST SlewDone = 16
+CONST ServoOverrun = 32
+'MiscMode bit definitions
+CONST AmpEnabled = 1
+CONST PWMSelected = 2
+CONST VelSelected = 4
+CONST PosSelected = 8
+CONST OnL1Selected = 16
+CONST OnL2Selected = 32
+CONST OnIndexSelected = 64
+CONST OnPeSelected = 128
+CONST OnCeSelected = 256
+CONST HomeFlagMask = &HFE0F
+'****************************************************************************************************
 '************************************************************************************
 '* Motor control globals
 GLOBAL filenum AS INTEGER
@@ -15,6 +108,9 @@ GLOBAL KeyTable() AS STRING
 GLOBAL nComm AS LONG
 GLOBAL PicPort AS STRING
 GLOBAL PicBaud AS LONG
+GLOBAL RecvSize AS LONG
+GLOBAL XmitSize AS LONG
+GLOBAL MemSize AS LONG
 GLOBAL Corr1()  AS BYTE
 GLOBAL Corr2()  AS BYTE
 GLOBAL LF() AS BYTE
@@ -26,8 +122,84 @@ GLOBAL YAcel() AS LONG
 GLOBAL XSpd()  AS LONG
 GLOBAL YSpd()  AS LONG
 GLOBAL nComm AS LONG
+GLOBAL A,B,C,D AS INTEGER
+'****************************************************************************************************
+TYPE GloRecord
+   NumModules AS INTEGER
+   StatusDef(5) AS LONG
+   ModuleType(5) AS INTEGER
+   ModuleVer(5) AS INTEGER
+   Position(5) AS LONG
+   CmdPosition(5) AS LONG
+   HomePosition(5) AS LONG
+   velocity(5) AS LONG
+   CmdVelocity(5) AS LONG
+   CmdAccel(5) AS LONG
+   CmdPwm(5) AS INTEGER
+   AdVal(5) AS INTEGER
+   Stat(5) AS INTEGER
+   AuxStat(5) AS INTEGER
+   Kp(5) AS INTEGER
+   Ki(5) AS INTEGER
+   Kd(5) AS INTEGER
+   IL(5) AS INTEGER
+   ol(5) AS INTEGER
+   CL(5) AS INTEGER
+   EL(5) AS INTEGER
+   SRD(5) AS LONG
+   MiscMode(5) AS LONG
+   SIOErrorMode AS LONG
+   SIOError AS LONG
+   CkSumError AS LONG
+   SIOPort AS LONG
+   AmpQuery AS LONG
+   PowerQuery AS LONG
+   baud AS LONG
+   'added for PIC-IO
+   IO1 AS INTEGER
+   IO2 AS INTEGER
+   Ad1 AS INTEGER
+   Ad2 AS INTEGER
+   Ad3 AS INTEGER
+   Counter AS LONG
+   SyncIO1 AS INTEGER
+   SyncIO2 AS INTEGER
+   SyncCounter AS INTEGER
+ END TYPE
+ GLOBAL Glo AS GloRecord
 '************************************************************************************
 '* Motor control Functions
+
+DECLARE FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
+FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER)
+ LOCAL OneChr AS STRING
+ LOCAL STime, Stime2 AS LONG
+ LOCAL BytesRead, ECode AS INTEGER
+ REM  Changed to PC serial port routine
+
+ OneChr$ = " "
+
+ STime& = GetTick&
+ 'loop till we get a byte from the serial port or timeout
+ DO
+
+    CALL ReadFromComm(PICPort, OneChr$, BytesRead, ECode%)
+
+    IF BytesRead > 0 THEN
+      Character = ASC(OneChr$)
+      SIOGetByte = TRUE
+      EXIT FUNCTION
+    END IF
+    Stime2& = getTick&
+    IF (ABS(Stime2& - STime&) > 1000) THEN
+      SIOGetByte = FALSE
+      EXIT FUNCTION
+    END IF
+
+ LOOP
+
+END FUNCTION
+
 DECLARE FUNCTION DelayFact& ()
 FUNCTION DelayFact&
 
@@ -48,11 +220,15 @@ FUNCTION DelayFact&
    EXIT FUNCTION
 
 END FUNCTION
-
+DECLARE FUNCTION GetTick& ()
+FUNCTION GetTick& ()
+    GetTick& = GetTickCount()
+END FUNCTION
 '************************************************************************************
 ' MCU SUBS
 DECLARE SUB SetTables ()
 SUB SetTables
+  LOCAL x AS INTEGER
 
   '**************************************************************************
   '                   JoyStick Conversion Table
@@ -139,9 +315,362 @@ SUB SetTables
     XSpd(x) = CINT((255 / 249) * (x - 6))
     YSpd(x) = CINT((255 / 249) * (x - 6))
   NEXT
+END SUB
+DECLARE FUNCTION InitNetWork ()
+FUNCTION InitNetWork
+  LOCAL ECode,i  AS INTEGER
+  LOCAL Cmd AS STRING
+  'Initial Varibles
+  Glo.SIOErrorMode = DoNothing
+  Glo.SIOError = 0
+  Glo.CkSumError = FALSE
+  Glo.NumModules = 0
+  Glo.AmpQuery = TRUE
+  Glo.PowerQuery = TRUE
+
+  FOR i = 1 TO 5
+     Glo.StatusDef(i) = 0
+     Glo.ModuleType(i) = -1
+     Glo.Position(i) = 0
+     Glo.CmdPosition(i) = 0
+     Glo.HomePosition(i) = 0
+     Glo.velocity(i) = 0
+     Glo.CmdVelocity(i) = 0
+     Glo.CmdAccel(i) = 0
+     Glo.CmdPwm(i) = 0
+     Glo.AdVal(i) = 0
+     Glo.Stat(i) = 0
+     Glo.AuxStat(i) = 0
+     IF i <> 3 THEN
+       Glo.Kp(i) = 300
+       Glo.Ki(i) = 200
+       Glo.Kd(i) = 8000
+       Glo.IL(i) = 40
+     ELSE  'Y-Axis - Changed for new OPA-549 Power Amps used for Matrix
+       Glo.Kp(i) = 200
+       Glo.Ki(i) = 100
+       Glo.Kd(i) = 2000
+       Glo.IL(i) = 10
+     END IF
+     Glo.ol(i) = 255
+     Glo.CL(i) = 0
+     Glo.EL(i) = 16384
+     Glo.SRD(i) = 1
+     Glo.MiscMode(i) = PWMSelected
+  NEXT i
+
+  'start network
+
+  'flush the input buffer
+  CALL FlushBuffers(PICPort$, 0, ECode%)
+
+  Glo.SIOErrorMode = DoNothing
+
+  'reset controllers
+  Cmd$ = CHR$(&HF)  'reset all modules
+  SendCmd AllServos, Cmd$
+  CALL DelayX(200)
+
+  FOR i = 1 TO 5
+
+    Cmd$ = CHR$(&H21) + CHR$(i) + CHR$(&HFF) 'set address
+    SendCmd 0, Cmd$
+    IF Glo.SIOError THEN EXIT FOR
+
+    'define what status is requested from PIC, set for device id only
+    Glo.StatusDef(i) = &H20
+    Cmd$ = CHR$(&H12) + CHR$(Glo.StatusDef(i))
+    SendCmd i, Cmd$
+    IF Glo.SIOError THEN EXIT FOR
+
+    IF Glo.ModuleType(i) = 0 THEN  'pic servo
+      CALL SetAccel(i)
+      CALL SetGain(i)
+      Glo.NumModules = Glo.NumModules + 1
+    ELSEIF Glo.ModuleType(i) = 2 THEN 'pic i/o
+      Glo.NumModules = Glo.NumModules + 1
+    ELSE                'unknown
+      EXIT FOR
+    END IF
+
+  NEXT
+
+  IF Glo.NumModules <> 5 THEN 'Failed
+    InitNetWork = FALSE
+    EXIT FUNCTION
+  END IF
+
+  'set status return for servos
+  Glo.StatusDef(1) = &H3: Glo.StatusDef(2) = &H3: Glo.StatusDef(3) = &H3
+  Glo.StatusDef(4) = &H3: Glo.StatusDef(5) = &HE: Cmd$ = CHR$(&H12) + CHR$(&H3)
+  SendCmd AllServos, Cmd$
+
+  'set status return for IO
+  Cmd$ = CHR$(&H12) + CHR$(&HE) '
+  SendCmd InOut1, Cmd$
+
+  'reset group command for pic-servo #4 to 253
+  Cmd$ = CHR$(&H21) + CHR$(4) + CHR$(&HFD) 'set address
+  SendCmd 4, Cmd$
+
+  'reset group command for pic-io to 254
+  Cmd$ = CHR$(&H21) + CHR$(5) + CHR$(&HFE) 'set address
+  SendCmd 5, Cmd$
+
+  'disable amp on Servo 4 since enabling disables servo
+  CALL EnableAmpl(0, 4)
+
+  CALL FlushBuffers(PICPort$, 0, ECode%)
+
+  InitNetWork = TRUE
+
+  EXIT FUNCTION
+
+END FUNCTION
+
+DECLARE FUNCTION OpenComPorts ()
+FUNCTION OpenComPorts
+    LOCAL x AS INTEGER
+    LOCAL ECode AS INTEGER
+    COMM OPEN PicPort AS #nComm
+    IF ERR THEN
+        OpenComPorts = FALSE
+        EXIT FUNCTION
+    END IF
+    XmitSize = 2048
+    RecvSize = 2048
+    COMM SET #nComm, TXBUFFER = xmitsize
+    COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
+    COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
+    COMM SET #nComm, BYTE   = 8     ' 8 bits
+    COMM SET #nComm, PARITY = %FALSE        ' No parity
+    COMM SET #nComm, STOP   = 0     ' 1 stop bit
+
+    COMM SET #nComm, XINPFLOW = 0
+    COMM SET #nComm, XOUTFLOW = 0
+    CALL FlushBuffers(PICPort$, 0, ECode%)
+    OpenComPorts = TRUE
+END FUNCTION
+DECLARE SUB SendCmd (address AS WORD, CmdString AS STRING)
+SUB SendCmd (address AS WORD, CmdString AS STRING)
+  LOCAL Cksum AS WORD
+  LOCAL SendStr AS STRING
+  LOCAL StrLen, i AS INTEGER
+  LOCAL BytesWritten, ECode AS INTEGER
+  LOCAL ACTPOS AS LONG
+  Cksum = address
+
+  Glo.SIOError = FALSE
+
+  FOR i = 1 TO LEN(CmdString)
+     Cksum = Cksum + ASC(MID$(CmdString, i, 1))
+  NEXT i
+  Cksum = (Cksum AND 255)
+
+  'Send the command
+
+  SendStr$ = CHR$(&HAA) + CHR$(address) + CmdString + CHR$(Cksum)
+
+  StrLen = LEN(SendStr$)
+
+  CALL WriteToComm(PICPort$, SendStr$, BytesWritten, ECode%)
+
+  'no reply if group command
+  IF address = &HFF THEN
+    GOTO GrpCmdExit
+  END IF
+
+  'Get new address value if change address command
+  IF ASC(MID$(CmdString, 1, 1)) = &H21 THEN address = ASC(MID$(CmdString, 2, 1))
+
+  IF address = 0 THEN address = 1 'for testing on axis 0
+
+  'Get the status byte
+  IF SIOGetByte(Glo.Stat(address), 1) = FALSE THEN
+    GOTO NoStatExit
+  END IF
+
+  Cksum = Glo.Stat(address)
+  IF Glo.ModuleType(address) = 0 THEN 'pic servo
+
+    'Get position data
+    IF (Glo.StatusDef(address) AND SendPos) THEN
+      IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + A + B + C + D
+      ActPos& = CharsToLong(A, B, C, D)
+      '****************************************
+      'changed to adjust for user counter offset
+      '****************************************
+      IF (address = 1 OR address = 2) THEN   'X Axis
+    Glo.Position(address) = ActPos& + SCANstruc.XOffset
+      ELSEIF address = 3 THEN  'Y Axis
+    Glo.Position(address) = ActPos& + SCANstruc.YOffset
+      ELSEIF address = 4 THEN  'A Axis
+    Glo.Position(address) = ActPos& + SCANstruc.AOffset
+      ELSE
+      END IF
+    END IF
+
+    'Get the A/D value
+    IF (Glo.StatusDef(address) AND SendAD) THEN
+      IF SIOGetByte(Glo.AdVal(address), 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.AdVal(address)
+    END IF
+
+    'Get velocity data
+    IF (Glo.StatusDef(address) AND SendVel) THEN
+      IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + A + B
+      Glo.velocity(address) = CharsToInt(A, B)
+    END IF
+
+    'Get the AUX status value
+    IF (Glo.StatusDef(address) AND SendAux) THEN
+      IF SIOGetByte(Glo.AuxStat(address), 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.AuxStat(address)
+    END IF
+
+    'Get home position data
+    IF (Glo.StatusDef(address) AND SendHome) THEN
+      IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + A + B + C + D
+      Glo.HomePosition(address) = CharsToLong(A, B, C, D)
+    END IF
+
+    'Get the module type and version
+
+    IF (Glo.StatusDef(address) AND SendID) THEN
+     IF SIOGetByte(Glo.ModuleType(address), 1) = FALSE THEN GOTO SendCmdExit
+     IF SIOGetByte(Glo.ModuleVer(address), 1) = FALSE THEN GOTO SendCmdExit
+     Cksum = Cksum + Glo.ModuleType(address) + Glo.ModuleVer(address)
+    END IF
+
+  ELSE   'PicIO module
+
+    'Get the I/0 values
+    IF (Glo.StatusDef(address) AND SendIO) THEN
+      IF SIOGetByte(Glo.IO1, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(Glo.IO2, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.IO1 + Glo.IO2
+    END IF
+
+    'Get the A/D 1 value
+    IF (Glo.StatusDef(address) AND SendAD1) THEN
+      IF SIOGetByte(Glo.Ad1, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.Ad1
+    END IF
+
+    'Get the A/D 2 value
+    IF (Glo.StatusDef(address) AND SendAD2) THEN
+      IF SIOGetByte(Glo.Ad2, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.Ad2
+    END IF
+
+    'Get the A/D 3 value
+    IF (Glo.StatusDef(address) AND SendAD3) THEN
+      IF SIOGetByte(Glo.Ad3, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.Ad3
+    END IF
+
+    'Get Ctr value
+    IF (Glo.StatusDef(address) AND SendCtr) THEN
+      IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + A + B + C + D
+      Glo.Counter = CharsToLong(A, B, C, D)
+    END IF
+
+
+
+    'Get the Sync I/0 values
+    IF (Glo.StatusDef(address) AND SendSyncIO) THEN
+      IF SIOGetByte(Glo.SyncIO1, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(Glo.SyncIO2, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + Glo.SyncIO1 + Glo.SyncIO2
+    END IF
+
+    'Get SyncCtr value
+    IF (Glo.StatusDef(address) AND SendSyncCtr) THEN
+      IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
+      Cksum = Cksum + A + B + C + D
+      Glo.SyncCounter = CharsToLong(A, B, C, D)
+    END IF
+    'Get the module type and version
+    IF (Glo.StatusDef(address) AND SendID) THEN
+      IF SIOGetByte(Glo.ModuleType(address), 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(Glo.ModuleVer(address), 1) = FALSE THEN GOTO SendCmdExit
+
+      Cksum = Cksum + Glo.ModuleType(address) + Glo.ModuleVer(address)
+    END IF
+  END IF
+
+  IF SIOGetByte(CCksum, 1) = FALSE THEN GOTO NoChkSum
+
+  Glo.CkSumError = FALSE
+
+  IF (Cksum AND 255) <> CCksum THEN
+    Glo.SIOError = TRUE
+   ' PRINT "Bad ChkSum"
+    CALL PrintClrStr(3, 1, "Bad ChkSum")
+    FixSIOerror
+    'CALL Delayx(500)
+    'CALL PrintClrStr(3, 1, " ")
+    Glo.CkSumError = TRUE
+    'GloErr = GloErr + 1
+  END IF
+
+  EXIT SUB
+
+
+NoStatExit:
+  Glo.SIOError = TRUE
+  CALL PrintClrStr(3, 1, "No Status")
+  'PRINT "No Status"
+  FixSIOerror
+  'CALL Delayx(500)
+  'CALL PrintClrStr(3, 1, " ")
+  'GloErr = GloErr + 1
+  EXIT SUB
+
+NoChkSum:
+  Glo.SIOError = TRUE
+  CALL PrintClrStr(3, 1, "No ChkSum")
+  'PRINT "No ChkSum"
+  FixSIOerror
+  'CALL Delayx(500)
+  'CALL PrintClrStr(3, 1, " ")
+  'GloErr = GloErr + 1
+  EXIT SUB
+
+
+SendCmdExit:
+  Glo.SIOError = TRUE
+  CALL PrintClrStr(3, 1, "SER IN FAILED")
+  'PRINT "SER IN FAILED"
+  FixSIOerror
+  'CALL Delayx(500)
+  'CALL PrintClrStr(3, 1, " ")
+  'GloErr = GloErr + 1
+  EXIT SUB
+
+
+GrpCmdExit:
 
 
 END SUB
+'***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
                           OPTIONAL BYVAL nModeless AS LONG)
@@ -561,6 +1090,7 @@ FUNCTION PBMAIN () AS LONG
   'Speed Control tables
     DIM  XSpd(0 TO 255)
     DIM  YSpd(0 TO 255)
+    DIM  StartLPos(3) AS BYTE
   '****************************************************************************************************
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
@@ -571,7 +1101,7 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
-    DIM  StartLPos(3)
+
 
     StartLPos(0) = &H0
     StartLPos(1) = &H40

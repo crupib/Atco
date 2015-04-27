@@ -275,6 +275,7 @@ TYPE GloRecord
  GLOBAL YAcel() AS LONG
  GLOBAL XSpd()  AS LONG
  GLOBAL YSpd()  AS LONG
+
 '****************************************************************************************************
 REM new RS232 PC compatible
 DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
@@ -1382,7 +1383,7 @@ MoveAxis:
 END SUB
 
 FUNCTION CalLoad (FileNumber$)
-   LOCAL TempStr AS header
+   LOCAL TempStr AS HEADER
    TempStr.hdr = HdrVer
    CALL FOpen (filenum, 0,0, FileNumber$, ECode)
   ' CALL FOpen(FileNumber$, 0, 0, HANDLE, ECode)
@@ -3371,59 +3372,7 @@ SUB MtrOff (address AS INTEGER)
 
 END SUB
 
-'FUNCTION OpenComPorts
 
-   REM Changed to PC Serial routines
-
-'   NumPorts = 1: RecvSize = 2048: XmitSize = 2048
-
-'   PortSeg = VARSEG(PICPort): PortOff = VARPTR(PICPort)
-'   RecvSeg = VARSEG(RecvSize): RecvOff = VARPTR(RecvSize)
-'   XmitSeg = VARSEG(XmitSize): XmitOff = VARPTR(XmitSize)
-
-'   CALL CalcRequiredMem(PortSeg, PortOff, RecvSeg, RecvOff, XmitSeg, XmitOff, NumPorts, MemSize, ECode)
-'   IF ECode THEN
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
-
-'   FarHeapSize& = SETMEM(-(MemSize))  'take some far heap
-
-'   CALL InitCommBuffers(ECode)
-'   IF ECode THEN
-'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
-
-   ' Set the flow control to no flow control
-'   CALL SetFlowControl(PICPort, 3, 3, 0, 0, 0, 0, ECode)
-'   IF ECode THEN
-'     CALL DeleteCommBuffers(ECode)
-'     FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
-
-'   CALL SetFIFOTriggerLevel(PICPort, 14, ECode)
-
-'   DataBits = 8: PARITY = 4: StopBits = 1
-
-'   CALL OpenCommPort(PICPort, PICBaud, DataBits, PARITY, StopBits, ECode)
-'   IF ECode THEN
-'     CALL DeleteCommBuffers(ECode)
- '    FarHeapSize& = SETMEM(MemSize)   'give far heap back to system
-'     OpenComPorts = FALSE
-'     EXIT FUNCTION
-'   END IF
-
-'   OpenComPorts = TRUE
-
-'   CALL FlushBuffers(PICPort, 0, ECode)
-
-'   EXIT FUNCTION
-
-'END FUNCTION
 
 SUB PrintAPos
 

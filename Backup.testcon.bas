@@ -15,6 +15,9 @@ DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
 GLOBAL mystring AS STRING * 20
+%myid = 1
+GLOBAL  crap AS INTEGER
+GLOBAL shit AS INTEGER
 
 TYPE MYTYPE
   id AS INTEGER
@@ -51,6 +54,8 @@ FUNCTION PBMAIN () AS LONG
  GRAPHIC GET CLIENT TO widthvar, Heightvar
  GRAPHIC WINDOW "Atco MCU Test",widthvar/2, Heightvar/2, 130, 130 TO hWin
  GRAPHIC ATTACH hWin, 0
+ shit = 1
+ crap = 32
  'SLEEP 5000
   'new keypad layout
   KeyTable(0) = ""
@@ -83,6 +88,10 @@ FUNCTION PBMAIN () AS LONG
  CON.PRINT "--------------------"
  CON.LOCATE 4, 4
  CON.PRINT "X"
+ CON.PRINT %myid
+ IF shit AND crap THEN
+     PRINT "Fuck"
+ END IF
 ' con.print KeyTable(1)
  'gg = keyTable(10)
  'CON.CLS
@@ -108,7 +117,7 @@ FUNCTION PBMAIN () AS LONG
  IF II = 1 THEN
      PRINT "Setup"
  END IF
-
+ CALL OpenComPorts
 ' RESET StringVariable$
  fcreate(filenum, 0, ThumbDisk+"file2.txt", ECode)
  IF ecode = 0 THEN
@@ -128,7 +137,7 @@ FUNCTION PBMAIN () AS LONG
  CALL DFRead(filenum, BYVAL VARPTR(hdrrecord),  0, BytesRead, ECode)
  CALL DFRead2(filenum, BYVAL VARPTR(inrecord),  LEN(hdrrecord), BytesRead, ECode)
  FClose(filenum)
- CALL OpenComPorts
+
 
  PRINT hdrrecord.hdr
  PRINT inrecord.id

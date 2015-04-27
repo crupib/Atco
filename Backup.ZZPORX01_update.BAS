@@ -7,76 +7,128 @@
 #INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
 DEFINT A-Z
 
-REM new RS232 PC compatible
-DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
-DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
-DECLARE SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
-DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
-DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
-DECLARE FUNCTION OpenComPorts ()
-DECLARE SUB DeleteCommBuffers (ECode%)
-
-'REM new routines for Joe Loyd Drive
-DECLARE SUB KeyWait ()
-DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
-DECLARE FUNCTION GetDiskFile$ (FSpec$)
-'motor soft controls
-DECLARE FUNCTION GetXCord& (Cts&)
-DECLARE FUNCTION ProfileScan ()
-DECLARE SUB ReSetMotors ()
-DECLARE SUB SetForAuto ()
-DECLARE FUNCTION GetYCord& (Cts&)
-
-DECLARE FUNCTION DoX (AbsPos&)
-DECLARE FUNCTION DoY (AbsPosY&)
-
-DECLARE SUB MoveXVel (dir)
-DECLARE SUB MoveYVel (dir)
-DECLARE SUB PrintPos ()
-
-'new x-ray
-'added from probas lib 7.1
-DECLARE FUNCTION GetTick& ()
-DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
-DECLARE SUB Strip (A$)   'pro basic
-DECLARE SUB Delay18th (MiniDelay)
-DECLARE FUNCTION DosInky$ ()
-DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAtrr)
-DECLARE FUNCTION DirNext ()
-DECLARE FUNCTION DirFileName$ ()
-
-'REM J.L. added from probas lib 7.1
-DECLARE FUNCTION LVal& (St$)
-DECLARE FUNCTION StrRChr (St$, BYVAL SrchChar)
-DECLARE SUB StripChar (St$, Ch$, SLen%)
-DECLARE SUB CRC2 (Rec$, HiCRC%, LowCRC%)
-DECLARE FUNCTION GetTick& ()
-DECLARE FUNCTION FarPeek (BYVAL DSeg, BYVAL DOfs)
-DECLARE SUB FarPoke (BYVAL DSeg, BYVAL DOfs, BYVAL PVal)
-DECLARE SUB ShiftR (Value, COUNT)
-DECLARE SUB ShiftL (Value, COUNT)
-DECLARE FUNCTION GetByte (DSeg, DOfs)
-DECLARE SUB PutByte (DSeg, DOfs, PVal)
-DECLARE SUB BiosInKey (AscCode, ScanCode)
-DECLARE FUNCTION GetKeyQ (AscCode, ScanCode)
-DECLARE FUNCTION DosInky$ ()
-DECLARE FUNCTION CheckDsk (Drv$)
-DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
-DECLARE SUB Strip (A$)   'pro basic
-DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAttrib%)
-DECLARE FUNCTION DirNext ()
-DECLARE FUNCTION DirFileName$ ()
-DECLARE FUNCTION DirFileSize& ()
-DECLARE FUNCTION CalcAttr2% (FORE, BACK)
-DECLARE SUB IPtrSort (DSeg, DOfs1, DSeg2, DOfs2, Elements)
-DECLARE SUB InitPtr (DSeg, DOfs, COUNT)
-DECLARE SUB SFRead2 (HANDLE, St$, BR, ECode)
-DECLARE SUB SFWrite (HANDLE, St$, BW, ECode)
-DECLARE SUB ClrKbd ()
-DECLARE SUB Delay18th (MiniDelay)
-DECLARE FUNCTION SETDRV (Drv$)
-'DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
-
+MACRO CONST = MACRO
+'****************************************************************************************************
+CONST D10 = 150   ' ~ 1 usec (compiled code) x10 uncompiled
+CONST D20 = 500   ' ~ 3 usec
+CONST D50 = 1000  ' ~ 6 usec
+CONST D100 = 2000 ' ~ 12 usec
+CONST LcdLines = 4
+CONST LcdColumns = 20
+CONST KeyReg = &H78 '&HFF00 Port 0 (keypad data bits)
+CONST LcdReg = &H7A '&HFF10 Port 2 (LCD data bits)
+CONST BitReg = &H7B '&HFF08 Port 3 (LCD and Keypad control bits)
+CONST KeyModeReg = &H98 '&HFF01 Port 0 Mode Register (For Key Port)
+CONST LcdModeReg = &H9A '&HFF11 Port 2 Mode Register (For LCD Port)
+CONST BitModeReg = &H9B '&HFF09 Port 3 Mode Register (For Key/LCD)
+CONST DataPortIn = &H0
+CONST DataPortOut = &HFF
+'Port 3 uses low nibble for SPI; safe to use high nibble only
+CONST DataStbOn = &HA0     ' RS=1, R/W=0, L/E=1, K/E=0
+CONST DataStbOff = &H80    ' RS=1, R/W=0, L/E=0, K/E=0
+CONST InstrStbOn = &H20    ' RS=0, R/W=0, L/E=1, K/E=0
+CONST InstrStbOff = &H0    ' RS=0, R/W=0, L/E=0, K/E=0
+CONST LcdBusy = &H60       ' RS=0, R/W=1, L/E=1, K/E=0
+CONST LcdPos = &H60        ' RS=0, R/W=1, L/E=1, K/E=0
+CONST KeyStbOn = &H10      ' RS=0, R/W=0, L/E=0, K/E=1
+CONST KeyStbOff = &H0      ' RS=0, R/W=0, L/E=0, K/E=0
+CONST BusyFlag = &H80
+CONST LcdAddress = &H7F
+CONST LcdAddrSet = &H80
+'miss const values
+CONST TRUE = -1
+CONST FALSE = NOT TRUE
+CONST gain = 0
+CONST NegDir = 0
+CONST PosDir = -1
+'Number of servos in system, change as needed.
+CONST Servo1 = 1
+CONST Servo2 = 2
+CONST Servo3 = 3
+CONST Servo4 = 4
+CONST AllServos = &HFF
+CONST LastServo  = 4
+CONST InOut1 = 5
+'Key codes
+CONST KeyUP = 72
+CONST KeyDN = 80
+CONST KeyLft = 75
+CONST KeyRgt = 77
+CONST KeyBKSPC = 8
+CONST KeySPC = 32
+CONST KeyEnter = 13
+CONST KeyEsc = 27
+'Sio error mode difinitions
+CONST DoNothing = 0
+CONST ErrorBox = 1
+CONST AbortCom = 2
+CONST ExitProgram = 3
+'Module type definitions
+CONST PicServoType = 0
+'Status definitions bits for servo
+CONST SendPos = 1
+CONST SendAD = 2
+CONST SendVel = 4
+CONST SendAux = 8
+CONST SendHome = 16
+CONST SendID = 32
+'Status definitions bits for io (SendID is shared with PIC)
+CONST SendIO = 1
+CONST SendAD1 = 2
+CONST SendAD2 = 4
+CONST SendAD3 = 8
+CONST SendCtr = 16
+CONST SendSyncIO = 64
+CONST SendSyncCtr = 128
+'Load Trajectory control byte
+CONST LoadPos = 1
+CONST LoadVel = 2
+CONST LoadAcc = 4
+CONST LoadPWM = 8
+CONST PosMode = 16
+CONST VelMode = 32
+CONST RevDir = 64
+CONST StartNow = 128
+CONST PWMMode = 0 'PWM added KJL
+'Stop control byte
+CONST EnableAmp = 1
+CONST MotorOff = 2
+CONST StopAbrupt = 5
+CONST StopSmooth = 9
+'Homing control byte
+CONST HomeOnLimit1 = 1
+CONST HomeOnLimit2 = 2
+CONST HomeOnIndex = 8
+CONST HomeOnPerr = 64
+CONST HomeOnCerr = 128
+'Status byte
+CONST MoveDone = 1
+CONST CksumErr = 2
+CONST OverCurrent = 4
+CONST PowerOn = 8
+CONST PosError = 16
+CONST Limit1 = 32
+CONST Limit2 = 64
+CONST HomeInProg = 128
+'Auxiliary status byte
+CONST IndexPulse = 1
+CONST PositionWrap = 2
+CONST ServoOn = 4
+CONST AccelDone = 8
+CONST SlewDone = 16
+CONST ServoOverrun = 32
+'MiscMode bit definitions
+CONST AmpEnabled = 1
+CONST PWMSelected = 2
+CONST VelSelected = 4
+CONST PosSelected = 8
+CONST OnL1Selected = 16
+CONST OnL2Selected = 32
+CONST OnIndexSelected = 64
+CONST OnPeSelected = 128
+CONST OnCeSelected = 256
+CONST HomeFlagMask = &HFE0F
+'****************************************************************************************************
 TYPE ScanParms
    YCtr          AS SINGLE       'YCts/inch
    XCtr          AS SINGLE       'XCts/inch
@@ -157,12 +209,139 @@ TYPE ScanParms
    NextFlagSTR AS STRING * 10
    AutoHoldSTR AS STRING * 10
   END TYPE
-  GLOBAL SCANstruc AS scanparms
-
+GLOBAL SCANstruc AS scanparms
+'****************************************************************************************************
 TYPE HEADER
    hdr AS STRING * 20
  END TYPE
 'new Si
+'****************************************************************************************************
+TYPE GloRecord
+   NumModules AS INTEGER
+   StatusDef(5) AS LONG
+   ModuleType(5) AS INTEGER
+   ModuleVer(5) AS INTEGER
+   Position(5) AS LONG
+   CmdPosition(5) AS LONG
+   HomePosition(5) AS LONG
+   velocity(5) AS LONG
+   CmdVelocity(5) AS LONG
+   CmdAccel(5) AS LONG
+   CmdPwm(5) AS INTEGER
+   AdVal(5) AS INTEGER
+   Stat(5) AS INTEGER
+   AuxStat(5) AS INTEGER
+   Kp(5) AS INTEGER
+   Ki(5) AS INTEGER
+   Kd(5) AS INTEGER
+   IL(5) AS INTEGER
+   ol(5) AS INTEGER
+   CL(5) AS INTEGER
+   EL(5) AS INTEGER
+   SRD(5) AS LONG
+   MiscMode(5) AS LONG
+   SIOErrorMode AS LONG
+   SIOError AS LONG
+   CkSumError AS LONG
+   SIOPort AS LONG
+   AmpQuery AS LONG
+   PowerQuery AS LONG
+   baud AS LONG
+   'added for PIC-IO
+   IO1 AS INTEGER
+   IO2 AS INTEGER
+   Ad1 AS INTEGER
+   Ad2 AS INTEGER
+   Ad3 AS INTEGER
+   Counter AS LONG
+   SyncIO1 AS INTEGER
+   SyncIO2 AS INTEGER
+   SyncCounter AS INTEGER
+ END TYPE
+ GLOBAL Glo AS GloRecord
+'****************************************************************************************************
+ GLOBAL filenum AS INTEGER
+ GLOBAL HdrVer AS STRING * 20
+ GLOBAL KeyTable() AS STRING
+ GLOBAL nComm AS LONG
+ GLOBAL PicPort AS STRING
+ GLOBAL PicBaud AS LONG
+ GLOBAL Corr1()  AS BYTE
+ GLOBAL Corr2()  AS BYTE
+ GLOBAL LF() AS BYTE
+ GLOBAL LU() AS BYTE
+ GLOBAL XVel() AS LONG
+ GLOBAL YVel() AS LONG
+ GLOBAL XAcel() AS LONG
+ GLOBAL YAcel() AS LONG
+ GLOBAL XSpd()  AS LONG
+ GLOBAL YSpd()  AS LONG
+'****************************************************************************************************
+REM new RS232 PC compatible
+DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
+DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
+DECLARE SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)
+DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
+DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
+DECLARE FUNCTION OpenComPorts ()
+DECLARE SUB DeleteCommBuffers (ECode%)
+'REM new routines for Joe Loyd Drive
+DECLARE SUB KeyWait ()
+DECLARE FUNCTION GetFileName$ (RowPos%, EditFile$)
+DECLARE FUNCTION GetDiskFile$ (FSpec$)
+'motor soft controls
+DECLARE FUNCTION GetXCord& (Cts&)
+DECLARE FUNCTION ProfileScan ()
+DECLARE SUB ReSetMotors ()
+DECLARE SUB SetForAuto ()
+DECLARE FUNCTION GetYCord& (Cts&)
+DECLARE FUNCTION DoX (AbsPos&)
+DECLARE FUNCTION DoY (AbsPosY&)
+DECLARE SUB MoveXVel (dir)
+DECLARE SUB MoveYVel (dir)
+DECLARE SUB PrintPos ()
+'new x-ray
+'added from probas lib 7.1
+DECLARE FUNCTION GetTick& ()
+DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
+DECLARE SUB Strip (A$)   'pro basic
+DECLARE SUB Delay18th (MiniDelay)
+DECLARE FUNCTION DosInky$ ()
+DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAtrr)
+DECLARE FUNCTION DirNext ()
+DECLARE FUNCTION DirFileName$ ()
+
+'REM J.L. added from probas lib 7.1
+DECLARE FUNCTION LVal& (St$)
+DECLARE FUNCTION StrRChr (St$, BYVAL SrchChar)
+DECLARE SUB StripChar (St$, Ch$, SLen%)
+DECLARE SUB CRC2 (Rec$, HiCRC%, LowCRC%)
+DECLARE FUNCTION GetTick& ()
+DECLARE FUNCTION FarPeek (BYVAL DSeg, BYVAL DOfs)
+DECLARE SUB FarPoke (BYVAL DSeg, BYVAL DOfs, BYVAL PVal)
+DECLARE SUB ShiftR (Value, COUNT)
+DECLARE SUB ShiftL (Value, COUNT)
+DECLARE FUNCTION GetByte (DSeg, DOfs)
+DECLARE SUB PutByte (DSeg, DOfs, PVal)
+DECLARE SUB BiosInKey (AscCode, ScanCode)
+DECLARE FUNCTION GetKeyQ (AscCode, ScanCode)
+DECLARE FUNCTION DosInky$ ()
+DECLARE FUNCTION CheckDsk (Drv$)
+DECLARE SUB STRIPBLANKS (A$, Num, SLen) 'pro assembler
+DECLARE SUB Strip (A$)   'pro basic
+DECLARE FUNCTION DirFirst (FileSpec$, BYVAL FileAttrib%)
+DECLARE FUNCTION DirNext ()
+DECLARE FUNCTION DirFileName$ ()
+DECLARE FUNCTION DirFileSize& ()
+DECLARE FUNCTION CalcAttr2% (FORE, BACK)
+DECLARE SUB IPtrSort (DSeg, DOfs1, DSeg2, DOfs2, Elements)
+DECLARE SUB InitPtr (DSeg, DOfs, COUNT)
+DECLARE SUB SFRead2 (HANDLE, St$, BR, ECode)
+DECLARE SUB SFWrite (HANDLE, St$, BW, ECode)
+DECLARE SUB ClrKbd ()
+DECLARE SUB Delay18th (MiniDelay)
+DECLARE FUNCTION SETDRV (Drv$)
+'DECLARE SUB COPYFILE (Fil$, DDrv$, ECode)
 DECLARE FUNCTION CalSave (FILENAMEX$)
 DECLARE FUNCTION CalLoad (FileNumber$)
 DECLARE SUB DFRead (filenum AS INTEGER, passrec AS HEADER , OFFSET AS INTEGER, BytesRead AS INTEGER, ECode AS INTEGER)
@@ -173,7 +352,6 @@ DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRIN
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING, ECode AS INTEGER)
 DECLARE SUB FClose (filenumber AS INTEGER)
 DECLARE FUNCTION Exist2 (FileNumber$)
-
 REM 'added from crescent
 DECLARE FUNCTION FUsing$ (Num$, Image$)
 DECLARE FUNCTION WriteTest (DRIVE$)
@@ -181,8 +359,6 @@ DECLARE FUNCTION DriveSpace& (Drv$)
 DECLARE FUNCTION Valid (FileNumber$)
 DECLARE SUB SetDrive (Drv$)
 DECLARE SUB KillFile (FILENAME$)
-
-
 'my subs
 DECLARE FUNCTION QStr$ (BYVAL Amount!, BYVAL Places)
 DECLARE SUB DelayX (Millisec) '
@@ -206,10 +382,7 @@ DECLARE SUB FixSIOerror ()
 DECLARE SUB KEdit (Edit$, ExitCode)
 DECLARE SUB AlphaNumIN (Edit$, ExitCode)
 DECLARE FUNCTION DelayFact& ()
-
 DECLARE SUB GetScanCal ()
-
-
 DECLARE SUB CalEncoder (YXAxis)
 DECLARE SUB ManYRGT ()
 DECLARE SUB ManXUP ()
@@ -263,221 +436,12 @@ DECLARE FUNCTION GetLcdMemPos ()
 DECLARE SUB CursorON ()
 DECLARE SUB CursorOFF ()
 
-MACRO CONST = MACRO
 
-CONST D10 = 150   ' ~ 1 usec (compiled code) x10 uncompiled
-CONST D20 = 500   ' ~ 3 usec
-CONST D50 = 1000  ' ~ 6 usec
-CONST D100 = 2000 ' ~ 12 usec
-CONST LcdLines = 4
-CONST LcdColumns = 20
-
-REM
-CONST KeyReg = &H78 '&HFF00 Port 0 (keypad data bits)
-CONST LcdReg = &H7A '&HFF10 Port 2 (LCD data bits)
-CONST BitReg = &H7B '&HFF08 Port 3 (LCD and Keypad control bits)
-
-CONST KeyModeReg = &H98 '&HFF01 Port 0 Mode Register (For Key Port)
-CONST LcdModeReg = &H9A '&HFF11 Port 2 Mode Register (For LCD Port)
-CONST BitModeReg = &H9B '&HFF09 Port 3 Mode Register (For Key/LCD)
-
-CONST DataPortIn = &H0
-CONST DataPortOut = &HFF
-
-'Port 3 uses low nibble for SPI; safe to use high nibble only
-CONST DataStbOn = &HA0     ' RS=1, R/W=0, L/E=1, K/E=0
-CONST DataStbOff = &H80    ' RS=1, R/W=0, L/E=0, K/E=0
-CONST InstrStbOn = &H20    ' RS=0, R/W=0, L/E=1, K/E=0
-CONST InstrStbOff = &H0    ' RS=0, R/W=0, L/E=0, K/E=0
-CONST LcdBusy = &H60       ' RS=0, R/W=1, L/E=1, K/E=0
-CONST LcdPos = &H60        ' RS=0, R/W=1, L/E=1, K/E=0
-CONST KeyStbOn = &H10      ' RS=0, R/W=0, L/E=0, K/E=1
-CONST KeyStbOff = &H0      ' RS=0, R/W=0, L/E=0, K/E=0
-
-CONST BusyFlag = &H80
-CONST LcdAddress = &H7F
-CONST LcdAddrSet = &H80
-
-'miss const values
-CONST TRUE = -1
-CONST FALSE = NOT TRUE
-%gain = 0
-%NegDir = 0
-%PosDir = -1
-'Number of servos in system, change as needed.
-'CONST Servo1 = 1
-'CONST Servo2 = 2
-'CONST Servo3 = 3
-'CONST Servo4 = 4
-'CONST AllServos = &HFF
-%LastServo  = 4
-%InOut1 = 5
-%Servo1 = 1
-%Servo2 = 2
-%Servo3 = 3
-%Servo4 = 4
-
-'Key codes
-%KeyUP = 72
-%KeyDN = 80
-%KeyLft = 75
-%KeyRgt = 77
-%KeyBKSPC = 8
-%KeySPC = 32
-%KeyEnter = 13
-%KeyEsc = 27
-
-
-
-'Sio error mode difinitions
-%DoNothing = 0
-%ErrorBox = 1
-%AbortCom = 2
-%ExitProgram = 3
-'Module type definitions
-%PicServoType = 0
-
-'Status definitions bits for servo
-%SendPos = 1
-%SendAD = 2
-%SendVel = 4
-%SendAux = 8
-%SendHome = 16
-%SendID = 32
-
-
-'Status definitions bits for io (SendID is shared with PIC)
-%SendIO = 1
-%SendAD1 = 2
-%SendAD2 = 4
-%SendAD3 = 8
-%SendCtr = 16
-%SendSyncIO = 64
-%SendSyncCtr = 128
-
-'Load Trajectory control byte
-%LoadPos = 1
-%LoadVel = 2
-%LoadAcc = 4
-%LoadPWM = 8
-%PosMode = 16
-%VelMode = 32
-%RevDir = 64
-%StartNow = 128
-%PWMMode = 0 'PWM added KJL
-'Stop control byte
-%EnableAmp = 1
-%MotorOff = 2
-%StopAbrupt = 5
-%StopSmooth = 9
-'Homing control byte
-%HomeOnLimit1 = 1
-%HomeOnLimit2 = 2
-%HomeOnIndex = 8
-%HomeOnPerr = 64
-%HomeOnCerr = 128
-'Status byte
-%MoveDone = 1
-%CksumErr = 2
-%OverCurrent = 4
-%PowerOn = 8
-%PosError = 16
-%Limit1 = 32
-%Limit2 = 64
-%HomeInProg = 128
-
-'Auxiliary status byte
-%IndexPulse = 1
-%PositionWrap = 2
-%ServoOn = 4
-%AccelDone = 8
-%SlewDone = 16
-%ServoOverrun = 32
-
-
-'MiscMode bit definitions
-
-%AmpEnabled = 1
-%PWMSelected = 2
-%VelSelected = 4
-%PosSelected = 8
-%OnL1Selected = 16
-%OnL2Selected = 32
-%OnIndexSelected = 64
-%OnPeSelected = 128
-%OnCeSelected = 256
-%HomeFlagMask = &HFE0F
-
-  TYPE glorecord
-   NumModules AS INTEGER
-   StatusDef(5) AS INTEGER
-   ModuleType(5) AS INTEGER
-   ModuleVer(5) AS INTEGER
-   Position(5) AS LONG
-   CmdPosition(5) AS LONG
-   HomePosition(5) AS LONG
-   velocity(5) AS INTEGER
-   CmdVelocity(5) AS LONG
-   CmdAccel(5) AS LONG
-   CmdPwm(5) AS INTEGER 'LONG
-   AdVal(5) AS INTEGER
-   Stat(5) AS INTEGER
-   AuxStat(5) AS INTEGER
-   Kp(5) AS INTEGER
-   Ki(5) AS INTEGER
-   Kd(5) AS INTEGER
-   IL(5) AS INTEGER
-   ol(5) AS INTEGER
-   CL(5) AS INTEGER
-   EL(5) AS INTEGER
-   SRD(5) AS INTEGER
-   MiscMode(5) AS INTEGER
-   SIOErrorMode AS INTEGER
-   SIOError AS INTEGER
-   CkSumError AS INTEGER
-   SIOPort AS INTEGER
-   AmpQuery AS INTEGER
-   PowerQuery AS INTEGER
-   baud AS LONG
-   'added for PIC-IO
-   IO1 AS INTEGER
-   IO2 AS INTEGER
-   Ad1 AS INTEGER
-   Ad2 AS INTEGER
-   Ad3 AS INTEGER
-   Counter AS LONG
-   SyncIO1 AS INTEGER
-   SyncIO2 AS INTEGER
-   SyncCounter AS LONG
- END TYPE
- GLOBAL glo AS glorecord
-
-
- GLOBAL filenum AS INTEGER
- GLOBAL HdrVer AS STRING * 20
- GLOBAL KeyTable() AS STRING
- GLOBAL nComm AS LONG
- GLOBAL PicPort AS STRING
- GLOBAL PicBaud AS LONG
- GLOBAL Corr1()  AS BYTE
- GLOBAL Corr2()  AS BYTE
- GLOBAL LF() AS BYTE
- GLOBAL LU() AS BYTE
- GLOBAL XVel() AS LONG
- GLOBAL YVel() AS LONG
- GLOBAL XAcel() AS LONG
- GLOBAL YAcel() AS LONG
- GLOBAL XSpd()  AS LONG
- GLOBAL YSpd()  AS LONG
- GLOBAL AllServos AS INTEGER
 
  FUNCTION PBMAIN  () AS LONG
 
   DIM HdrVer AS STRING * 20
-  HdrVer = "SCU-1.00            "
   DIM ThumbDisk AS STRING * 2
-  ThumbDisk = "C:\UCALS\"
-  DIM AllServos AS INTEGER
   'COM PORTS
   DIM  RecvSize AS LONG
   DIM  XmitSize AS LONG
@@ -488,40 +452,34 @@ CONST FALSE = NOT TRUE
   'delay timer
   DIM  DelayCtr AS LONG
   DIM  WaitX AS INTEGER
-  AllServos = &HFF
-  'set com port numbers & baud
-  PICPort ="COM1"
-  PICBaud = 19200
-  nComm = FREEFILE
-  DelayCtr = DelayFact
-  WaitX = 1   'delay used in comm
-
-  'joystick to pwm conversion table
   DIM  LF(0 TO 255)
   DIM  LU(0 TO 255)
   DIM  Corr1(0 TO 255) AS BYTE
   DIM  Corr2(0 TO 255) AS BYTE
-
   'Vel & Accel pot tables
   DIM  XVel(255) AS LONG
   DIM  YVel(255) AS LONG
   DIM  XAcel(255) AS LONG
   DIM  YAcel(255) AS LONG
-
   'Speed Control tables
   DIM  XSpd(0 TO 255)
   DIM  YSpd(0 TO 255)
-
+  '****************************************************************************************************
+  HdrVer = "SCU-1.00"
+  ThumbDisk = "C:\UCALS\"
+  PICPort ="COM1"
+  PICBaud = 19200
+  nComm = FREEFILE
+  DelayCtr = DelayFact
+  WaitX = 1
+  'joystick to pwm conversion table
   CALL SetTables
-
   'memory line start positions for LCD
   DIM  StartLPos(3)
   StartLPos(0) = &H0
   StartLPos(1) = &H40
   StartLPos(2) = &H14
   StartLPos(3) = &H54
-
-
   'new keypad layout
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
@@ -544,7 +502,6 @@ CONST FALSE = NOT TRUE
   KeyTable(18) = CHR$(55)          '7
   KeyTable(19) = CHR$(52)          '4
   KeyTable(20) = CHR$(49)          '1
-
   DIM  ExtKey(49 TO 57, 0 TO 3) AS INTEGER
   ExtKey(49, 0) = 49: ExtKey(49, 1) = 65: ExtKey(49, 2) = 66: ExtKey(49, 3) = 67
   ExtKey(50, 0) = 50: ExtKey(50, 1) = 68: ExtKey(50, 2) = 69: ExtKey(50, 3) = 70
@@ -555,13 +512,6 @@ CONST FALSE = NOT TRUE
   ExtKey(55, 0) = 55: ExtKey(55, 1) = 83: ExtKey(55, 2) = 84: ExtKey(55, 3) = 85
   ExtKey(56, 0) = 56: ExtKey(56, 1) = 86: ExtKey(56, 2) = 87: ExtKey(56, 3) = 88
   ExtKey(57, 0) = 57: ExtKey(57, 1) = 89: ExtKey(57, 2) = 90: ExtKey(57, 3) = 196
-
-  '*********************************************************************
-  ' intialize LCD, KeyPad, & Ports
-  '*********************************************************************
- ' CALL SetPorts
-
- ' CALL InitDisplay
 
   ClrLCD
 
@@ -827,7 +777,7 @@ SetDefaults:
   RETURN
 
 XScan:
-    DO WHILE SCANstruc.IndexCt >= SCANstruc.YDataStart AND SCANstruc.IndexCt <= SCANstruc.YDataEnd
+    DO WHILE SCANstruc.IndexCt >= (SCANstruc.YDataStart AND SCANstruc.IndexCt) <= SCANstruc.YDataEnd
       UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.XCts > SCANstruc.XStartCts + (SCANstruc.XEndCts - SCANstruc.XStartCts) / 2 THEN
@@ -848,7 +798,7 @@ XScan:
     RETURN
 
 YScan:
-    DO WHILE SCANstruc.IndexCt >= SCANstruc.XDataStart AND SCANstruc.IndexCt <= SCANstruc.XDataEnd
+    DO WHILE SCANstruc.IndexCt >= (SCANstruc.XDataStart AND SCANstruc.IndexCt) <= SCANstruc.XDataEnd
       UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.YCts > SCANstruc.YStartCts + (SCANstruc.YEndCts - SCANstruc.YStartCts) / 2 THEN
@@ -1099,9 +1049,9 @@ Profiler:
   'check all scan cal parameters
   IF SCANstruc.XHigh > SCANstruc.XLow THEN
     IF SCANstruc.YHigh > SCANstruc.YLow THEN
-      IF SCANstruc.XIndex > 0 AND SCANstruc.YIndex > 0 THEN
-    IF SCANstruc.XPlus = TRUE OR SCANstruc.XPlus = FALSE THEN
-      IF SCANstruc.YPlus = TRUE OR SCANstruc.YPlus = FALSE THEN
+      IF (SCANstruc.XIndex > 0 AND SCANstruc.YIndex > 0) THEN
+    IF (SCANstruc.XPlus = TRUE OR SCANstruc.XPlus = FALSE) THEN
+      IF (SCANstruc.YPlus = TRUE OR SCANstruc.YPlus = FALSE) THEN
         IF SCANstruc.XSpeed > 0 THEN
           IF SCANstruc.YSpeed > 0 THEN
         IF SCANstruc.XEnable THEN
@@ -1158,7 +1108,7 @@ SUB AlphaNumIN (Edit$, ExitCode)
            CASE 49 TO 57   '1 to 9
          GOSUB AlphaFlag
          PrevKey = LastKey: LastKey = AscCode
-         IF (PrevKey = LastKey) AND (TIMER - T! < 3) THEN
+         IF ((PrevKey = LastKey) AND (TIMER - T! < 3)) THEN
            KeyNum = KeyNum + 1
          ELSE
            KeyNum = 0
@@ -1219,7 +1169,7 @@ SUB AlphaNumIN (Edit$, ExitCode)
      END IF
 
      'move cursor if last key press > 3 secs
-     IF KeyPress AND (TIMER - T! > 3) AND (StrPos < Length) THEN
+     IF (KeyPress AND (TIMER - T! > 3) AND (StrPos < Length)) THEN
         StrPos = StrPos + 1
         'PrintStr y, X, s$
         SetLcdPos y, x + (StrPos - 1)
@@ -1363,7 +1313,7 @@ MoveAxis:
 
       KeyPress = GetSelectKey
 
-      IF KeyPress = KeyUP AND AxisNum = 1 THEN
+      IF (KeyPress = KeyUP AND AxisNum = 1) THEN
     CALL MoveXVel(PosDir)
     DO
        CALL GetXyPos
@@ -1376,7 +1326,7 @@ MoveAxis:
     CALL StopMtrs
     FlushKeys
 
-      ELSEIF KeyPress = KeyDN AND AxisNum = 1 THEN
+      ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
     CALL MoveXVel(NegDir)
     DO
        CALL GetXyPos
@@ -1389,7 +1339,7 @@ MoveAxis:
     CALL StopMtrs
     FlushKeys
 
-      ELSEIF KeyPress = KeyLft AND AxisNum = 3 THEN
+      ELSEIF KeyPress = (KeyLft AND AxisNum = 3) THEN
     CALL MoveYVel(NegDir)
     DO
        CALL GetXyPos
@@ -1398,7 +1348,7 @@ MoveAxis:
     CALL StopMtrs
     FlushKeys
 
-      ELSEIF KeyPress = KeyRgt AND AxisNum = 3 THEN
+      ELSEIF KeyPress = (KeyRgt AND AxisNum = 3) THEN
     CALL MoveYVel(PosDir)
     DO
        CALL GetXyPos
@@ -1407,7 +1357,7 @@ MoveAxis:
     CALL StopMtrs
     FlushKeys
       END IF
-  LOOP UNTIL KeyPress = KeyEsc OR KeyPress = KeyEnter
+  LOOP UNTIL KeyPress = (KeyEsc OR KeyPress = KeyEnter)
 
   CALL GetXyPos
 
@@ -1659,7 +1609,7 @@ SUB EnableAmpl (Value AS INTEGER, address AS INTEGER)
      Glo.MiscMode(MtrNum) = Glo.MiscMode(MtrNum) OR AmpEnabled
   ELSE
      Cmd$ = CHR$(&H17) + CHR$(0)
-     Glo.MiscMode(MtrNum) = Glo.MiscMode(MtrNum) AND (NOT AmpEnabled)
+     Glo.MiscMode(MtrNum) = (Glo.MiscMode(MtrNum) AND (NOT AmpEnabled))
   END IF
 
   SendCmd address, Cmd$
@@ -1689,16 +1639,9 @@ END SUB
 
 SUB FlushKeys
     GRAPHIC INPUT FLUSH
-
-   'keypad flush
-   'CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
-   'CALL ddelay(50): OUT BitReg, KeyStbOn  'enable
-   'CALL ddelay(50): OUT BitReg, KeyStbOff 'disable
-
 END SUB
 
 SUB GetAD
-
 END SUB
 
 FUNCTION GetKeys$
@@ -1712,62 +1655,16 @@ FUNCTION GetKeys$
  END IF
 
  GetKeys$ = KeyTable(KeyNum)
-
- 'get keypad press
- 'IF INP(KeyReg) AND &H20 THEN   'keypress
- '  OUT BitReg, KeyStbOn  'enable
- '  KBuff = INP(KeyReg)    'input data
- '  OUT BitReg, KeyStbOff 'disable
- '  KBuff = KBuff AND &H1F 'remove data ready bit
- '  KeyNum = KBuff + 1       'return keypress
- '  IF KeyNum > 20 THEN KeyNum = 0
- 'ELSE
-   KeyNum = 0            'return no keypress
-' END IF
-
-' GetKeys$ = KeyTable(KeyNum)
-
 END FUNCTION
 
 FUNCTION GetLcdColPos
   'REMED
-  DIM junk AS INTEGER
-'  GetLcdColPos = POS(0)
   GetLcdColPos = GRAPHIC(POS.X)
-  EXIT FUNCTION
-  Position = GetLcdMemPos
-
-  'pull the present column position of the cursor
-  Position = Position AND LcdAddress
-  FOR i = 0 TO LcdLines - 1
-   IF ((Position >= StartLPos(i)) AND (Position <= (StartLPos(i) + LcdColumns - 1))) THEN
-      Temp = (Position - StartLPos(i))
-   END IF
-  NEXT
-  GetLcdColPos = Temp + 1
-
 
 END FUNCTION
 
 FUNCTION GetLcdMemPos
-
-  'Get the present row & col (mem) position of the cursor
- ' OUT LcdModeReg, DataPortIn 'set data port as input
- ' CALL ddelay(D20)
- ' OUT BitReg, LcdPos 'test busy flag & get mem position
- ' CALL ddelay(D20)
- '
- ' GetLcdMemPos = INP(LcdReg)
-
-  'WHILE (INP(LcdReg) AND BusyFlag)  'loop while BF=1
- ' WEND
-  'OUT BitReg, DataStbOff
- ' OUT LcdModeReg, DataPortOut
- ' CALL ddelay(D20)
-
   EXIT FUNCTION
-
-
 END FUNCTION
 
 FUNCTION GetLcdRowPos
@@ -1776,7 +1673,7 @@ FUNCTION GetLcdRowPos
   EXIT FUNCTION
   Position = GetLcdMemPos
 
-  Position = Position AND LcdAddress
+  Position = (Position AND LcdAddress)
   Temp = 0
   FOR i = 0 TO LcdLines - 1
    IF ((Position >= StartLPos(i)) AND (Position <= (StartLPos(i) + LcdColumns - 1))) THEN
@@ -1884,7 +1781,7 @@ SUB GetScanCal
          WindowNum = 2
            END IF
        END SELECT
-    LOOP WHILE WindowNum = 1 AND XCode <> KeyEsc
+    LOOP WHILE (WindowNum = 1 AND XCode <> KeyEsc)
     LastKey = XCode
       CASE 2
     CursorON
@@ -1974,7 +1871,7 @@ SUB GetScanCal
          WindowNum = 3
            END IF
        END SELECT
-    LOOP WHILE WindowNum = 2 AND XCode <> KeyEsc
+    LOOP WHILE (WindowNum = 2 AND XCode <> KeyEsc)
     LastKey = XCode
       CASE 3
     GetXyPos  'load current encoder position
@@ -2070,7 +1967,7 @@ SUB GetScanCal
          WindowNum = 4
            END IF
        END SELECT
-    LOOP WHILE WindowNum = 3 AND XCode <> KeyEsc
+    LOOP WHILE (WindowNum = 3 AND XCode <> KeyEsc)
     LastKey = XCode
       CASE 4
     CursorON
@@ -2196,7 +2093,7 @@ SUB GetScanCal
          END IF
            LOOP
        END SELECT
-    LOOP WHILE WindowNum = 4 AND XCode <> KeyEsc
+    LOOP WHILE (WindowNum = 4 AND XCode <> KeyEsc )
     LastKey = XCode
       CASE 5
     CursorOFF
@@ -2332,7 +2229,7 @@ SUB GetScanCal
           END IF
            LOOP
        END SELECT
-    LOOP WHILE WindowNum = 5 AND XCode <> KeyEsc
+    LOOP WHILE (WindowNum = 5 AND XCode <> KeyEsc )
     LastKey = XCode
       CASE 6
     CursorON
@@ -2405,7 +2302,7 @@ SUB GetScanCal
          WindowNum = 7
            END IF
        END SELECT
-    LOOP WHILE WindowNum = 6 AND XCode <> KeyEsc
+    LOOP WHILE ( WindowNum = 6 AND XCode <> KeyEsc    )
     LastKey = XCode
       CASE 7
     GOSUB EnterMenu
@@ -2480,7 +2377,7 @@ SUB GetScanCal
          END IF
            LOOP
        END SELECT
-     LOOP WHILE WindowNum = 7 AND XCode <> KeyEsc
+     LOOP WHILE (WindowNum = 7 AND XCode <> KeyEsc)
      LastKey = XCode
     END SELECT
 
@@ -2698,7 +2595,7 @@ FUNCTION InitNetWork
 
   FOR i = 1 TO 5
      Glo.StatusDef(i) = 0
-     Glo.ModuleType(i) = -1 '*** changed from (0) to (-1) 9-3-02
+     Glo.ModuleType(i) = -1
      Glo.Position(i) = 0
      Glo.CmdPosition(i) = 0
      Glo.HomePosition(i) = 0
@@ -2777,14 +2674,6 @@ FUNCTION InitNetWork
   Cmd$ = CHR$(&H12) + CHR$(&HE) '
   SendCmd InOut1, Cmd$
 
-  'Taken because of com errors in newer Flash Micros
-  'Cmd$ = CHR$(&H1A) + CHR$(10) 'set baudrate 115200
-  'SendCmd &HFF, Cmd$
-  'CALL Delayx(25)
-  'CALL baud(10)   'Set Proccessor baudrate to 115200
-  'CALL Delayx(25)
-  'CALL FlushBuffers(PICPort, 0, ECode)
-
   'reset group command for pic-servo #4 to 253
   Cmd$ = CHR$(&H21) + CHR$(4) + CHR$(&HFD) 'set address
   SendCmd 4, Cmd$
@@ -2806,8 +2695,8 @@ END FUNCTION
 
 FUNCTION IntToStr$ (x AS INTEGER)
 
-   B = x AND &HFF
-   A = ((x AND &HFF00&) \ 256&) AND &HFF
+   B = (x AND &HFF)
+   A = (((x AND &HFF00&) \ 256&) AND &HFF )
 
    IntToStr = CHR$(B) + CHR$(A)
 
@@ -3317,10 +3206,10 @@ END SUB
 
 FUNCTION LongToStr$ (x AS LONG)
 
-   D = x AND &HFF
-   C = (x AND &HFF00&) \ 256&
-   B = (x AND &HFF0000) \ 65536
-   A = ((x AND &HFF000000) \ 16777216) AND &HFF
+   D = (x AND &HFF)
+   C = ((x AND &HFF00&) \ 256& )
+   B = ((x AND &HFF0000) \ 65536  )
+   A = (((x AND &HFF000000) \ 16777216) AND &HFF)
 
    LongToStr = CHR$(D) + CHR$(C) + CHR$(B) + CHR$(A)
 
@@ -3563,29 +3452,11 @@ END SUB
 SUB PrintClrStr (y, x, BYVAL prtText AS STRING)
      LOCATE Y, 1: PRINT SPACE$(80);
      LOCATE Y, X: PRINT prtText;
-     EXIT SUB
-    YY = y: XX = x
-
-    CALL SetLcdPos(YY, XX) 'position cursor
-
-    FOR i = 1 TO LEN(Text$)
-      IF XX <= LcdColumns THEN
-        CALL StrobeData(ASC(MID$(Text$, i, 1))) 'print the char
-        XX = XX + 1
-      END IF
-    NEXT
-
-    WHILE XX <= LcdColumns ' clear rest of line
-      CALL StrobeData(32) 'print spaces
-      XX = XX + 1
-    WEND
-
 END SUB
 
 SUB PrintPos
 
     CALL GetXyPos
-
     CALL PrintClrStr(1, 7, SCANstruc.XPosStr)
     CALL PrintClrStr(2, 7, SCANstruc.YPosStr)
     CALL PrintClrStr(3, 7, SCANstruc.APosStr)
@@ -3807,7 +3678,7 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
   FOR i = 1 TO LEN(CmdString)
      Cksum = Cksum + ASC(MID$(CmdString, i, 1))
   NEXT i
-  Cksum = Cksum AND 255
+  Cksum = (Cksum AND 255)
 
   'Send the command
   '** add for probas com routine
@@ -3842,11 +3713,10 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
   END IF
 
   Cksum = Glo.Stat(address)
-
   IF Glo.ModuleType(address) = 0 THEN 'pic servo
 
     'Get position data
-    IF Glo.StatusDef(address) AND SendPos THEN
+    IF (Glo.StatusDef(address) AND SendPos) THEN
       IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
@@ -3856,7 +3726,7 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
       '****************************************
       'changed to adjust for user counter offset
       '****************************************
-      IF address = 1 OR address = 2 THEN   'X Axis
+      IF (address = 1 OR address = 2) THEN   'X Axis
     Glo.Position(address) = ActPos& + SCANstruc.XOffset
       ELSEIF address = 3 THEN  'Y Axis
     Glo.Position(address) = ActPos& + SCANstruc.YOffset
@@ -3867,13 +3737,13 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
     END IF
 
     'Get the A/D value
-    IF Glo.StatusDef(address) AND SendAD THEN
+    IF (Glo.StatusDef(address) AND SendAD) THEN
       IF SIOGetByte(Glo.AdVal(address), 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.AdVal(address)
     END IF
 
     'Get velocity data
-    IF Glo.StatusDef(address) AND SendVel THEN
+    IF (Glo.StatusDef(address) AND SendVel) THEN
       IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(A, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + A + B
@@ -3881,13 +3751,13 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
     END IF
 
     'Get the AUX status value
-    IF Glo.StatusDef(address) AND SendAux THEN
+    IF (Glo.StatusDef(address) AND SendAux) THEN
       IF SIOGetByte(Glo.AuxStat(address), 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.AuxStat(address)
     END IF
 
     'Get home position data
-    IF Glo.StatusDef(address) AND SendHome THEN
+    IF (Glo.StatusDef(address) AND SendHome) THEN
       IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
@@ -3897,7 +3767,8 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
     END IF
 
     'Get the module type and version
-    IF Glo.StatusDef(address) AND SendID THEN
+
+    IF (Glo.StatusDef(address) AND SendID) THEN
      IF SIOGetByte(Glo.ModuleType(address), 1) = FALSE THEN GOTO SendCmdExit
      IF SIOGetByte(Glo.ModuleVer(address), 1) = FALSE THEN GOTO SendCmdExit
      Cksum = Cksum + Glo.ModuleType(address) + Glo.ModuleVer(address)
@@ -3906,32 +3777,32 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
   ELSE   'PicIO module
 
     'Get the I/0 values
-    IF Glo.StatusDef(address) AND SendIO THEN
+    IF (Glo.StatusDef(address) AND SendIO) THEN
       IF SIOGetByte(Glo.IO1, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(Glo.IO2, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.IO1 + Glo.IO2
     END IF
 
     'Get the A/D 1 value
-    IF Glo.StatusDef(address) AND SendAD1 THEN
+    IF (Glo.StatusDef(address) AND SendAD1) THEN
       IF SIOGetByte(Glo.Ad1, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.Ad1
     END IF
 
     'Get the A/D 2 value
-    IF Glo.StatusDef(address) AND SendAD2 THEN
+    IF (Glo.StatusDef(address) AND SendAD2) THEN
       IF SIOGetByte(Glo.Ad2, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.Ad2
     END IF
 
     'Get the A/D 3 value
-    IF Glo.StatusDef(address) AND SendAD3 THEN
+    IF (Glo.StatusDef(address) AND SendAD3) THEN
       IF SIOGetByte(Glo.Ad3, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.Ad3
     END IF
 
     'Get Ctr value
-    IF Glo.StatusDef(address) AND SendCtr THEN
+    IF (Glo.StatusDef(address) AND SendCtr) THEN
       IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
@@ -3940,22 +3811,17 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
       Glo.Counter = CharsToLong(A, B, C, D)
     END IF
 
-    'Get the module type and version
-    IF Glo.StatusDef(address) AND SendID THEN
-      IF SIOGetByte(Glo.ModuleType(address), 1) = FALSE THEN GOTO SendCmdExit
-      IF SIOGetByte(Glo.ModuleVer(address), 1) = FALSE THEN GOTO SendCmdExit
-      Cksum = Cksum + Glo.ModuleType(address) + Glo.ModuleVer(address)
-    END IF
+
 
     'Get the Sync I/0 values
-    IF Glo.StatusDef(address) AND SendSyncIO THEN
+    IF (Glo.StatusDef(address) AND SendSyncIO) THEN
       IF SIOGetByte(Glo.SyncIO1, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(Glo.SyncIO2, 1) = FALSE THEN GOTO SendCmdExit
       Cksum = Cksum + Glo.SyncIO1 + Glo.SyncIO2
     END IF
 
     'Get SyncCtr value
-    IF Glo.StatusDef(address) AND SendSyncCtr THEN
+    IF (Glo.StatusDef(address) AND SendSyncCtr) THEN
       IF SIOGetByte(D, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(C, 1) = FALSE THEN GOTO SendCmdExit
       IF SIOGetByte(B, 1) = FALSE THEN GOTO SendCmdExit
@@ -3963,7 +3829,13 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
       Cksum = Cksum + A + B + C + D
       Glo.SyncCounter = CharsToLong(A, B, C, D)
     END IF
+    'Get the module type and version
+    IF (Glo.StatusDef(address) AND SendID) THEN
+      IF SIOGetByte(Glo.ModuleType(address), 1) = FALSE THEN GOTO SendCmdExit
+      IF SIOGetByte(Glo.ModuleVer(address), 1) = FALSE THEN GOTO SendCmdExit
 
+      Cksum = Cksum + Glo.ModuleType(address) + Glo.ModuleVer(address)
+    END IF
   END IF
 
   IF SIOGetByte(CCksum, 1) = FALSE THEN GOTO NoChkSum
@@ -4133,6 +4005,8 @@ END SUB
 SUB SetLcdPos (ROW, COL)
 
   C = COL - 1: R = ROW - 1
+  LOCATE R, C
+  EXIT SUB
 
   'Sets lcd position to line 'row', column 'col' (if in lcd range)
   IF ((C < LcdColumns) AND (R < LcdLines)) THEN
@@ -4438,11 +4312,12 @@ END FUNCTION
 
 SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
       LOCAL ncbData AS LONG    ' bytes of data waiting
+
       ncbData = COMM(#nComm, RXQUE)
       IF ncbData THEN
             COMM RECV #nComm, 1, ReadBuffer$
       END IF
-      BytesRead% = ncbData
+      BytesRead% = 1
 END SUB
 
 FUNCTION OpenComPorts
@@ -4481,6 +4356,7 @@ END SUB
 SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
     LOCAL qty AS INTEGER
     COMM SEND #nComm, WriteBuffer$
+    SLEEP 200
 END SUB
 
 SUB GetCharsInBuffer (ComPortNum$, RecvQue%, XmitQue%, ECode%)

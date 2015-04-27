@@ -3,10 +3,145 @@
 #INCLUDE "circle.inc"
 #INCLUDE "Win32API.inc"
 #RESOURCE ICON, exeICON, "ATCO.ico"
+DEFINT A-Z
+
 GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
+'************************************************************************************
+'* Motor control globals
+GLOBAL filenum AS INTEGER
+GLOBAL HdrVer AS STRING * 20
+GLOBAL KeyTable() AS STRING
+GLOBAL nComm AS LONG
+GLOBAL PicPort AS STRING
+GLOBAL PicBaud AS LONG
+GLOBAL Corr1()  AS BYTE
+GLOBAL Corr2()  AS BYTE
+GLOBAL LF() AS BYTE
+GLOBAL LU() AS BYTE
+GLOBAL XVel() AS LONG
+GLOBAL YVel() AS LONG
+GLOBAL XAcel() AS LONG
+GLOBAL YAcel() AS LONG
+GLOBAL XSpd()  AS LONG
+GLOBAL YSpd()  AS LONG
+GLOBAL nComm AS LONG
+'************************************************************************************
+'* Motor control Functions
+DECLARE FUNCTION DelayFact& ()
+FUNCTION DelayFact&
+
+   'determine cts per milisec
+   LOCAL T,x AS DOUBLE
+   LOCAL CtrBegin AS LONG
+   LOCAL CtrEnd,Ctr   AS LONG
+   T# = TIMER 'times in seconds
+
+   DO
+     CtrBegin& = CtrEnd& + 1: CtrEnd& = CtrBegin& + 100000
+     FOR Ctr& = CtrBegin& TO CtrEnd&: NEXT
+     x# = TIMER - T#  'rollover at midnight, careful here!
+   LOOP UNTIL x# > .5 'be > .5 seconds for accuracy and rollover
+
+   DelayFact = Ctr& / (x# * 1000)  'divide counter by 1000 (millisecs)
+
+   EXIT FUNCTION
+
+END FUNCTION
+
+'************************************************************************************
+' MCU SUBS
+DECLARE SUB SetTables ()
+SUB SetTables
+
+  '**************************************************************************
+  '                   JoyStick Conversion Table
+  '**************************************************************************
+
+  'Correction factor for Left/Right
+  FOR x = 0 TO 59
+    Corr2(x) = 0   '0 to 29 = 0
+  NEXT
+  FOR x = 60 TO 100
+   Corr2(x) = CINT((x - 60) / 40 * 127)   '30 to 100 = 0 to 127
+  NEXT
+  FOR x = 100 TO 173
+   Corr2(x) = 127     '100 to 173 = 127
+  NEXT
+  FOR x = 174 TO 255
+   Corr2(x) = CINT((x - 174) / 81 * 128) + 127 '174 to 255 = 127 to 255
+  NEXT
+
+  'Correction factor for up/dn
+  FOR x = 0 TO 29
+    Corr1(x) = 0   '0 to 29 = 0
+  NEXT
+  FOR x = 30 TO 125
+   Corr1(x) = CINT((x - 30) / 95 * 127)   '30 to 125 = 0 to 127
+  NEXT
+  FOR x = 125 TO 150
+   Corr1(x) = 127     '125 to 150 = 127
+  NEXT
+  FOR x = 151 TO 255
+   Corr1(x) = CINT((x - 151) / 104 * 128) + 127 '151 to 255 = 127 to 255
+  NEXT
+
+  FOR x = 0 TO 63
+     LF(x) = CINT(-((63 - x) / 63 * 100)) '0 to 63 = -100% to 0%
+     LF(255 - x) = LF(x)                  '255 to 192 =-100% to 0%
+  NEXT
+
+  FOR x = 64 TO 127
+     LF(x) = CINT((x - 64) / 63 * 100)    '64 to 127 = 0% to 100%
+     LF(255 - x) = LF(x)                  '191 to 128 = 0% to 100%
+  NEXT
+
+  'Speed table for forward/reverse crawler motion
+  FOR x = 127 TO 255
+    LU(x) = CINT((x - 127) / 128 * 100)   '127 to 255 = 0% to 100%
+  NEXT
+  FOR x = 0 TO 126
+    LU(x) = CINT((126 - x) / 126 * -100)  '0 to 126 = -100% to 0%
+  NEXT
+
+  '**************************************************************************
+  '                  End JoyStick Conversion Table
+  '**************************************************************************
+
+  'Velocity Mode Tables
+  'velocity = (((RPM / 60) * EncCts\Rev) / ServoTics) * 65536
+  LOCAL MaxXVel, MaxYVel AS LONG
+  MaxXVel& = (((6150 / 60) * 2000) / 1953) * 65536
+  MaxYVel& = (((10000 / 60) * 2000) / 1953) * 65536
+
+  'accel = velocity / ( #secstovel * ServoTics )
+  FOR x = 0 TO 5
+    XVel(x) = 0
+    XAcel(x) = 0
+    YVel(x) = 0
+    YAcel(x) = 0
+  NEXT
+
+  FOR x = 6 TO 255
+    XVel(x) = CLNG((MaxXVel& / 249) * (x - 6))
+    XAcel(x) = CLNG(XVel(x) / (.5 * 1953))
+    YVel(x) = CLNG((MaxYVel& / 249) * (x - 6))
+    YAcel(x) = CLNG(YVel(x) / (.5 * 1953))
+  NEXT
+
+  'speed control tables
+  FOR x = 0 TO 5
+    XSpd(x) = 0
+    YSpd(x) = 0
+  NEXT
+
+  FOR x = 6 TO 255
+    XSpd(x) = CINT((255 / 249) * (x - 6))
+    YSpd(x) = CINT((255 / 249) * (x - 6))
+  NEXT
 
 
+END SUB
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
                           OPTIONAL BYVAL nModeless AS LONG)
@@ -372,7 +507,7 @@ SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, BYVAL isfilea
     IF GetObject(hBmp, SIZEOF(tObj), tObj) = 0 THEN EXIT SUB
 
     ' Create the dialog...
-    DIALOG NEW 0, "", , , 0, 0, %WS_POPUP, %DS_3DLOOK TO hDlg
+    DIALOG NEW 0, "", , , 0, 0, %DS_3DLOOK ,%WS_EX_TOPMOST  TO hDlg
     SetWindowPos hDlg, 0, (GetSystemMetrics(%SM_CXSCREEN)/2)-(tObj.bmWidth/2), _
                           (GetSystemMetrics(%SM_CYSCREEN)/2)-(tObj.bmHeight/2), _
                           tObj.bmWidth, tObj.bmHeight, %SWP_NOZORDER
@@ -399,6 +534,43 @@ SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, BYVAL isfilea
 END SUB
 '#EndIf
 FUNCTION PBMAIN () AS LONG
+'*******************************************************************************************************
+'MCU                                                                                                   *
+'*******************************************************************************************************
+    DIM HdrVer AS STRING * 20
+    DIM ThumbDisk AS STRING * 2
+  'COM PORTS
+    DIM  RecvSize AS LONG
+    DIM  XmitSize AS LONG
+    DIM  MemSize AS LONG
+    DIM  PICPort AS STRING
+    DIM  PICBaud AS LONG
+    DIM KeyTable(20) AS STRING
+  'delay timer
+    DIM  DelayCtr AS LONG
+    DIM  WaitX AS INTEGER
+    DIM  LF(0 TO 255)
+    DIM  LU(0 TO 255)
+    DIM  Corr1(0 TO 255) AS BYTE
+    DIM  Corr2(0 TO 255) AS BYTE
+  'Vel & Accel pot tables
+    DIM  XVel(255) AS LONG
+    DIM  YVel(255) AS LONG
+    DIM  XAcel(255) AS LONG
+    DIM  YAcel(255) AS LONG
+  'Speed Control tables
+    DIM  XSpd(0 TO 255)
+    DIM  YSpd(0 TO 255)
+  '****************************************************************************************************
+    HdrVer = "SCU-1.00"
+    ThumbDisk = "C:\UCALS\"
+    PICPort ="COM1"
+    PICBaud = 19200
+    nComm = FREEFILE
+    DelayCtr = DelayFact
+    WaitX = 1
+    'joystick to pwm conversion table
+    CALL SetTables
     IsSplashActive = 1
     ShowSplashDlg(5000, "atcosplash.bmp", 1, "MCU 2015",1)
 

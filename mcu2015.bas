@@ -3,10 +3,145 @@
 #INCLUDE "circle.inc"
 #INCLUDE "Win32API.inc"
 #RESOURCE ICON, exeICON, "ATCO.ico"
+DEFINT A-Z
+
 GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
+'************************************************************************************
+'* Motor control globals
+GLOBAL filenum AS INTEGER
+GLOBAL HdrVer AS STRING * 20
+GLOBAL KeyTable() AS STRING
+GLOBAL nComm AS LONG
+GLOBAL PicPort AS STRING
+GLOBAL PicBaud AS LONG
+GLOBAL Corr1()  AS BYTE
+GLOBAL Corr2()  AS BYTE
+GLOBAL LF() AS BYTE
+GLOBAL LU() AS BYTE
+GLOBAL XVel() AS LONG
+GLOBAL YVel() AS LONG
+GLOBAL XAcel() AS LONG
+GLOBAL YAcel() AS LONG
+GLOBAL XSpd()  AS LONG
+GLOBAL YSpd()  AS LONG
+GLOBAL nComm AS LONG
+'************************************************************************************
+'* Motor control Functions
+DECLARE FUNCTION DelayFact& ()
+FUNCTION DelayFact&
+
+   'determine cts per milisec
+   LOCAL T,x AS DOUBLE
+   LOCAL CtrBegin AS LONG
+   LOCAL CtrEnd,Ctr   AS LONG
+   T# = TIMER 'times in seconds
+
+   DO
+     CtrBegin& = CtrEnd& + 1: CtrEnd& = CtrBegin& + 100000
+     FOR Ctr& = CtrBegin& TO CtrEnd&: NEXT
+     x# = TIMER - T#  'rollover at midnight, careful here!
+   LOOP UNTIL x# > .5 'be > .5 seconds for accuracy and rollover
+
+   DelayFact = Ctr& / (x# * 1000)  'divide counter by 1000 (millisecs)
+
+   EXIT FUNCTION
+
+END FUNCTION
+
+'************************************************************************************
+' MCU SUBS
+DECLARE SUB SetTables ()
+SUB SetTables
+
+  '**************************************************************************
+  '                   JoyStick Conversion Table
+  '**************************************************************************
+
+  'Correction factor for Left/Right
+  FOR x = 0 TO 59
+    Corr2(x) = 0   '0 to 29 = 0
+  NEXT
+  FOR x = 60 TO 100
+   Corr2(x) = CINT((x - 60) / 40 * 127)   '30 to 100 = 0 to 127
+  NEXT
+  FOR x = 100 TO 173
+   Corr2(x) = 127     '100 to 173 = 127
+  NEXT
+  FOR x = 174 TO 255
+   Corr2(x) = CINT((x - 174) / 81 * 128) + 127 '174 to 255 = 127 to 255
+  NEXT
+
+  'Correction factor for up/dn
+  FOR x = 0 TO 29
+    Corr1(x) = 0   '0 to 29 = 0
+  NEXT
+  FOR x = 30 TO 125
+   Corr1(x) = CINT((x - 30) / 95 * 127)   '30 to 125 = 0 to 127
+  NEXT
+  FOR x = 125 TO 150
+   Corr1(x) = 127     '125 to 150 = 127
+  NEXT
+  FOR x = 151 TO 255
+   Corr1(x) = CINT((x - 151) / 104 * 128) + 127 '151 to 255 = 127 to 255
+  NEXT
+
+  FOR x = 0 TO 63
+     LF(x) = CINT(-((63 - x) / 63 * 100)) '0 to 63 = -100% to 0%
+     LF(255 - x) = LF(x)                  '255 to 192 =-100% to 0%
+  NEXT
+
+  FOR x = 64 TO 127
+     LF(x) = CINT((x - 64) / 63 * 100)    '64 to 127 = 0% to 100%
+     LF(255 - x) = LF(x)                  '191 to 128 = 0% to 100%
+  NEXT
+
+  'Speed table for forward/reverse crawler motion
+  FOR x = 127 TO 255
+    LU(x) = CINT((x - 127) / 128 * 100)   '127 to 255 = 0% to 100%
+  NEXT
+  FOR x = 0 TO 126
+    LU(x) = CINT((126 - x) / 126 * -100)  '0 to 126 = -100% to 0%
+  NEXT
+
+  '**************************************************************************
+  '                  End JoyStick Conversion Table
+  '**************************************************************************
+
+  'Velocity Mode Tables
+  'velocity = (((RPM / 60) * EncCts\Rev) / ServoTics) * 65536
+  LOCAL MaxXVel, MaxYVel AS LONG
+  MaxXVel& = (((6150 / 60) * 2000) / 1953) * 65536
+  MaxYVel& = (((10000 / 60) * 2000) / 1953) * 65536
+
+  'accel = velocity / ( #secstovel * ServoTics )
+  FOR x = 0 TO 5
+    XVel(x) = 0
+    XAcel(x) = 0
+    YVel(x) = 0
+    YAcel(x) = 0
+  NEXT
+
+  FOR x = 6 TO 255
+    XVel(x) = CLNG((MaxXVel& / 249) * (x - 6))
+    XAcel(x) = CLNG(XVel(x) / (.5 * 1953))
+    YVel(x) = CLNG((MaxYVel& / 249) * (x - 6))
+    YAcel(x) = CLNG(YVel(x) / (.5 * 1953))
+  NEXT
+
+  'speed control tables
+  FOR x = 0 TO 5
+    XSpd(x) = 0
+    YSpd(x) = 0
+  NEXT
+
+  FOR x = 6 TO 255
+    XSpd(x) = CINT((255 / 249) * (x - 6))
+    YSpd(x) = CINT((255 / 249) * (x - 6))
+  NEXT
 
 
+END SUB
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
                           OPTIONAL BYVAL nModeless AS LONG)
@@ -399,9 +534,101 @@ SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, BYVAL isfilea
 END SUB
 '#EndIf
 FUNCTION PBMAIN () AS LONG
+'*******************************************************************************************************
+'MCU                                                                                                   *
+'*******************************************************************************************************
+    DIM HdrVer AS STRING * 20
+    DIM ThumbDisk AS STRING * 2
+  'COM PORTS
+    DIM  RecvSize AS LONG
+    DIM  XmitSize AS LONG
+    DIM  MemSize AS LONG
+    DIM  PICPort AS STRING
+    DIM  PICBaud AS LONG
+    DIM KeyTable(20) AS STRING
+  'delay timer
+    DIM  DelayCtr AS LONG
+    DIM  WaitX AS INTEGER
+    DIM  LF(0 TO 255)
+    DIM  LU(0 TO 255)
+    DIM  Corr1(0 TO 255) AS BYTE
+    DIM  Corr2(0 TO 255) AS BYTE
+  'Vel & Accel pot tables
+    DIM  XVel(255) AS LONG
+    DIM  YVel(255) AS LONG
+    DIM  XAcel(255) AS LONG
+    DIM  YAcel(255) AS LONG
+  'Speed Control tables
+    DIM  XSpd(0 TO 255)
+    DIM  YSpd(0 TO 255)
+  '****************************************************************************************************
+    HdrVer = "SCU-1.00"
+    ThumbDisk = "C:\UCALS\"
+    PICPort ="COM1"
+    PICBaud = 19200
+    nComm = FREEFILE
+    DelayCtr = DelayFact
+    WaitX = 1
+    'joystick to pwm conversion table
+    CALL SetTables
+    DIM  StartLPos(3)
+
+    StartLPos(0) = &H0
+    StartLPos(1) = &H40
+    StartLPos(2) = &H14
+    StartLPos(3) = &H54
+  'new keypad layout
+    KeyTable(0) = ""
+    KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
+    KeyTable(2) = CHR$(0) + CHR$(75) 'LftArrow
+    KeyTable(3) = CHR$(0) + CHR$(80) 'DnArrow
+    KeyTable(4) = CHR$(0) + CHR$(72) 'UpArrow
+    KeyTable(5) = CHR$(13)           'Ent
+    KeyTable(6) = CHR$(32)           'Space
+    KeyTable(7) = CHR$(8)            'BkSpace
+    KeyTable(8) = CHR$(27)           'ESC
+    KeyTable(9) = CHR$(46)           '.
+    KeyTable(10) = CHR$(57)          '9
+    KeyTable(11) = CHR$(54)          '6
+    KeyTable(12) = CHR$(51)          '3
+    KeyTable(13) = CHR$(48)          '0
+    KeyTable(14) = CHR$(56)          '8
+    KeyTable(15) = CHR$(53)          '5
+    KeyTable(16) = CHR$(50)          '2
+    KeyTable(17) = CHR$(46)          '.
+    KeyTable(18) = CHR$(55)          '7
+    KeyTable(19) = CHR$(52)          '4
+    KeyTable(20) = CHR$(49)          '1
+    DIM  ExtKey(49 TO 57, 0 TO 3) AS INTEGER
+    ExtKey(49, 0) = 49: ExtKey(49, 1) = 65: ExtKey(49, 2) = 66: ExtKey(49, 3) = 67
+    ExtKey(50, 0) = 50: ExtKey(50, 1) = 68: ExtKey(50, 2) = 69: ExtKey(50, 3) = 70
+    ExtKey(51, 0) = 51: ExtKey(51, 1) = 71: ExtKey(51, 2) = 72: ExtKey(51, 3) = 73
+    ExtKey(52, 0) = 52: ExtKey(52, 1) = 74: ExtKey(52, 2) = 75: ExtKey(52, 3) = 76
+    ExtKey(53, 0) = 53: ExtKey(53, 1) = 77: ExtKey(53, 2) = 78: ExtKey(53, 3) = 79
+    ExtKey(54, 0) = 54: ExtKey(54, 1) = 80: ExtKey(54, 2) = 81: ExtKey(54, 3) = 82
+    ExtKey(55, 0) = 55: ExtKey(55, 1) = 83: ExtKey(55, 2) = 84: ExtKey(55, 3) = 85
+    ExtKey(56, 0) = 56: ExtKey(56, 1) = 86: ExtKey(56, 2) = 87: ExtKey(56, 3) = 88
+    ExtKey(57, 0) = 57: ExtKey(57, 1) = 89: ExtKey(57, 2) = 90: ExtKey(57, 3) = 196
+   '***********************************************
+   'Open & Check Com Buffers, Report & Fix errors
+   '
+   '  - check PIC, power on, etc..
+   '***********************************************
+    IF NOT OpenComPorts THEN
+     MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
+     DO
+     LOOP
+    END IF
+
+    IF NOT InitNetWork THEN
+     MSGBOX "SETUP ERROR",, "InitNetWork Failed."
+     DO
+       CALL DelayX(200)
+     LOOP UNTIL InitNetWork
+    END IF
+
     IsSplashActive = 1
     ShowSplashDlg(5000, "atcosplash.bmp", 1, "MCU 2015",1)
-
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
 

@@ -1,0 +1,22 @@
+PowerBASIC 6 Console Compiler
+Copyright (c) 1998-2011 PowerBasic Inc.
+Englewood, Florida USA
+All Rights Reserved
+
+Primary source:  C:\Users\crupib\Documents\GitHub\Atco\Comm.bas   {85 total lines}
+Target compilation:  Comm.EXE
+Compile time:  0.1 seconds, at 102000 lines/minute
+
+1184 bytes compiled code, 12664 bytes RTLibrary,
+220 bytes string literals, and 2892 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 18432 bytes   Memory image: 15776 bytes.
+
+Component Files:
+----------------
+C:\Users\crupib\Documents\GitHub\Atco\Comm.bas
+
+
+Code Extracted:
+---------------
+<NONE>

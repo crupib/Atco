@@ -1,7 +1,9 @@
 #COMPILE EXE
 #DIM ALL
 #CONSOLE OFF
-#INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
+#INCLUDE "C:\PBCC60\WinAPI\WIN32API.INC"
+MACRO CONST = MACRO
+CONST D10 = 150
 FUNCTION PBMAIN () AS LONG
   LOCAL underline&, NormalFont&
   LOCAL mystrings() AS STRING
@@ -28,6 +30,7 @@ FUNCTION PBMAIN () AS LONG
   mystrings$(1) = mystring
   mystrings$(2) = mystring1
   mystrings$(3) = mystring3
+  PRINT D10
   FONT NEW "myfont", 10, 4, 0, 1 TO underline&
   FONT NEW "myfont1",10 , 0, 0, 1 TO NormalFont&
   GRAPHIC SET FONT NormalFont&
@@ -97,7 +100,7 @@ FUNCTION PBMAIN () AS LONG
             IF Q=80 THEN
                rowpt = rowpt + 1
                rp = rp+GRAPHIC(CHR.SIZE.Y)
-               IF rowpt > LEN(numrows) THEN
+               IF rowpt > numrows THEN
                     rowpt = rowpt - 1
                     rp = rp-GRAPHIC(CHR.SIZE.Y)
                END IF

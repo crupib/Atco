@@ -11,6 +11,8 @@ GLOBAL ECODE AS INTEGER
 MACRO CONST = MACRO
 CONST TRUE = -1
 CONST FALSE = NOT TRUE
+CONST = &hff
+
 DECLARE FUNCTION OpenComPorts  AS INTEGER
 GLOBAL filenum AS INTEGER
 GLOBAL bytesread AS INTEGER
@@ -18,6 +20,7 @@ GLOBAL mystring AS STRING * 20
 %myid = 1
 GLOBAL  crap AS INTEGER
 GLOBAL shit AS INTEGER
+
 
 TYPE MYTYPE
   id AS INTEGER
@@ -58,6 +61,9 @@ FUNCTION PBMAIN () AS LONG
  crap = 32
  'SLEEP 5000
   'new keypad layout
+  widthvar  =   KeyStbOn
+
+  PRINT widthvar
   KeyTable(0) = ""
   KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
   KeyTable(2) = CHR$(0) + CHR$(75) 'LftArrow

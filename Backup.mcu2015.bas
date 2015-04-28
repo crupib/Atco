@@ -7,6 +7,15 @@ DEFINT A-Z
 #INCLUDE "AtcoSer.inc"
 '************************************************************************************
 '* Motor control Functions
+DECLARE FUNCTION IntToStr$ (x AS INTEGER)
+FUNCTION IntToStr$ (x AS INTEGER)
+
+   B = (x AND &HFF)
+   A = (((x AND &HFF00&) \ 256&) AND &HFF )
+
+   IntToStr = CHR$(B) + CHR$(A)
+
+END FUNCTION
 DECLARE FUNCTION CharsToInt (BYVAL A AS INTEGER, B AS INTEGER)
 FUNCTION CharsToInt (BYVAL A AS INTEGER, B AS INTEGER)
 'converts two bytes, (a=msb) to a signed integer
@@ -275,6 +284,8 @@ FUNCTION InitNetWork
   IF Glo.NumModules <> 5 THEN 'Failed
     InitNetWork = FALSE
     EXIT FUNCTION
+  ELSE
+      MSGBOX "Number of Modules  "+ STR$(Glo.NumModules)
   END IF
 
   'set status return for servos

@@ -265,7 +265,7 @@ END SUB
 DECLARE SUB SetGain (address AS INTEGER)
 SUB SetGain (address AS INTEGER)
 
-   LOCAL MtrNum AS INTEGER
+   LOCAL MtrNum, x AS INTEGER
    LOCAL Cmd AS STRING
    IF address < 1 THEN EXIT SUB
 
@@ -284,5 +284,25 @@ SUB SetGain (address AS INTEGER)
    Cmd$ = Cmd$ + IntToStr(Glo.EL(MtrNum)) + CHR$(Glo.SRD(MtrNum))
 
    SendCmd address, Cmd$
+
+END SUB
+DECLARE SUB EnableAmpl (Value AS INTEGER, address AS INTEGER)
+SUB EnableAmpl (Value AS INTEGER, address AS INTEGER)
+  LOCAL MtrNum AS INTEGER
+  LOCAL Cmd AS STRING
+  IF address < 1 THEN EXIT SUB
+
+
+  MtrNum = address
+
+  IF Value THEN
+     Cmd$ = CHR$(&H17) + CHR$(EnableAmp)
+     Glo.MiscMode(MtrNum) = Glo.MiscMode(MtrNum) OR AmpEnabled
+  ELSE
+     Cmd$ = CHR$(&H17) + CHR$(0)
+     Glo.MiscMode(MtrNum) = (Glo.MiscMode(MtrNum) AND (NOT AmpEnabled))
+  END IF
+
+  SendCmd address, Cmd$
 
 END SUB

@@ -275,6 +275,7 @@ TYPE GloRecord
  GLOBAL YAcel() AS LONG
  GLOBAL XSpd()  AS LONG
  GLOBAL YSpd()  AS LONG
+
 '****************************************************************************************************
 REM new RS232 PC compatible
 DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
@@ -585,6 +586,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 1, 1
            END IF
+
          CASE 2  'joystick
            CALL PrintChar(2, 1, ">")
            DO: XCode = GetSelectKey
@@ -604,6 +606,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 2, 1
            END IF
+
          CASE 3 ' Auto Jog
            CALL PrintChar(3, 1, ">")
            DO: XCode = GetSelectKey
@@ -623,6 +626,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 3, 1
            END IF
+
          CASE 4 ' Save Setup
            CALL PrintChar(4, 1, ">")
            DO: XCode = GetSelectKey
@@ -666,6 +670,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 1, 1
            END IF
+
          CASE 2  'XSPD Cntrol
            CALL PrintChar(2, 11, ">")
            DO: XCode = GetSelectKey
@@ -685,6 +690,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 2, 11
            END IF
+
          CASE 3 ' Manual Jog
            CALL PrintChar(3, 11, ">")
            DO: XCode = GetSelectKey
@@ -704,6 +710,7 @@ BaseMenu:
          GOSUB PrintMainMenu
          SetLcdPos 3, 11
            END IF
+
          CASE 4 ' Load setup
            CALL PrintChar(4, 11, ">")
            DO: XCode = GetSelectKey
@@ -1390,9 +1397,6 @@ FUNCTION CalLoad (FileNumber$)
      CalLoad = FALSE
      EXIT FUNCTION
    END IF
-
-   'read header label
-'   CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
    CALL DFRead(filenum, TempStr, 0, BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
@@ -1401,8 +1405,7 @@ FUNCTION CalLoad (FileNumber$)
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
-   CALL DFRead2(filenum, ScanStruc, LEN(SCANparm), BytesRead, ECode)
-   'CALL DFRead(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesRead&, ECode)
+   CALL DFRead2(filenum, ScanStruc, LEN(SCANparms), BytesRead, ECode)
    IF ECode THEN GOTO ExitCalLoad
 
 

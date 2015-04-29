@@ -6,6 +6,7 @@ DEFINT A-Z
 #INCLUDE "ATCO.inc"
 #INCLUDE "AtcoSer.inc"
 #INCLUDE "mywindows.inc"
+#INCLUDE "File.inc"
 FUNCTION PBMAIN () AS LONG
 '*******************************************************************************************************
 'MCU                                                                                                   *
@@ -35,6 +36,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  XSpd(0 TO 255)
     DIM  YSpd(0 TO 255)
     DIM  StartLPos(3) AS BYTE
+    DIM  CalSet AS INTEGER
   '****************************************************************************************************
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
@@ -91,6 +93,7 @@ FUNCTION PBMAIN () AS LONG
     IF NOT OpenComPorts THEN
      MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
      DO
+      EXIT FUNCTION
      LOOP
     END IF
 
@@ -100,6 +103,23 @@ FUNCTION PBMAIN () AS LONG
        CALL DelayX(200)
      LOOP UNTIL InitNetWork
     END IF
+    DIM GloErr AS INTEGER
+
+    CalSet = FALSE
+    IF NOT KeyDown THEN  'do not load if user has key pressed
+      IF CalLoad(ThumbDisk + "0.M2K") THEN
+       CalSet = TRUE
+      END IF
+    END IF
+
+  'if no cal on disk or corrupt then set defaults
+    IF NOT CalSet THEN
+      CALL SetDefaults
+    END IF
+    Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
+    CALL SetForAuto  'set velocity, etc. & motors on
+    CALL DelayX(2000)
+
 
     IsSplashActive = 1
     ShowSplashDlg(5000, "atcosplash.bmp", 1, "MCU 2015",1)

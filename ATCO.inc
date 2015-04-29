@@ -242,6 +242,10 @@ TYPE ScanParms
    AutoHoldSTR AS STRING * 10
   END TYPE
 GLOBAL SCANstruc AS scanparms
+
+TYPE HEADER
+   hdr AS STRING * 20
+END TYPE
 '****************************************************************************************************
 DECLARE SUB DelayX (Millisec) '
 SUB DelayX (Millisec) '
@@ -848,5 +852,197 @@ SUB FixSIOerror
 
   'flush the input buffer
   CALL FlushBuffers(PICPort$, 0, ECode%)
+
+END SUB
+DECLARE FUNCTION KeyDown ()
+FUNCTION KeyDown
+
+
+   IF GRAPHIC(INSTAT) THEN
+       KEYDOWN = -1
+   ELSE
+       KEYDOWN = 0
+   END IF
+
+END FUNCTION
+
+DECLARE FUNCTION CalLoad (FileNumber$)
+
+FUNCTION CalLoad (FileNumber$)
+   LOCAL TempStr AS HEADER
+   LOCAL ECode AS INTEGER
+   LOCAL BytesRead AS INTEGER
+   TempStr.hdr = HdrVer
+   CALL FOpen (filenum, 0,0, FileNumber$, ECode)
+   IF ECode THEN
+     CalLoad = FALSE
+     EXIT FUNCTION
+   END IF
+
+   'read header label
+'   CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
+   CALL DFRead(filenum, TempStr, 0, BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalLoad
+
+   'Verify correct header
+   IF HdrVer <> TempStr THEN
+     ECode = TRUE
+     GOTO ExitCalLoad
+   END IF
+   CALL DFRead2(filenum, ScanStruc, LEN(SCANparms), BytesRead, ECode)
+   'CALL DFRead(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesRead&, ECode)
+   IF ECode THEN GOTO ExitCalLoad
+
+
+ExitCalLoad:
+   HdrVer = TempStr 'in case of corrupt hdr read
+   CALL FClose(filenum)
+   IF ECode THEN
+     CalLoad = FALSE
+   ELSE
+     CalLoad = TRUE
+   END IF
+
+   EXIT FUNCTION
+
+
+END FUNCTION
+
+DECLARE SUB SetDefaults
+SUB SetDefaults
+  SCANstruc.YCtr = 14858 'cts per inch travel
+  SCANstruc.XCtr = 62047
+  SCANstruc.ACtr = 1000
+  GetXyPos  'load current encoder position
+  SCANstruc.XLow = 0: SCANstruc.XLowStr = QStr(SCANstruc.XLow, 10)
+  SCANstruc.XHigh = 96: SCANstruc.XHighStr = QStr(SCANstruc.XHigh, 10)
+  SCANstruc.YLow = 0: SCANstruc.YLowStr = QStr(SCANstruc.YLow, 10)
+  SCANstruc.YHigh = 12: SCANstruc.YHighStr = QStr(SCANstruc.YHigh, 10)
+  SCANstruc.XIndex = .25: SCANstruc.XIndexSTR = QStr(SCANstruc.XIndex, 10)
+  SCANstruc.YIndex = .125: SCANstruc.YIndexSTR = QStr(SCANstruc.YIndex, 10)
+  SCANstruc.IndexLow = FALSE: SCANstruc.IndexLowStr = "LOW - HIGH"
+  SCANstruc.XPlus = TRUE:  SCANstruc.XPlusSTR = "POSITIVE  "
+  SCANstruc.YPlus = FALSE: SCANstruc.YPlusSTR = "NEGATIVE  "
+  SCANstruc.XSpeed = 2: SCANstruc.XSpeedSTR = QStr(SCANstruc.XSpeed, 10)
+  SCANstruc.YSpeed = 16: SCANstruc.YSpeedSTR = QStr(SCANstruc.YSpeed, 10)
+  SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+  SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+  SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+  SCANstruc.XEnable = TRUE: SCANstruc.XEnableSTR = "ON        "
+  SCANstruc.YEnable = TRUE: SCANstruc.YEnableSTR = "ON        "
+  SCANstruc.XSpdDir = TRUE: SCANstruc.XSpdDirSTR = "FORWARD*"
+  SCANstruc.AutoHold = TRUE: SCANstruc.AutoHoldSTR = "ON "
+  SCANstruc.IndexY = FALSE: SCANstruc.IndexYSTR = "X         "
+  SCANstruc.OverLap = 1: SCANstruc.OverLapStr = "1         "
+  SCANstruc.DualRas = FALSE: SCANstruc.DualRasSTR = "OFF       "
+END SUB
+DECLARE SUB GetXyPos ()
+SUB GetXyPos
+
+    CALL GetStatus(&H255)   'get status of all servos (4)
+
+    SCANstruc.XCts = ABS(Glo.Position(Servo1))
+    SCANstruc.YCts = ABS(Glo.Position(Servo3))
+    SCANstruc.ACts = ABS(Glo.Position(Servo4))
+
+    SCANstruc.XPos = CLNG((SCANstruc.XCts / SCANstruc.XCtr) * 1000) / 1000
+    SCANstruc.YPos = CLNG((SCANstruc.YCts / SCANstruc.YCtr) * 1000) / 1000
+    SCANstruc.APos = CLNG((SCANstruc.ACts / SCANstruc.ACtr) * 1000) / 1000
+
+    SCANstruc.XPosStr = QStr(SCANstruc.XPos, 10)
+    SCANstruc.YPosStr = QStr(SCANstruc.YPos, 10)
+    SCANstruc.APosStr = QStr(SCANstruc.APos, 10)
+
+    CALL GetStatus(InOut1)   'get status of IO
+
+END SUB
+DECLARE FUNCTION QStr$ (BYVAL Amount!, BYVAL Places)
+FUNCTION QStr$ (BYVAL Amount!, BYVAL Places) STATIC
+
+    QStr$ = LEFT$(LTRIM$(STR$(Amount!)) + SPACE$(Places), Places)
+
+END FUNCTION
+DECLARE SUB GetStatus (Num)
+SUB GetStatus (Num)
+
+   LOCAL MtrNum AS INTEGER
+   LOCAL Cmd AS STRING
+   Cmd$ = CHR$(&HD)  'nop
+
+   IF Num = &H255 THEN  'load status all servos
+     FOR MtrNum = 1 TO LastServo
+       SendCmd MtrNum, Cmd$
+     NEXT
+   ELSE                       'load status of one servo or io
+     SendCmd Num, Cmd$
+   END IF
+
+END SUB
+
+DECLARE SUB SetForAuto ()
+SUB SetForAuto
+  LOCAL XVelocity, YVelocity, XCel, YCel AS LONG
+  LOCAL Xtime, YTime AS SINGLE
+  LOCAL Axis AS INTEGER
+  LOCAL Cmd AS STRING
+  IF SCANstruc.XSpeed = 0 THEN SCANstruc.XSpeed = 2
+  IF SCANstruc.YSpeed = 0 THEN SCANstruc.YSpeed = 1
+
+  'determine cts/millisec needed based on inches travel/sec
+  XVelocity& = SCANstruc.XSpeed * SCANstruc.XCtr * (1 / 1953) * 65536
+  YVelocity& = SCANstruc.YSpeed * SCANstruc.YCtr * (1 / 1953) * 65536
+
+  'set length of time in seconds to reach specified maximum velocity
+  XTime! = .1: YTime! = .1
+
+  'x & y acceleration, deceleration  calc's
+  XCel& = (SCANstruc.XSpeed / XTime!) * SCANstruc.XCtr * (1 / 1953) * (1 / 1953) * 65536
+  YCel& = (SCANstruc.YSpeed / YTime!) * SCANstruc.YCtr * (1 / 1953) * (1 / 1953) * 65536
+
+  Glo.CmdVelocity(Servo1) = XVelocity&
+  Glo.CmdVelocity(Servo2) = XVelocity&
+  Glo.CmdVelocity(Servo3) = YVelocity&
+  Glo.CmdAccel(Servo1) = XCel&
+  Glo.CmdAccel(Servo2) = XCel&
+  Glo.CmdAccel(Servo3) = YCel&
+
+  'set gains
+  FOR Axis = Servo1 TO Servo3
+    IF Axis = Servo3 THEN  'y-axis
+      Glo.Kp(Axis) = 200   '200
+      Glo.Ki(Axis) = 50    '100 '100   REM changed 4/29/08
+      Glo.Kd(Axis) = 2000  '4000
+      Glo.IL(Axis) = 0     '10  '20   REM changed 4/29/08
+    ELSE
+      Glo.Kp(Axis) = 300   '300
+      Glo.Ki(Axis) = 200     '200
+      Glo.Kd(Axis) = 8000  '8000
+      Glo.IL(Axis) = 40     '40
+    END IF
+    Glo.ol(Axis) = 255
+    Glo.CL(Axis) = 0
+    Glo.EL(Axis) = 16384
+    Glo.SRD(Axis) = 1
+    Cmd$ = CHR$(&HD6) + IntToStr(Glo.Kp(Axis)) + IntToStr(Glo.Kd(Axis))
+    Cmd$ = Cmd$ + IntToStr(Glo.Ki(Axis)) + IntToStr(Glo.IL(Axis))
+    Cmd$ = Cmd$ + CHR$(Glo.ol(Axis)) + CHR$(Glo.CL(Axis))
+    Cmd$ = Cmd$ + IntToStr(Glo.EL(Axis)) + CHR$(Glo.SRD(Axis))
+    SendCmd Axis, Cmd$
+  NEXT Axis
+
+  StopMtrs
+
+END SUB
+DECLARE SUB StopMtrs ()
+SUB StopMtrs
+  LOCAL Cmd AS STRING
+  LOCAL x AS INTEGER
+  Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
+
+  SendCmd AllServos, Cmd$
+
+  FOR x = 1 TO 3
+    Glo.CmdPwm(x) = 0
+  NEXT
 
 END SUB

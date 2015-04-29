@@ -37,6 +37,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  YSpd(0 TO 255)
     DIM  StartLPos(3) AS BYTE
     DIM  CalSet AS INTEGER
+    DIM lResult AS LONG
   '****************************************************************************************************
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
@@ -98,9 +99,12 @@ FUNCTION PBMAIN () AS LONG
     END IF
 
     IF NOT InitNetWork THEN
-     MSGBOX "SETUP ERROR",, "InitNetWork Failed."
+     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
      DO
        CALL DelayX(200)
+       IF lResult& = %IDCANCEL THEN
+           EXIT FUNCTION
+       END IF
      LOOP UNTIL InitNetWork
     END IF
     DIM GloErr AS INTEGER

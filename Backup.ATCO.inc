@@ -1036,6 +1036,7 @@ END SUB
 DECLARE SUB StopMtrs ()
 SUB StopMtrs
   LOCAL Cmd AS STRING
+  LOCAL x AS INTEGER
   Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
 
   SendCmd AllServos, Cmd$

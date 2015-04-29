@@ -796,10 +796,7 @@ SUB SendCmd (address AS WORD, CmdString AS STRING)
     Glo.SIOError = TRUE
     MSGBOX "Bad Check Sum"
     FixSIOerror
-    'CALL Delayx(500)
-    'CALL PrintClrStr(3, 1, " ")
     Glo.CkSumError = TRUE
-    'GloErr = GloErr + 1
   END IF
 
   EXIT SUB

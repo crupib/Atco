@@ -37,6 +37,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  YSpd(0 TO 255)
     DIM  StartLPos(3) AS BYTE
     DIM  CalSet AS INTEGER
+    DIM lResult AS LONG
   '****************************************************************************************************
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
@@ -98,7 +99,7 @@ FUNCTION PBMAIN () AS LONG
     END IF
 
     IF NOT InitNetWork THEN
-     MSGBOX "SETUP ERROR",, "InitNetWork Failed."
+     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
      DO
        CALL DelayX(200)
      LOOP UNTIL InitNetWork
@@ -114,7 +115,7 @@ FUNCTION PBMAIN () AS LONG
 
   'if no cal on disk or corrupt then set defaults
     IF NOT CalSet THEN
-      GOSUB SetDefaults
+      CALL SetDefaults
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on

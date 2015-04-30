@@ -48,8 +48,6 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
-
-
     StartLPos(0) = &H0
     StartLPos(1) = &H40
     StartLPos(2) = &H14
@@ -102,6 +100,9 @@ FUNCTION PBMAIN () AS LONG
      lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
      DO
        CALL DelayX(200)
+       IF lResult& = %IDCANCEL THEN
+           EXIT FUNCTION
+       END IF
      LOOP UNTIL InitNetWork
     END IF
     DIM GloErr AS INTEGER

@@ -1694,7 +1694,7 @@ SUB GetScanCal
     CALL PrintClrStr(1, 1, " X START: " + SCANstruc.XLowStr)
     CALL PrintClrStr(2, 1, "   X END: " + SCANstruc.XHighStr)
     CALL PrintClrStr(3, 1, " Y START: " + SCANstruc.YLowStr)
-    CALL PrintClrStr(4, 1, "   Y END: " + SCANstruc.YHighStr)
+    CALL PrintClrStr(4, 1, "   Y END: " + SCANstruc.YLowStr)
     IF LastKey = KeyUP THEN
       SetLcdPos 4, 1
     ELSE  'LastKey = UP

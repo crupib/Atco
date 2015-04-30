@@ -48,8 +48,6 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
-
-
     StartLPos(0) = &H0
     StartLPos(1) = &H40
     StartLPos(2) = &H14
@@ -122,6 +120,7 @@ FUNCTION PBMAIN () AS LONG
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on
+
     CALL DelayX(2000)
 
 

@@ -1,3 +1,75 @@
+%IDC_GRAPHIC1 = 110
+%IDC_EDITBOX1 = 111
+%IDC_LABEL1 = 1112
+%IDC_LABEL2 = 1113
+%IDC_LABEL3 = 1114
+%IDC_LABEL4 = 1115
+%IDC_LABEL5 = 1116
+%IDC_LABEL6 = 1117
+%IDC_LABEL7 = 1118
+%IDC_LABEL8 = 1119
+%IDC_LABEL9 = 1110
+%IDC_LABEL10 = 1101
+%IDC_LABEL11 = 1102
+%IDC_LABEL12 = 1103
+%IDC_LABEL13 = 1104
+%IDC_LABEL14 = 1105
+%IDC_LABEL15 = 1106
+%IDC_LABEL20 = 4000
+%IDC_LABEL21 = 4001
+%IDC_LABEL22 = 4002
+%IDC_LABEL23 = 4003
+%IDC_LABEL24 = 4004
+%IDC_LABEL25 = 4005
+%IDC_LABEL26 = 4006
+%IDC_LABEL27 = 4007
+%IDC_EDITBOX2 = 113
+%IDC_EDITBOX3 = 114
+%IDC_EDITBOX4 = 115
+%IDC_EDITBOX5 = 116
+%IDC_EDITBOX6 = 117
+%IDC_EDITBOX7 = 118
+%IDC_EDITBOX8 = 119
+%IDC_EDITBOX9 = 120
+%IDC_EDITBOX10 = 121
+%IDC_EDITBOX11 = 122
+%IDC_EDITBOX12 = 123
+%IDC_EDITBOX13 = 124
+%IDC_EDITBOX14 = 125
+%IDC_EDITBOX15 = 126
+%IDC_EDITBOX20 = 3000
+%IDC_EDITBOX21 = 3001
+%IDC_EDITBOX22 = 3002
+%IDC_EDITBOX23 = 3003
+%IDC_EDITBOX24 = 3004
+%IDC_EDITBOX25 = 3005
+%IDC_EDITBOX26 = 3006
+%IDC_EDITBOX27 = 3007
+%IDC_TextBox   = 123
+%IDC_UpDown = 124
+%IDC_LABSPIN = 125
+%OPT1 = 1001
+%OPT2 = 1002
+%OPT3 = 1003
+%OPT4 = 1004
+%OPT5 = 1005
+%OPT6 = 1006
+%OPT7 = 1007
+%OPT8 = 1008
+%OPT9 = 1009
+%SETUP_BUTTON = 2000
+%JOYSTICK_BUTTON = 2010
+%AJOG = 2020
+%SAVE = 2030
+%AUTOSCAN = 2040
+%XSPDCTRL = 2050
+%MJOG = 2060
+%LOAD = 2070
+%CALIBRATEENC = 2080
+
+
+GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
+GLOBAL IsSplashActive AS LONG
 '***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
@@ -97,82 +169,82 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     CONTROL SET FONT hDlg1, %CALIBRATEENC, NormalFont&
 
     TXT$ = "X Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX1, "", 100, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX1, SCANstruc.XLowStr, 100, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL1, TXT$,    10, 10, 50, 20
 
     TXT$ = "X End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX2, "", 100, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX2, SCANstruc.XHighStr, 100, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL2, TXT$, 10,    40, 50, 20
 
     TXT$ = "Y Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX3 , "", 100, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX3 , SCANstruc.YLowStr, 100, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL3, TXT$, 10,     70, 50, 20
 
     TXT$ = "Y End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX4 , "", 100, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX4 , SCANstruc.YLowStr, 100, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL4, TXT$, 10,     100, 50, 20
 
     TXT$ = "X Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX5 , "", 100, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX5 , SCANstruc.XIndexSTR, 100, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL5, TXT$, 10,     130, 50, 20
 
     TXT$ = "Y Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX6 , "", 100, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX6 , SCANstruc.YIndexSTR, 100, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL6, TXT$, 10,     160, 50, 20
 
     TXT$ = "X Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX7 , "", 100, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX7 , SCANstruc.XSpeedSTR, 100, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL7, TXT$, 10,     190, 50, 20
 
     TXT$ = "Y Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX8 , "", 100, 220, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX8 , SCANstruc.YSpeedSTR, 100, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL8, TXT$, 10,     220, 50, 20
 
     TXT$ = "X POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX9, "", 410, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX9, SCANstruc.XPosStr, 410, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL9, TXT$,    300, 10, 50, 20
 
     TXT$ = "Y POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX10, "", 410, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX10, SCANstruc.YPosStr, 410, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL10, TXT$, 300,    40, 50, 20
 
     TXT$ = "X CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX11 , "", 410, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX11 , SCANstruc.XCtrStr, 410, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL11, TXT$, 300,     70, 50, 20
 
     TXT$ = "Y CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX12 , "", 410, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX12 , SCANstruc.YCtrStr, 410, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL12, TXT$, 300,     100, 50, 20
 
     TXT$ = "X +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX12 , "", 410, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX12 , SCANstruc.XPlusSTR, 410, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL5, TXT$, 300,     130, 50, 20
 
     TXT$ = "Y +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX13 , "", 410, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX13 , SCANstruc.YPlusSTR, 410, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL13, TXT$, 300,     160, 50, 20
 
     TXT$ = "INDEX"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX14 , "", 410, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX14 , SCANstruc.IndexYSTR, 410, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL14, TXT$, 300,     190, 50, 20
 
     TXT$ = "IDX H/L"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX15 , "", 410, 220, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX15 , SCANstruc.IndexLowStr, 410, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL15, TXT$, 300,     220, 50, 20
 
@@ -215,61 +287,10 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
 
 CALLBACK FUNCTION EditControlCallback()
     LOCAL TXT AS STRING
-    LOCAL lResult AS LONG
-    CONTROL GET CHECK hDlg, %OPT1 TO lResult&
-    IF  lResult <> 0 THEN
         CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
         CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-    '    central_angle = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT2 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-        'radius = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-     '   Chord_ab = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT3 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-      '  Ed = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT4 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-    '    radius = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-     '   OE = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT5 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-     '   radius = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-     '   Arc_ab = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT6 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-     '   Chord_AB = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-     '   ED = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT7 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-     '   Chord_AB = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-     '   OE = VAL(TXT$)
-    END IF
-    CONTROL GET CHECK hDlg, %OPT8 TO lResult&
-    IF  lResult <> 0 THEN
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-   '     ED = VAL(TXT$)
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-  '      OE = VAL(TXT$)
-    END IF
+
+
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG

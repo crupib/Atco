@@ -302,6 +302,16 @@ CALLBACK FUNCTION EditControlCallback()
            SCANstruc.YLow = ABS(VAL(TXT$))
            SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
     END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX4 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.YHigh = ABS(VAL(TXT$))
+           SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX5 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.XIndex = ABS(VAL(TXT$))
+           SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+    END IF
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG

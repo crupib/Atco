@@ -287,10 +287,31 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
 
 CALLBACK FUNCTION EditControlCallback()
     LOCAL TXT AS STRING
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-
-
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+    IF GoodSNG(TXT$) THEN
+       SCANstruc.XLow = ABS(VAL(TXT$))
+       SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+    IF GoodSNG(TXT$) THEN
+       SCANstruc.XHigh = ABS(VAL(TXT$))
+       SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX3 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.YLow = ABS(VAL(TXT$))
+           SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX4 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.YHigh = ABS(VAL(TXT$))
+           SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX5 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.XIndex = ABS(VAL(TXT$))
+           SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+    END IF
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG

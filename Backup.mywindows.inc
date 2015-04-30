@@ -249,37 +249,37 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL15, TXT$, 300,     220, 50, 20
 
     TXT$ = "X ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX20, "", 730, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX20, SCANstruc.XEnableSTR, 730, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL20, TXT$,    600, 10, 60, 20
 
     TXT$ = "Y ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX21, "", 730, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX21, SCANstruc.YEnableSTR, 730, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL21, TXT$, 600,    40, 60, 20
 
     TXT$ = "AUTO HD"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX22 , "", 730, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX22 , SCANstruc.AutoHoldSTR, 730, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL22, TXT$, 600,     70, 60, 20
 
     TXT$ = "DUALRAS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX23 , "", 730, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX23 ,SCANstruc.DualRasSTR, 730, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL23, TXT$, 600,     100, 60, 20
 
     TXT$ = "OVERLAP"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX24 , "", 730, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX24 , SCANstruc.OverLapStr, 730, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL24, TXT$, 600,     130, 60, 20
 
     TXT$ = "A POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX25 , "", 730, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX25 , SCANstruc.APosStr, 730, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL13, TXT$, 600,     160, 60, 20
 
     TXT$ = "A CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX25, "", 730, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX25, SCANstruc.ACtrStr, 730, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL25, TXT$, 600,     190, 60, 20
 
@@ -287,10 +287,21 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
 
 CALLBACK FUNCTION EditControlCallback()
     LOCAL TXT AS STRING
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-        CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-
-
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
+    IF GoodSNG(TXT$) THEN
+       SCANstruc.XLow = ABS(VAL(TXT$))
+       SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
+    IF GoodSNG(TXT$) THEN
+       SCANstruc.XHigh = ABS(VAL(TXT$))
+       SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+    END IF
+    CONTROL GET TEXT hDlg, %IDC_EDITBOX3 TO TXT$
+    IF GoodSNG(TXT$) THEN
+           SCANstruc.YLow = ABS(VAL(TXT$))
+           SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+    END IF
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG

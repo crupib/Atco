@@ -1043,3 +1043,54 @@ SUB StopMtrs
   NEXT
 
 END SUB
+
+DECLARE FUNCTION GoodLNG (Num$)
+FUNCTION GoodLNG (Num$)
+
+  IF VAL(Num$) > 2147483647 THEN
+    GoodLNG = FALSE
+    EXIT FUNCTION
+  ELSEIF VAL(Num$) < -2147483648# THEN
+    GoodLNG = FALSE
+    EXIT FUNCTION
+  ELSE
+    GoodLNG = TRUE
+    EXIT FUNCTION
+  END IF
+END FUNCTION
+
+DECLARE FUNCTION GoodSNG (Num$)
+FUNCTION GoodSNG (Num$)
+
+  IF VAL(Num$) < -3.402823E+38 THEN
+    GoodSNG = FALSE
+    EXIT FUNCTION
+  ELSEIF VAL(Num$) > 3.402823E+38 THEN
+    GoodSNG = FALSE
+    EXIT FUNCTION
+  ELSE
+    GoodSNG = TRUE
+    EXIT FUNCTION
+  END IF
+END FUNCTION
+DECLARE SUB ResetPosition (address AS INTEGER)
+SUB ResetPosition (address AS INTEGER)
+ LOCAL Cmd AS STRING
+ IF address < 1 THEN EXIT SUB
+
+ Cmd$ = CHR$(&H0)
+
+ SendCmd address, Cmd$
+
+END SUB
+DECLARE FUNCTION GetXCord& (Cts&)
+FUNCTION GetXCord& (Cts&)
+  IF SCANstruc.XPlus = TRUE THEN 'X positive direction
+    GetXCord& = Cts&
+  ELSE
+    GetXCord& = -Cts&   'X negative direction
+  END IF
+
+  EXIT FUNCTION
+
+END FUNCTION

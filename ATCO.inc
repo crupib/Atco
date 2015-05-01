@@ -1073,3 +1073,36 @@ FUNCTION GoodSNG (Num$)
     EXIT FUNCTION
   END IF
 END FUNCTION
+DECLARE SUB ResetPosition (address AS INTEGER)
+SUB ResetPosition (address AS INTEGER)
+ LOCAL Cmd AS STRING
+ IF address < 1 THEN EXIT SUB
+
+ Cmd$ = CHR$(&H0)
+
+ SendCmd address, Cmd$
+
+END SUB
+DECLARE FUNCTION GetXCord& (Cts&)
+FUNCTION GetXCord& (Cts&)
+  IF SCANstruc.XPlus = TRUE THEN 'X positive direction
+    GetXCord& = Cts&
+  ELSE
+    GetXCord& = -Cts&   'X negative direction
+  END IF
+
+  EXIT FUNCTION
+
+END FUNCTION
+DECLARE FUNCTION GetYCord& (Cts&)
+FUNCTION GetYCord& (Cts&)
+
+  IF SCANstruc.YPlus = TRUE THEN 'Y positive cts
+    GetYCord& = Cts&
+  ELSE
+    GetYCord& = -Cts&  'Y negative cts
+  END IF
+
+  EXIT FUNCTION
+
+END FUNCTION

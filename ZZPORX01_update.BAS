@@ -959,6 +959,7 @@ ScanMenu:
            CALL KEdit(Temp$, XCode)  'get input
            CursorOFF
            IF XCode = KeyEnter THEN
+'wlc
          IF GoodSNG(Temp$) THEN
            SCANstruc.YPos = VAL(Temp$)
            SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)

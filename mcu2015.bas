@@ -89,22 +89,22 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
-    IF NOT OpenComPorts THEN
-     MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
-     DO
-      EXIT FUNCTION
-     LOOP
-    END IF
+ '   IF NOT OpenComPorts THEN
+ '    MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
+ '    DO
+ '     EXIT FUNCTION
+ '    LOOP
+ '   END IF
 
-    IF NOT InitNetWork THEN
-     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
-     DO
-       CALL DelayX(200)
-       IF lResult& = %IDCANCEL THEN
-           EXIT FUNCTION
-       END IF
-     LOOP UNTIL InitNetWork
-    END IF
+ '   IF NOT InitNetWork THEN
+ '    lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
+ '    DO
+ '      CALL DelayX(200)
+ '      IF lResult& = %IDCANCEL THEN
+ '          EXIT FUNCTION
+ '      END IF
+ '    LOOP UNTIL InitNetWork
+ '   END IF
     DIM GloErr AS INTEGER
 
     CalSet = FALSE
@@ -125,7 +125,7 @@ FUNCTION PBMAIN () AS LONG
 
 
     IsSplashActive = 1
-    ShowSplashDlg(5000, "atcosplash.bmp", 1, "MCU 2015",1)
+    ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
 

@@ -1,5 +1,4 @@
-%IDC_GRAPHIC1 = 110
-%IDC_EDITBOX1 = 111
+
 %IDC_LABEL1 = 1112
 %IDC_LABEL2 = 1113
 %IDC_LABEL3 = 1114
@@ -23,31 +22,34 @@
 %IDC_LABEL21 = 4005
 %IDC_LABEL22 = 4006
 %IDC_LABEL23 = 4007
-%IDC_EDITBOX2 = 113
-%IDC_EDITBOX3 = 114
-%IDC_EDITBOX4 = 115
-%IDC_EDITBOX5 = 116
-%IDC_EDITBOX6 = 117
-%IDC_EDITBOX7 = 118
-%IDC_EDITBOX8 = 119
-%IDC_EDITBOX9 = 120
-%IDC_EDITBOX10 = 121
-%IDC_EDITBOX11 = 122
-%IDC_EDITBOX12 = 123
-%IDC_EDITBOX13 = 124
-%IDC_EDITBOX14 = 125
-%IDC_EDITBOX15 = 126
-%IDC_EDITBOX16 = 3000
-%IDC_EDITBOX17 = 3001
-%IDC_EDITBOX18 = 3002
-%IDC_EDITBOX19 = 3003
-%IDC_EDITBOX20 = 3004
-%IDC_EDITBOX21 = 3005
-%IDC_EDITBOX22 = 3006
-%IDC_EDITBOX23 = 3007
+
+%IDC_EB_XSTART = 111
+%IDC_EB_XEND = 113
+%IDC_EB_YSTART = 114
+%IDC_EB_YEND = 115
+%IDC_EB_XINDEX = 116
+%IDC_EB_YINDEX = 117
+%IDC_EB_XSPEED = 118
+%IDC_EB_YSPEED = 119
+%IDC_EB_XPOS = 120
+%IDC_EB_YPOS = 121
+%IDC_EB_XCTIN = 122
+%IDC_EB_YCTIN = 123
+%IDC_EB_XPLUSMIN = 124
+%IDC_EB_YPLUSMIN = 125
+%IDC_EB_INDEX = 126
+%IDC_EB_IDXHL = 3000
+%IDC_EB_XONOFF = 3001
+%IDC_EB_YONOFF = 3002
+%IDC_EB_AUTOHD = 3003
+%IDC_EB_DUALRAS = 3004
+%IDC_EB_OVERLAP = 3005
+%IDC_EB_APOS = 3006
+%IDC_EB_ACTIN = 3007
 %IDC_TextBox   = 123
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
+
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003
@@ -57,6 +59,7 @@
 %OPT7 = 1007
 %OPT8 = 1008
 %OPT9 = 1009
+
 %SETUP_BUTTON = 2000
 %JOYSTICK_BUTTON = 2010
 %AJOG = 2020
@@ -169,117 +172,117 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     CONTROL SET FONT hDlg1, %CALIBRATEENC, NormalFont&
 
     TXT$ = "X Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX1, SCANstruc.XLowStr, 100, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSTART, SCANstruc.XLowStr, 100, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL1, TXT$,    10, 10, 50, 20
 
     TXT$ = "X End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX2, SCANstruc.XHighStr, 100, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XEND, SCANstruc.XHighStr, 100, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL2, TXT$, 10,    40, 50, 20
 
     TXT$ = "Y Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX3 , SCANstruc.YLowStr, 100, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSTART , SCANstruc.YLowStr, 100, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL3, TXT$, 10,     70, 50, 20
 
     TXT$ = "Y End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX4 , SCANstruc.YLowStr, 100, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YEND , SCANstruc.YLowStr, 100, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL4, TXT$, 10,     100, 50, 20
 
     TXT$ = "X Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX5 , SCANstruc.XIndexSTR, 100, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XINDEX , SCANstruc.XIndexSTR, 100, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL5, TXT$, 10,     130, 50, 20
 
     TXT$ = "Y Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX6 , SCANstruc.YIndexSTR, 100, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YINDEX , SCANstruc.YIndexSTR, 100, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL6, TXT$, 10,     160, 50, 20
 
     TXT$ = "X Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX7 , SCANstruc.XSpeedSTR, 100, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSPEED , SCANstruc.XSpeedSTR, 100, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL7, TXT$, 10,     190, 50, 20
 
     TXT$ = "Y Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX8 , SCANstruc.YSpeedSTR, 100, 220, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSPEED , SCANstruc.YSpeedSTR, 100, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL8, TXT$, 10,     220, 50, 20
 
     TXT$ = "X POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX9, SCANstruc.XPosStr, 410, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPOS, SCANstruc.XPosStr, 410, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL9, TXT$,    300, 10, 50, 20
 
     TXT$ = "Y POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX10, SCANstruc.YPosStr, 410, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPOS, SCANstruc.YPosStr, 410, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL10, TXT$, 300,    40, 50, 20
 
     TXT$ = "X CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX11 , SCANstruc.XCtrStr, 410, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XCTIN , SCANstruc.XCtrStr, 410, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL11, TXT$, 300,     70, 50, 20
 
     TXT$ = "Y CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX12 , SCANstruc.YCtrStr, 410, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YCTIN , SCANstruc.YCtrStr, 410, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL12, TXT$, 300,     100, 50, 20
 
     TXT$ = "X +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX13 , SCANstruc.XPlusSTR, 410, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPLUSMIN , SCANstruc.XPlusSTR, 410, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL13, TXT$, 300,     130, 50, 20
 
     TXT$ = "Y +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX14 , SCANstruc.YPlusSTR, 410, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPLUSMIN , SCANstruc.YPlusSTR, 410, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL14, TXT$, 300,     160, 50, 20
 
     TXT$ = "INDEX"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX15 , SCANstruc.IndexYSTR, 410, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_INDEX , SCANstruc.IndexYSTR, 410, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL15, TXT$, 300,     190, 50, 20
 
     TXT$ = "IDX H/L"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX16, SCANstruc.IndexLowStr, 410, 220, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_IDXHL, SCANstruc.IndexLowStr, 410, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL16, TXT$, 300,     220, 50, 20
 
     TXT$ = "X ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX17, SCANstruc.XEnableSTR, 730, 10, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XONOFF, SCANstruc.XEnableSTR, 730, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL17, TXT$,    600, 10, 60, 20
 
     TXT$ = "Y ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX18, SCANstruc.YEnableSTR, 730, 40, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YONOFF, SCANstruc.YEnableSTR, 730, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL18, TXT$, 600,    40, 60, 20
 
     TXT$ = "AUTO HD"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX19 , SCANstruc.AutoHoldSTR, 730, 70, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_AUTOHD , SCANstruc.AutoHoldSTR, 730, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL19, TXT$, 600,     70, 60, 20
 
     TXT$ = "DUALRAS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX20 ,SCANstruc.DualRasSTR, 730, 100, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_DUALRAS ,SCANstruc.DualRasSTR, 730, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL20, TXT$, 600,     100, 60, 20
 
     TXT$ = "OVERLAP"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX21 , SCANstruc.OverLapStr, 730, 130, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_OVERLAP , SCANstruc.OverLapStr, 730, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL21, TXT$, 600,     130, 60, 20
 
     TXT$ = "A POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX22 , SCANstruc.APosStr, 730, 160, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_APOS , SCANstruc.APosStr, 730, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL22, TXT$, 600,     160, 60, 20
 
     TXT$ = "A CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EDITBOX23, SCANstruc.ACtrStr, 730, 190, 80, 20, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_ACTIN, SCANstruc.ACtrStr, 730, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL23, TXT$, 600,     190, 60, 20
 
@@ -287,62 +290,100 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
 
 CALLBACK FUNCTION EditControlCallback()
     LOCAL TXT AS STRING
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX1 TO TXT$
-    IF GoodSNG(TXT$) THEN
-       SCANstruc.XLow = ABS(VAL(TXT$))
-       SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX2 TO TXT$
-    IF GoodSNG(TXT$) THEN
-       SCANstruc.XHigh = ABS(VAL(TXT$))
-       SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX3 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YLow = ABS(VAL(TXT$))
-           SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX4 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YHigh = ABS(VAL(TXT$))
-           SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX5 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XIndex = ABS(VAL(TXT$))
-           SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX6 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YIndex = ABS(VAL(TXT$))
-           SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX7 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XSpeed = ABS(VAL(TXT$))
-           SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX8 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YSpeed = ABS(VAL(TXT$))
-           SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX9 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XPos = ABS(VAL(TXT$))
-           SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
-           SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
-           CALL ResetPosition(Servo1)
-           CALL ResetPosition(Servo2)
-    END IF
-    CONTROL GET TEXT hDlg, %IDC_EDITBOX10 TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YPos = VAL(TXT$)
-           SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
-           SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
-           CALL ResetPosition(Servo3)
-    END IF
+    LOCAL InkeyVar AS STRING
+    IF CB.CTLMSG = %EN_CHANGE THEN
+       SELECT CASE CB.CTL
+    'X START
+            CASE %IDC_EB_XSTART
+                CONTROL GET TEXT hDlg, %IDC_EB_XSTART TO TXT$
+                IF GoodSNG(TXT$) THEN
+                  SCANstruc.XLow = ABS(VAL(TXT$))
+                  SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+                END IF
+    'X END
+            CASE %IDC_EB_XEND
+                CONTROL GET TEXT hDlg, %IDC_EB_XEND TO TXT$
+                IF GoodSNG(TXT$) THEN
+                   SCANstruc.XHigh = ABS(VAL(TXT$))
+                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+                END IF
+    'Y START
+            CASE %IDC_EB_YSTART
+                CONTROL GET TEXT hDlg, %IDC_EB_YSTART TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
 
+    'Y END
+           CASE %IDC_EB_YEND
+                CONTROL GET TEXT hDlg, %IDC_EB_YEND TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YHigh = ABS(VAL(TXT$))
+                       SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+                END IF
+                'X INDEX
+           CASE %IDC_EB_XINDEX
+                CONTROL GET TEXT hDlg, %IDC_EB_XINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XIndex = ABS(VAL(TXT$))
+                       SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+                END IF
+    'Y INDEX
+           CASE %IDC_EB_YINDEX
+                CONTROL GET TEXT hDlg, %IDC_EB_YINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YIndex = ABS(VAL(TXT$))
+                       SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
+                END IF
+    'X SPEED
+            CASE %IDC_EB_XSPEED
+                CONTROL GET TEXT hDlg, %IDC_EB_XSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XSpeed = ABS(VAL(TXT$))
+                       SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
+                END IF
+    'Y SPEED
+            CASE %IDC_EB_YSPEED
+                CONTROL GET TEXT hDlg, %IDC_EB_YSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YSpeed = ABS(VAL(TXT$))
+                       SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
+                END IF
+    'X POS
+            CASE %IDC_EB_XPOS
+                CONTROL GET TEXT hDlg, %IDC_EB_XPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XPos = ABS(VAL(TXT$))
+                       SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+                       SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+                       CALL ResetPosition(Servo1)
+                       CALL ResetPosition(Servo2)
+                END IF
+    'Y POS
+            CASE %IDC_EB_YPOS
+                CONTROL GET TEXT hDlg, %IDC_EB_YPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YPos = VAL(TXT$)
+                       SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+                       SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
+                       CALL ResetPosition(Servo3)
+                END IF
+    'X CT/IN
+            CASE %IDC_EB_XCTIN
+                CONTROL GET TEXT hDlg, %IDC_EB_XCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                       SCANstruc.XCtr = ABS(VAL(TXT$))
+                       SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
+                     END IF
+                'Y CT/IN
+                CONTROL GET TEXT hDlg, %IDC_EB_YCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                     SCANstruc.YCtr = ABS(VAL(TXT$))
+                     SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
+                END IF
+       END SELECT
+ END IF
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG
@@ -425,7 +466,7 @@ SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, BYVAL isfilea
     IsSplashActive = 1
 
     ' Default delay...
-    IF nDelay = 0 THEN nDelay = 2500
+    IF nDelay = 0 THEN nDelay = 1500
 
     IF isfilea THEN
        hBmp = LoadImage(0, BYCOPY sBitmapID, %IMAGE_BITMAP, 0, 0, %LR_LOADFROMFILE)

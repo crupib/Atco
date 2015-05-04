@@ -589,8 +589,8 @@ FUNCTION InitNetWork
   IF Glo.NumModules <> 5 THEN 'Failed
     InitNetWork = FALSE
     EXIT FUNCTION
-  ELSE
-      MSGBOX "Number of Modules  "+ STR$(Glo.NumModules)
+'  ELSE
+'      MSGBOX "Number of Modules  "+ STR$(Glo.NumModules)
   END IF
 
   'set status return for servos

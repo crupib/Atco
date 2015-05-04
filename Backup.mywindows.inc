@@ -70,7 +70,7 @@
 %LOAD = 2070
 %CALIBRATEENC = 2080
 
-
+GLOBAL ghMsgHook   AS DWORD
 GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
 '***************************************************************************************************************************************
@@ -79,17 +79,27 @@ DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           OPTIONAL BYVAL nModeless AS LONG)
 
 CALLBACK FUNCTION BTN_SETUP_CALL()
-    DIALOG END hDlg
+    LOCAL  x      AS LONG
+   'DIALOG END hDlg
     BUILDSETUPWINDOW()
-    DIALOG SHOW MODAL hDlg1, CALL DlgProc
-    BUILDWINDOW()
-    DIALOG SHOW MODAL hDlg, CALL DlgProc
+    DIALOG SHOW MODELESS hDlg1, CALL DlgProcSetup
+    DIALOG ENABLE hDlg1
+
+    DO
+          ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg1 TO x, x
+          DIALOG DOEVENTS  0
+    LOOP WHILE x&
+    DIALOG SHOW STATE hDlg, %SW_SHOWNORMAL
 END FUNCTION
+
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
 CALLBACK FUNCTION BTN_AJOG_CALL()
     MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
+    CALL SetForAuto
+    JogAuto
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
     MSGBOX "SAVE, hit OK to continue",, "Title of subroutine 123"
@@ -120,15 +130,15 @@ FUNCTION BUILDWINDOW() AS LONG
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
 
-    CONTROL ADD BUTTON, hDlg, %SETUP_BUTTON, "Setup", 100, 100, 200, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg, %SETUP_BUTTON, "Set&up", 100, 100, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_SETUP_CALL()
     CONTROL SET FONT hDlg, %SETUP_BUTTON, NormalFont&
 
-    CONTROL ADD BUTTON, hDlg, %JOYSTICK_BUTTON, "Joy Stick", 100, 200, 200, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg, %JOYSTICK_BUTTON, "&Joy Stick", 100, 200, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_JOYSTICK_CALL()
     CONTROL SET FONT hDlg, %JOYSTICK_BUTTON, NormalFont&
 
-    CONTROL ADD BUTTON, hDlg,%AJOG, "A-Jog", 100, 300, 200, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg,%AJOG, "A-Jo&g", 100, 300, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_AJOG_CALL()
     CONTROL SET FONT hDlg, %AJOG, NormalFont&
 
@@ -145,14 +155,13 @@ FUNCTION BUILDWINDOW() AS LONG
     CALL BTN_XSPDCTRL_CALL()
     CONTROL SET FONT hDlg, %XSPDCTRL, NormalFont&
 
-    CONTROL ADD BUTTON, hDlg,%MJOG, "M-Jog", 600, 300, 200, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg,%MJOG, "&M-Jog", 600, 300, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_MJOG_CALL()
     CONTROL SET FONT hDlg, %MJOG, NormalFont&
 
-    CONTROL ADD BUTTON, hDlg,%LOAD, "Load", 600, 400, 200, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg,%LOAD, "&Load", 600, 400, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_LOAD_CALL()
     CONTROL SET FONT hDlg, %LOAD, NormalFont&
-
 
  END FUNCTION
 FUNCTION BUILDSETUPWINDOW() AS LONG
@@ -162,7 +171,9 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     exeICON = "exeICON"
     LOCAL NormalFont&
     DESKTOP GET SIZE TO w, h
-    DIALOG NEW PIXELS, 0, "MCU 2015 Setup",,, w/2, h/2,%WS_OVERLAPPEDWINDOW  , 0 TO hDlg1
+   ' DIALOG NEW PIXELS, 0, "MCU 2015 Setup",,, w/2, h/2,%WS_OVERLAPPEDWINDOW  , 0 TO hDlg1
+    DIALOG NEW hdlg, " MCU 2015 Setup", 0, 0, w/2, h/2, %WS_OVERLAPPEDWINDOW, TO hDlg1
+    DIALOG SET USER hDlg1, 1, hdlg
     DIALOG SET ICON hDlg1, exeICON$   '
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
@@ -295,118 +306,109 @@ CALLBACK FUNCTION EditControlCallback()
        SELECT CASE CB.CTL
     'X START
             CASE %IDC_EB_XSTART
-                CONTROL GET TEXT hDlg, %IDC_EB_XSTART TO TXT$
+                CONTROL GET TEXT hDlg1, %IDC_EB_XSTART TO TXT$
                 IF GoodSNG(TXT$) THEN
                   SCANstruc.XLow = ABS(VAL(TXT$))
                   SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
                 END IF
     'X END
             CASE %IDC_EB_XEND
-                CONTROL GET TEXT hDlg, %IDC_EB_XEND TO TXT$
+                CONTROL GET TEXT hDlg1, %IDC_EB_XEND TO TXT$
                 IF GoodSNG(TXT$) THEN
                    SCANstruc.XHigh = ABS(VAL(TXT$))
                    SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
                 END IF
     'Y START
             CASE %IDC_EB_YSTART
-                CONTROL GET TEXT hDlg, %IDC_EB_YSTART TO TXT$
+                CONTROL GET TEXT hDlg1, %IDC_EB_YSTART TO TXT$
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.YLow = ABS(VAL(TXT$))
                        SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
                 END IF
-    END SELECT
+
     'Y END
-    IF CB.CTL = %IDC_EB_YEND AND CB.CTLMSG = %EN_CHANGE THEN
-    CONTROL GET TEXT hDlg, %IDC_EB_YEND TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YHigh = ABS(VAL(TXT$))
-           SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
-    END IF
-    END IF
-    'X INDEX
-    IF CB.CTL = %IDC_EB_XINDEX AND CB.CTLMSG = %EN_CHANGE THEN
-    CONTROL GET TEXT hDlg, %IDC_EB_XINDEX TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XIndex = ABS(VAL(TXT$))
-           SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
-    END IF
-    END IF
+           CASE %IDC_EB_YEND
+                CONTROL GET TEXT hDlg1, %IDC_EB_YEND TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YHigh = ABS(VAL(TXT$))
+                       SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+                END IF
+                'X INDEX
+           CASE %IDC_EB_XINDEX
+                CONTROL GET TEXT hDlg1, %IDC_EB_XINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XIndex = ABS(VAL(TXT$))
+                       SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+                END IF
     'Y INDEX
-    IF CB.CTL = %IDC_EB_YINDEX AND CB.CTLMSG = %EN_CHANGE THEN
-    CONTROL GET TEXT hDlg, %IDC_EB_YINDEX TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YIndex = ABS(VAL(TXT$))
-           SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
-    END IF
-    END IF
+           CASE %IDC_EB_YINDEX
+                CONTROL GET TEXT hDlg1, %IDC_EB_YINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YIndex = ABS(VAL(TXT$))
+                       SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
+                END IF
     'X SPEED
-    CONTROL GET TEXT hDlg, %IDC_EB_XSPEED TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XSpeed = ABS(VAL(TXT$))
-           SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
-    END IF
+            CASE %IDC_EB_XSPEED
+                CONTROL GET TEXT hDlg1, %IDC_EB_XSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XSpeed = ABS(VAL(TXT$))
+                       SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
+                END IF
     'Y SPEED
-    CONTROL GET TEXT hDlg, %IDC_EB_YSPEED TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YSpeed = ABS(VAL(TXT$))
-           SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
-    END IF
+            CASE %IDC_EB_YSPEED
+                CONTROL GET TEXT hDlg1, %IDC_EB_YSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YSpeed = ABS(VAL(TXT$))
+                       SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
+                END IF
     'X POS
-    CONTROL GET TEXT hDlg, %IDC_EB_XPOS TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.XPos = ABS(VAL(TXT$))
-           SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
-           SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
-           CALL ResetPosition(Servo1)
-           CALL ResetPosition(Servo2)
-    END IF
+            CASE %IDC_EB_XPOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_XPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XPos = ABS(VAL(TXT$))
+                       SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+                       SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+                       CALL ResetPosition(Servo1)
+                       CALL ResetPosition(Servo2)
+                END IF
     'Y POS
-    CONTROL GET TEXT hDlg, %IDC_EB_YPOS TO TXT$
-    IF GoodSNG(TXT$) THEN
-           SCANstruc.YPos = VAL(TXT$)
-           SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
-           SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
-           CALL ResetPosition(Servo3)
-    END IF
+            CASE %IDC_EB_YPOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_YPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YPos = VAL(TXT$)
+                       SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+                       SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
+                       CALL ResetPosition(Servo3)
+                END IF
     'X CT/IN
-    CONTROL GET TEXT hDlg, %IDC_EB_XCTIN TO TXT$
-    IF GoodLNG(TXT$) THEN
-           SCANstruc.XCtr = ABS(VAL(TXT$))
-           SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
-         END IF
-    'Y CT/IN
-    CONTROL GET TEXT hDlg, %IDC_EB_YCTIN TO TXT$
-    IF GoodLNG(TXT$) THEN
-         SCANstruc.YCtr = ABS(VAL(TXT$))
-         SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
-    END IF
+            CASE %IDC_EB_XCTIN
+                CONTROL GET TEXT hDlg1, %IDC_EB_XCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                       SCANstruc.XCtr = ABS(VAL(TXT$))
+                       SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
+                     END IF
+                'Y CT/IN
+                CONTROL GET TEXT hDlg1, %IDC_EB_YCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                     SCANstruc.YCtr = ABS(VAL(TXT$))
+                     SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
+                END IF
+       END SELECT
  END IF
 
 END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG
-    LOCAL temp$
-    SELECT CASE CB.MSG
-        CASE %WM_INITDIALOG   ' <- Sent right before the dialog is shown
-        CASE %WM_COMMAND      ' <- A control is calling
-            SELECT CASE CB.CTL  ' <- Look at control's id
-            CASE %IDCANCEL
-             IF CB.CTLMSG = %BN_CLICKED THEN ' Exit on Esc
-                DIALOG END CB.HNDL
-             END IF
-            END SELECT
-         CASE %WM_NOTIFY
-            SELECT CASE CB.NMID
-                CASE %IDC_UpDown
-                 SELECT CASE CB.NMCODE
-                  CASE %UDN_DeltaPOS
-                     LOCAL UPD AS NMUPDOWN PTR
-                     UPD = CB.LPARAM
-                     'old value will be @upd.iPos
-                     'change (delta) to old value will be @upd.iDelta
-               END SELECT
-         END SELECT
-    END SELECT
+
 END FUNCTION
+
+CALLBACK FUNCTION DlgProcSetup () AS LONG
+ SELECT CASE AS LONG CB.MSG
+    CASE %WM_INITDIALOG
+      ' Create the Agent Control Object
+  END SELECT
+END FUNCTION
+
+
 '________________________________________________________________________________________
 '
 ' Splash Dialog Box function
@@ -442,6 +444,33 @@ CALLBACK FUNCTION dlgSplashProc
               DeleteObject SendDlgItemMessage(CBHNDL, 100, %STM_GETIMAGE, %IMAGE_BITMAP, 0)
               DIALOG END CBHNDL
   END SELECT
+
+END FUNCTION
+
+FUNCTION MsgFilterProc _
+  ( _
+  BYVAL nCode   AS LONG, _
+  BYVAL wParam  AS DWORD, _
+  BYVAL lParam  AS LONG _
+  ) AS LONG
+
+  LOCAL ptmsg     AS tagMSG PTR
+  LOCAL lRetVal   AS LONG
+  LOCAL wm AS WORD
+  ptmsg = lParam
+
+  lRetVal = CallNextHookEx(ghMsgHook, nCode, wParam, BYVAL lParam)
+
+  IF nCode = %MSGF_DIALOGBOX THEN
+    IF @ptmsg.message = %WM_KEYDOWN THEN
+        IF wParam = %VK_BACK THEN
+            MSGBOX "MsgFilterProc: WM_KEYDOWN"
+            lRetVal = 0  ' 1
+        END IF
+     END IF
+  END IF
+
+  FUNCTION = lRetVal
 
 END FUNCTION
 
@@ -500,3 +529,5 @@ SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, BYVAL isfilea
        DIALOG SHOW MODELESS hDlg CALL dlgSplashProc
     END IF
 END SUB
+
+'===================================================================

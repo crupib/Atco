@@ -1094,3 +1094,15 @@ FUNCTION GetXCord& (Cts&)
   EXIT FUNCTION
 
 END FUNCTION
+DECLARE FUNCTION GetYCord& (Cts&)
+FUNCTION GetYCord& (Cts&)
+
+  IF SCANstruc.YPlus = TRUE THEN 'Y positive cts
+    GetYCord& = Cts&
+  ELSE
+    GetYCord& = -Cts&  'Y negative cts
+  END IF
+
+  EXIT FUNCTION
+
+END FUNCTION

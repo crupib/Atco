@@ -1,0 +1,22 @@
+PowerBASIC 10 for Windows
+Copyright (c) 1996-2011 PowerBasic Inc.
+Englewood, Florida USA
+All Rights Reserved
+
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\modeless.bas   {46 total lines}
+Target compilation:  modeless.EXE
+Compile time:  0.1 seconds, at 55200 lines/minute
+
+1216 bytes compiled code, 39528 bytes RTLibrary,
+76 bytes string literals, and 2796 bytes dgroup.
+Executable stack size:  1048576 bytes.
+Disk image: 48128 bytes   Memory image: 42400 bytes.
+
+Component Files:
+----------------
+C:\Users\Bill\Documents\GitHub\Atco\modeless.bas
+
+
+Code Extracted:
+---------------
+<NONE>

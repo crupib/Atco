@@ -73,6 +73,7 @@
 GLOBAL ghMsgHook   AS DWORD
 GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
+GLOBAL gOldEditClassProc AS LONG
 '***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
@@ -99,7 +100,7 @@ END FUNCTION
 CALLBACK FUNCTION BTN_AJOG_CALL()
     MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
     CALL SetForAuto
-    JogAuto
+'    JogAuto
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
     MSGBOX "SAVE, hit OK to continue",, "Title of subroutine 123"
@@ -400,12 +401,37 @@ END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG
 
 END FUNCTION
-
+FUNCTION EditSubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_XSTART, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
 CALLBACK FUNCTION DlgProcSetup () AS LONG
- SELECT CASE AS LONG CB.MSG
-    CASE %WM_INITDIALOG
-      ' Create the Agent Control Object
-  END SELECT
+ LOCAL i AS LONG
+   SELECT CASE CBMSG
+      CASE %WM_INITDIALOG
+         'Subclass the editbox control
+         STATIC hEdit AS LONG
+         CONTROL HANDLE CBHNDL, %IDC_EB_XSTART TO hEdit
+         gOldEditClassProc = SetWindowLong(hEdit, %GWL_WNDPROC, CODEPTR(EditSubClassProc))
+      CASE %WM_KEYDOWN
+         IF CBCTL = %IDC_EB_XSTART THEN
+            IF CBLPARAM = %VK_RETURN THEN
+ '              DIALOG SET TEXT CBHNDL, "Return"
+                CONTROL SET TEXT hDlg1, %IDC_EB_YPOS, "return"
+            ELSEIF CBLPARAM = %VK_UP THEN
+               DIALOG SET TEXT CBHNDL, "Up"
+            ELSE
+               DIALOG SET TEXT CBHNDL, "Capture Keys"
+            END IF
+         END IF
+      CASE %WM_DESTROY
+         'Important! Remove the subclassing
+         SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc
+   END SELECT
 END FUNCTION
 
 

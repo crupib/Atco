@@ -122,7 +122,6 @@ FUNCTION PBMAIN () AS LONG
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on
-
     CALL DelayX(2000)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc

@@ -110,11 +110,11 @@ FUNCTION PBMAIN () AS LONG
     DIM GloErr AS INTEGER
 
     CalSet = FALSE
-    IF NOT KeyDown THEN  'do not load if user has key pressed
-      IF CalLoad(ThumbDisk + "0.M2K") THEN
-       CalSet = TRUE
-      END IF
-    END IF
+'    IF NOT KeyDown THEN  'do not load if user has key pressed
+'      IF CalLoad(ThumbDisk + "0.M2K") THEN
+'       CalSet = TRUE
+ '     END IF
+'    END IF
 
   'if no cal on disk or corrupt then set defaults
     IF NOT CalSet THEN
@@ -122,7 +122,7 @@ FUNCTION PBMAIN () AS LONG
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on
-    CALL DelayX(2000)
+    CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
   '  UnhookWindowsHookEx ghMsgHook

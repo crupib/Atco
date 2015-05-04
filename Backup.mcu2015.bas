@@ -90,39 +90,39 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
-    IsSplashActive = 1
-    ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
-    IF NOT OpenComPorts THEN
-     MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
-     DO
-      EXIT FUNCTION
-     LOOP
-    END IF
-    IF NOT InitNetWork THEN
-     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
-     DO
-       CALL DelayX(200)
-       IF lResult& = %IDCANCEL THEN
-           EXIT FUNCTION
-       END IF
-     LOOP UNTIL InitNetWork
-    END IF
+ '   IsSplashActive = 1
+ '   ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+ '   IF NOT OpenComPorts THEN
+ '    MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
+ '    DO
+ '     EXIT FUNCTION
+ '    LOOP
+ '   END IF
+ '   IF NOT InitNetWork THEN
+ '    lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
+'     DO
+ '      CALL DelayX(200)
+ '      IF lResult& = %IDCANCEL THEN
+  '         EXIT FUNCTION
+  '     END IF
+  '   LOOP UNTIL InitNetWork
+'    END IF
     DIM GloErr AS INTEGER
 
-    CalSet = FALSE
-    IF NOT KeyDown THEN  'do not load if user has key pressed
-      IF CalLoad(ThumbDisk + "0.M2K") THEN
-       CalSet = TRUE
-      END IF
-    END IF
+'    CalSet = FALSE
+'    IF NOT KeyDown THEN  'do not load if user has key pressed
+'      IF CalLoad(ThumbDisk + "0.M2K") THEN
+'       CalSet = TRUE
+ '     END IF
+'    END IF
 
   'if no cal on disk or corrupt then set defaults
-    IF NOT CalSet THEN
-      CALL SetDefaults
-    END IF
+ '   IF NOT CalSet THEN
+ '     CALL SetDefaults
+'    END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on
-    CALL DelayX(2000)
+    CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
   '  UnhookWindowsHookEx ghMsgHook

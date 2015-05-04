@@ -85,7 +85,6 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
     BUILDSETUPWINDOW()
     DIALOG SHOW MODELESS hDlg1, CALL DlgProcSetup
     DIALOG ENABLE hDlg1
-
     DO
           ' Allow messages to be dispatched
           DIALOG GET SIZE hDlg1 TO x, x
@@ -120,6 +119,7 @@ END FUNCTION
 CALLBACK FUNCTION BTN_CALENC_CALL()
     MSGBOX "Calculate Encoders, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
+
 FUNCTION BUILDWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -164,7 +164,8 @@ FUNCTION BUILDWINDOW() AS LONG
     CALL BTN_LOAD_CALL()
     CONTROL SET FONT hDlg, %LOAD, NormalFont&
 
- END FUNCTION
+END FUNCTION
+
 FUNCTION BUILDSETUPWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -387,13 +388,23 @@ CALLBACK FUNCTION EditControlCallback()
                 IF GoodLNG(TXT$) THEN
                        SCANstruc.XCtr = ABS(VAL(TXT$))
                        SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
-                     END IF
-                'Y CT/IN
+                END IF
+    'Y CT/IN
+            CASE %IDC_EB_YCTIN
+
                 CONTROL GET TEXT hDlg1, %IDC_EB_YCTIN TO TXT$
                 IF GoodLNG(TXT$) THEN
                      SCANstruc.YCtr = ABS(VAL(TXT$))
                      SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
                 END IF
+    'X +/-
+            CASE %IDC_EB_XPLUSMIN
+
+    'Y +/-
+            CASE %IDC_EB_YPLUSMIN
+    'Index
+            CASE %IDC_EB_INDEX
+
        END SELECT
  END IF
 
@@ -404,7 +415,23 @@ END FUNCTION
 FUNCTION EditSubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
    SELECT CASE wMsg&
       CASE %WM_KEYUP
-         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_XSTART, wParm&
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_XPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit2SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_YPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit3SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_INDEX, wParm&
    END SELECT
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
@@ -414,23 +441,52 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
          'Subclass the editbox control
-         STATIC hEdit AS LONG
-         CONTROL HANDLE CBHNDL, %IDC_EB_XSTART TO hEdit
+         STATIC hEdit, hEdit1, hEdit2 AS LONG
+         CONTROL HANDLE CBHNDL, %IDC_EB_XPLUSMIN TO hEdit
+         CONTROL HANDLE CBHNDL, %IDC_EB_YPLUSMIN TO hEdit1
+         CONTROL HANDLE CBHNDL, %IDC_EB_INDEX TO hEdit2
          gOldEditClassProc = SetWindowLong(hEdit, %GWL_WNDPROC, CODEPTR(EditSubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit1, %GWL_WNDPROC, CODEPTR(Edit2SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit2, %GWL_WNDPROC, CODEPTR(Edit3SubClassProc))
       CASE %WM_KEYDOWN
-         IF CBCTL = %IDC_EB_XSTART THEN
-            IF CBLPARAM = %VK_RETURN THEN
- '              DIALOG SET TEXT CBHNDL, "Return"
-                CONTROL SET TEXT hDlg1, %IDC_EB_YPOS, "return"
-            ELSEIF CBLPARAM = %VK_UP THEN
-               DIALOG SET TEXT CBHNDL, "Up"
-            ELSE
-               DIALOG SET TEXT CBHNDL, "Capture Keys"
+         IF CBCTL = %IDC_EB_XPLUSMIN THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.XPlus = TRUE
+                SCANstruc.XPlusSTR = "POSITIVE  "
+                CONTROL SET TEXT hDlg1, %IDC_EB_XPLUSMIN, "POSITIVE"
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+               SCANstruc.XPlus = FALSE
+               SCANstruc.XPlusSTR = "NEGATIVE  "
+               CONTROL SET TEXT hDlg1, %IDC_EB_XPLUSMIN, "NEGATIVE"
+            END IF
+         END IF
+         IF CBCTL = %IDC_EB_YPLUSMIN THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.YPlus = TRUE
+                SCANstruc.YPlusSTR = "POSITIVE  "
+                CONTROL SET TEXT hDlg1, %IDC_EB_YPLUSMIN, "POSITIVE"
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+               SCANstruc.YPlus = FALSE
+               SCANstruc.YPlusSTR = "NEGATIVE  "
+               CONTROL SET TEXT hDlg1, %IDC_EB_YPLUSMIN, "NEGATIVE"
+            END IF
+         END IF
+          IF CBCTL = %IDC_EB_INDEX THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.IndexY = FALSE
+                SCANstruc.IndexYSTR = "X
+                CONTROL SET TEXT hDlg1, %IDC_EB_INDEX, "X"
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+               SCANstruc.IndexY = TRUE
+               SCANstruc.IndexYSTR = "Y         "
+               CONTROL SET TEXT hDlg1, %IDC_EB_INDEX, "Y"
             END IF
          END IF
       CASE %WM_DESTROY
          'Important! Remove the subclassing
          SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit1, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit2, %GWL_WNDPROC, gOldEditClassProc
    END SELECT
 END FUNCTION
 

@@ -3,14 +3,14 @@ Copyright (c) 1996-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\crupib\Documents\GitHub\Atco\mcu2015.bas   {196509 total lines}
+Primary source:  C:\Users\crupib\Documents\GitHub\Atco\mcu2015.bas   {196565 total lines}
 Target compilation:  mcu2015.EXE
-Compile time:  0.7 seconds, at 16843628 lines/minute
+Compile time:  0.7 seconds, at 16848428 lines/minute
 
-23952 bytes compiled code, 52516 bytes RTLibrary,
-1164 bytes string literals, and 6840 bytes dgroup.
+23888 bytes compiled code, 47684 bytes RTLibrary,
+1176 bytes string literals, and 6868 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 88080 bytes   Memory image: 60520 bytes.
+Disk image: 82448 bytes   Memory image: 55728 bytes.
 
 Component Files:
 ----------------
@@ -563,6 +563,8 @@ SETGAIN
 ENABLEAMPL
 LONGTOSTR
 INITNETWORK
+KEYDOWN
+CALLOAD
 CLOSECOMMPORT
 OPENCOMPORTS
 DELETECOMMBUFFERS
@@ -570,6 +572,10 @@ CLOSECOMPORTS
 SHOWSPLASHDLG
 DLGSPLASHPROC
 MSGFILTERPROC
+DFREAD
+DFREAD2
 DFWRITE
 DFWRITE2
 FCREATE
+FOPEN
+FCLOSE

@@ -1106,3 +1106,26 @@ FUNCTION GetYCord& (Cts&)
   EXIT FUNCTION
 
 END FUNCTION
+DECLARE SUB StopXMtrs ()
+SUB StopXMtrs
+LOCAL Cmd AS STRING
+  Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
+
+  SendCmd Servo1, Cmd$
+  SendCmd Servo2, Cmd$
+
+  Glo.CmdPwm(1) = 0
+  Glo.CmdPwm(2) = 0
+
+END SUB
+DECLARE SUB StopYMtr ()
+SUB StopYMtr
+  LOCAL Cmd AS STRING
+
+  Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
+
+  SendCmd Servo3, Cmd$
+
+  Glo.CmdPwm(3) = 0
+
+END SUB

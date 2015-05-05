@@ -589,8 +589,8 @@ FUNCTION InitNetWork
   IF Glo.NumModules <> 5 THEN 'Failed
     InitNetWork = FALSE
     EXIT FUNCTION
-  ELSE
-      MSGBOX "Number of Modules  "+ STR$(Glo.NumModules)
+'  ELSE
+'      MSGBOX "Number of Modules  "+ STR$(Glo.NumModules)
   END IF
 
   'set status return for servos
@@ -1106,3 +1106,15 @@ FUNCTION GetYCord& (Cts&)
   EXIT FUNCTION
 
 END FUNCTION
+DECLARE SUB StopXMtrs ()
+SUB StopXMtrs
+LOCAL Cmd AS STRING
+  Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
+
+  SendCmd Servo1, Cmd$
+  SendCmd Servo2, Cmd$
+
+  Glo.CmdPwm(1) = 0
+  Glo.CmdPwm(2) = 0
+
+END SUB

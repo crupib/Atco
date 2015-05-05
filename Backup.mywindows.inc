@@ -81,7 +81,6 @@ DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
 
 CALLBACK FUNCTION BTN_SETUP_CALL()
     LOCAL  x      AS LONG
-   'DIALOG END hDlg
     BUILDSETUPWINDOW()
     DIALOG SHOW MODELESS hDlg1, CALL DlgProcSetup
     DIALOG ENABLE hDlg1
@@ -406,6 +405,10 @@ CALLBACK FUNCTION EditControlCallback()
             CASE %IDC_EB_INDEX
     'IDX/HL
             CASE %IDC_EB_IDXHL
+    'X ON/OFF
+            CASE %IDC_EB_XONOFF
+    'Y ON/OFF
+            CASE %IDC_EB_YONOFF
 
        END SELECT
  END IF
@@ -446,20 +449,41 @@ FUNCTION Edit4SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&)
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
 END FUNCTION
+FUNCTION Edit5SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_XONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit6SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_YONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+
 CALLBACK FUNCTION DlgProcSetup () AS LONG
  LOCAL i AS LONG
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
          'Subclass the editbox control
-         STATIC hEdit, hEdit1, hEdit2, hEdit3 AS LONG
+         STATIC hEdit, hEdit1, hEdit2, hEdit3, hEdit4, hEdit5 AS LONG
          CONTROL HANDLE CBHNDL, %IDC_EB_XPLUSMIN TO hEdit
          CONTROL HANDLE CBHNDL, %IDC_EB_YPLUSMIN TO hEdit1
          CONTROL HANDLE CBHNDL, %IDC_EB_INDEX TO hEdit2
          CONTROL HANDLE CBHNDL, %IDC_EB_IDXHL TO hEdit3
+         CONTROL HANDLE CBHNDL, %IDC_EB_XONOFF TO hEdit4
+         CONTROL HANDLE CBHNDL, %IDC_EB_YONOFF TO hEdit5
          gOldEditClassProc = SetWindowLong(hEdit, %GWL_WNDPROC, CODEPTR(EditSubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit1, %GWL_WNDPROC, CODEPTR(Edit2SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit2, %GWL_WNDPROC, CODEPTR(Edit3SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit3, %GWL_WNDPROC, CODEPTR(Edit4SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit4, %GWL_WNDPROC, CODEPTR(Edit5SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit4, %GWL_WNDPROC, CODEPTR(Edit6SubClassProc))
       CASE %WM_KEYDOWN
          IF CBCTL = %IDC_EB_XPLUSMIN THEN
             IF CBLPARAM = %VK_RIGHT THEN
@@ -483,7 +507,20 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                CONTROL SET TEXT hDlg1, %IDC_EB_YPLUSMIN, "NEGATIVE"
             END IF
          END IF
-          IF CBCTL = %IDC_EB_IDXHL THEN
+
+         IF CBCTL = %IDC_EB_INDEX THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.IndexY = FALSE
+                SCANstruc.IndexYSTR = "X         "
+                CONTROL SET TEXT hDlg1, %IDC_EB_INDEX, "X         "
+
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+                SCANstruc.IndexY = TRUE
+                SCANstruc.IndexYSTR = "Y         "
+                CONTROL SET TEXT hDlg1, %IDC_EB_INDEX, "Y         "
+            END IF
+         END IF
+         IF CBCTL = %IDC_EB_IDXHL THEN
             IF CBLPARAM = %VK_RIGHT THEN
                 SCANstruc.IndexLow = TRUE
                 SCANstruc.IndexLowStr = "HIGH - LOW"
@@ -491,15 +528,57 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
             ELSEIF CBLPARAM = %VK_LEFT THEN
                SCANstruc.IndexLow = FALSE
                SCANstruc.IndexLowStr = "LOW - HIGH"
-               CONTROL SET TEXT hDlg1, %IDC_EB_INDEX, "LOW - HIGH"
+               CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "LOW - HIGH"
             END IF
          END IF
+         IF CBCTL = %IDC_EB_IDXHL THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.IndexLow = TRUE
+                SCANstruc.IndexLowStr = "HIGH - LOW"
+                CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "HIGH - LOW"
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+               SCANstruc.IndexLow = FALSE
+               SCANstruc.IndexLowStr = "LOW - HIGH"
+               CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "LOW - HIGH"
+            END IF
+         END IF
+         IF CBCTL = %IDC_EB_XONOFF THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.XEnable = FALSE
+                SCANstruc.XEnableSTR = "OFF       "
+                CALL EnableAmpl(SCANstruc.XEnable, Servo1)
+                CALL EnableAmpl(SCANstruc.XEnable, Servo2)
+                CONTROL SET TEXT hDlg1, %IDC_EB_XONOFF, "OFF       "
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+                SCANstruc.XEnable = TRUE
+                SCANstruc.XEnableSTR = "ON        "
+                CALL StopXMtrs
+                CONTROL SET TEXT hDlg1, %IDC_EB_XONOFF, "ON        "
+            END IF
+         END IF
+         IF CBCTL = %IDC_EB_YONOFF THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.YEnable = FALSE
+                SCANstruc.YEnableSTR = "OFF       "
+                CALL EnableAmpl(SCANstruc.YEnable, Servo1)
+                CALL EnableAmpl(SCANstruc.YEnable, Servo2)
+                CONTROL SET TEXT hDlg1, %IDC_EB_YONOFF, "OFF       "
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+                SCANstruc.YEnable = TRUE
+                SCANstruc.YEnableSTR = "ON        "
+                CALL StopYMtr
+                CONTROL SET TEXT hDlg1, %IDC_EB_YONOFF, "ON        "
+            END IF
+         END IF
+
       CASE %WM_DESTROY
          'Important! Remove the subclassing
          SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc
          SetWindowLong hEdit1, %GWL_WNDPROC, gOldEditClassProc
          SetWindowLong hEdit2, %GWL_WNDPROC, gOldEditClassProc
          SetWindowLong hEdit3, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit4, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit5, %GWL_WNDPROC, gOldEditClassProc
    END SELECT
 END FUNCTION
 

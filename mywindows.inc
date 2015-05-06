@@ -409,6 +409,32 @@ CALLBACK FUNCTION EditControlCallback()
             CASE %IDC_EB_XONOFF
     'Y ON/OFF
             CASE %IDC_EB_YONOFF
+    'Auto HD
+            CASE %IDC_EB_AUTOHD
+    'DUALRAS
+            CASE %IDC_EB_DUALRAS
+            CASE %IDC_EB_OVERLAP
+                CONTROL GET TEXT hDlg1, %IDC_EB_OVERLAP TO TXT$
+                IF GoodSNG(TXT$) THEN
+                    SCANstruc.OverLap = ABS(VAL(TXT$))
+                    SCANstruc.OverLapStr = QStr$(SCANstruc.OverLap, 10)
+                END IF
+    'A POS
+            CASE %IDC_EB_APOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_APOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                    SCANstruc.APos = ABS(VAL(TXT$))
+                    SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+                    SCANstruc.AOffset = GetXCord(CLNG(SCANstruc.APos * SCANstruc.ACtr))
+                    CALL ResetPosition(Servo4)
+                END IF
+    'A CT/IN
+            CASE %IDC_EB_ACTIN
+                CONTROL GET TEXT hDlg1, %IDC_EB_ACTIN TO TXT$
+                 IF GoodLNG(TXT$) THEN
+                    SCANstruc.ACtr = ABS(VAL(TXT$))
+                    SCANstruc.ACtrStr = QStr$(SCANstruc.ACtr, 10)
+                 END IF
        END SELECT
  END IF
 
@@ -464,25 +490,46 @@ FUNCTION Edit6SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&)
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
 END FUNCTION
+FUNCTION Edit7SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_AUTOHD  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+
+FUNCTION Edit8SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_DUALRAS  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
 
 CALLBACK FUNCTION DlgProcSetup () AS LONG
  LOCAL i AS LONG
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
          'Subclass the editbox control
-         STATIC hEdit, hEdit1, hEdit2, hEdit3, hEdit4, hEdit5 AS LONG
+         STATIC hEdit, hEdit1, hEdit2, hEdit3, hEdit4, hEdit5, hEdit6, hEdit7 AS LONG
          CONTROL HANDLE CBHNDL, %IDC_EB_XPLUSMIN TO hEdit
          CONTROL HANDLE CBHNDL, %IDC_EB_YPLUSMIN TO hEdit1
          CONTROL HANDLE CBHNDL, %IDC_EB_INDEX TO hEdit2
          CONTROL HANDLE CBHNDL, %IDC_EB_IDXHL TO hEdit3
          CONTROL HANDLE CBHNDL, %IDC_EB_XONOFF TO hEdit4
          CONTROL HANDLE CBHNDL, %IDC_EB_YONOFF TO hEdit5
+         CONTROL HANDLE CBHNDL, %IDC_EB_AUTOHD TO hEdit6
+         CONTROL HANDLE CBHNDL, %IDC_EB_DUALRAS TO hEdit7
          gOldEditClassProc = SetWindowLong(hEdit, %GWL_WNDPROC, CODEPTR(EditSubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit1, %GWL_WNDPROC, CODEPTR(Edit2SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit2, %GWL_WNDPROC, CODEPTR(Edit3SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit3, %GWL_WNDPROC, CODEPTR(Edit4SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit4, %GWL_WNDPROC, CODEPTR(Edit5SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit5, %GWL_WNDPROC, CODEPTR(Edit6SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit6, %GWL_WNDPROC, CODEPTR(Edit7SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEdit7, %GWL_WNDPROC, CODEPTR(Edit8SubClassProc))
       CASE %WM_KEYDOWN
          IF CBCTL = %IDC_EB_XPLUSMIN THEN
             IF CBLPARAM = %VK_RIGHT THEN
@@ -569,6 +616,30 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                 CONTROL SET TEXT hDlg1, %IDC_EB_YONOFF, "ON        "
             END IF
          END IF
+         IF CBCTL = %IDC_EB_AUTOHD THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.YEnable = FALSE
+                SCANstruc.YEnableSTR = "OFF       "
+                CALL EnableAmpl(SCANstruc.YEnable, Servo1)
+                CALL EnableAmpl(SCANstruc.YEnable, Servo2)
+                CONTROL SET TEXT hDlg1, %IDC_EB_AUTOHD, "OFF       "
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+                SCANstruc.AutoHold = TRUE
+                SCANstruc.AutoHoldSTR = "ON        "
+                CONTROL SET TEXT hDlg1, %IDC_EB_AUTOHD, "ON        "
+            END IF
+         END IF
+         IF CBCTL = %IDC_EB_DUALRAS THEN
+            IF CBLPARAM = %VK_RIGHT THEN
+                SCANstruc.DualRas = FALSE
+                SCANstruc.DualRasSTR = "OFF       "
+                CONTROL SET TEXT hDlg1, %IDC_EB_DUALRAS, "OFF       "
+            ELSEIF CBLPARAM = %VK_LEFT THEN
+                SCANstruc.DualRas = TRUE
+                SCANstruc.DualRasSTR = "ON        "
+                CONTROL SET TEXT hDlg1, %IDC_EB_DUALRAS, "ON        "
+            END IF
+         END IF
 
       CASE %WM_DESTROY
          'Important! Remove the subclassing
@@ -578,6 +649,8 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
          SetWindowLong hEdit3, %GWL_WNDPROC, gOldEditClassProc
          SetWindowLong hEdit4, %GWL_WNDPROC, gOldEditClassProc
          SetWindowLong hEdit5, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit6, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEdit7, %GWL_WNDPROC, gOldEditClassProc
    END SELECT
 END FUNCTION
 

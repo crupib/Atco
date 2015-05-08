@@ -69,9 +69,11 @@
 %MJOG = 2060
 %LOAD = 2070
 %CALIBRATEENC = 2080
-
+%CALX_BUTTON = 2081
+%CALY_BUTTON = 2082
+%CALA_BUTTON  = 2083
 GLOBAL ghMsgHook   AS DWORD
-GLOBAL hDlg, hDlg1 AS DWORD, w, h AS LONG
+GLOBAL hDlg, hDlg1, hDlg2 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
 '***************************************************************************************************************************************
@@ -91,7 +93,15 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
     LOOP WHILE x&
     DIALOG SHOW STATE hDlg, %SW_SHOWNORMAL
 END FUNCTION
-
+CALLBACK FUNCTION BTN_CALX_CALL()
+    MSGBOX "Cal x, hit OK to continue",, "Title of subroutine 123"
+END FUNCTION
+CALLBACK FUNCTION BTN_CALY_CALL()
+    MSGBOX "Cal y, hit OK to continue",, "Title of subroutine 123"
+END FUNCTION
+CALLBACK FUNCTION BTN_CALA_CALL()
+    MSGBOX "Cal A, hit OK to continue",, "Title of subroutine 123"
+END FUNCTION
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
@@ -116,7 +126,16 @@ CALLBACK FUNCTION BTN_LOAD_CALL()
     MSGBOX "Load, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
 CALLBACK FUNCTION BTN_CALENC_CALL()
-    MSGBOX "Calculate Encoders, hit OK to continue",, "Title of subroutine 123"
+    LOCAL  x      AS LONG
+    BUILDCALWINDOW()
+    DIALOG SHOW MODELESS hDlg2, CALL DlgProcSetup
+    DIALOG ENABLE hDlg2
+    DO
+          ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg2 TO x, x
+          DIALOG DOEVENTS  0
+    LOOP WHILE x&
+    DIALOG SHOW STATE hDlg, %SW_SHOWNORMAL
 END FUNCTION
 
 FUNCTION BUILDWINDOW() AS LONG
@@ -125,7 +144,7 @@ FUNCTION BUILDWINDOW() AS LONG
     exeICON = "exeICON"
     LOCAL NormalFont&
     DESKTOP GET SIZE TO w, h
-    DIALOG NEW PIXELS, 0, "Atco MCU2015",,, w/2, h/2,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
+    DIALOG NEW PIXELS, 0, "Atco MCU2015",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
     DIALOG SET ICON hDlg, exeICON$   '
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
@@ -164,6 +183,32 @@ FUNCTION BUILDWINDOW() AS LONG
     CONTROL SET FONT hDlg, %LOAD, NormalFont&
 
 END FUNCTION
+FUNCTION BUILDCALWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, " MCU 2015 Calibrate Encoders", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg2
+    DIALOG SET USER hDlg2, 1, hdlg
+    DIALOG SET ICON hDlg2, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2, %CALX_BUTTON, "CAL &X Encoder", 100, 100, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALX_CALL()
+    CONTROL SET FONT hDlg2, %CALX_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2, %CALY_BUTTON, "CAL &Y Encoder", 100, 200, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALY_CALL()
+    CONTROL SET FONT hDlg2, %CALY_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2,%CALA_BUTTON, "CAL &A Encoder", 100, 300, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALA_CALL()
+    CONTROL SET FONT hDlg2, %CALA_BUTTON, NormalFont&
+
+END FUNCTION
 
 FUNCTION BUILDSETUPWINDOW() AS LONG
     LOCAL exeICON AS STRING
@@ -173,128 +218,128 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     LOCAL NormalFont&
     DESKTOP GET SIZE TO w, h
    ' DIALOG NEW PIXELS, 0, "MCU 2015 Setup",,, w/2, h/2,%WS_OVERLAPPEDWINDOW  , 0 TO hDlg1
-    DIALOG NEW hdlg, " MCU 2015 Setup", 0, 0, w/2, h/2, %WS_OVERLAPPEDWINDOW, TO hDlg1
+    DIALOG NEW PIXELS, hdlg, " MCU 2015 Setup", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg1
     DIALOG SET USER hDlg1, 1, hdlg
     DIALOG SET ICON hDlg1, exeICON$   '
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
 
-    CONTROL ADD BUTTON, hDlg1, %CALIBRATEENC, "Calibrate Encoders", 10, 400, 400, 50,%BS_PUSHLIKE , , _
+    CONTROL ADD BUTTON, hDlg1, %CALIBRATEENC, "Calibrate Encoders", 100, 300, 400, 50,%BS_PUSHLIKE , , _
     CALL BTN_CALENC_CALL()
     CONTROL SET FONT hDlg1, %CALIBRATEENC, NormalFont&
 
     TXT$ = "X Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSTART, SCANstruc.XLowStr, 100, 10, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSTART, SCANstruc.XLowStr, 100, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL1, TXT$,    10, 10, 50, 20
 
     TXT$ = "X End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XEND, SCANstruc.XHighStr, 100, 40, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XEND, SCANstruc.XHighStr, 100, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL2, TXT$, 10,    40, 50, 20
 
     TXT$ = "Y Start"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSTART , SCANstruc.YLowStr, 100, 70, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSTART , SCANstruc.YLowStr, 100, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL3, TXT$, 10,     70, 50, 20
 
     TXT$ = "Y End"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YEND , SCANstruc.YLowStr, 100, 100, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YEND , SCANstruc.YLowStr, 100, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL4, TXT$, 10,     100, 50, 20
 
     TXT$ = "X Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XINDEX , SCANstruc.XIndexSTR, 100, 130, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XINDEX , SCANstruc.XIndexSTR, 100, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
-    CONTROL ADD LABEL, hDlg1, %IDC_LABEL5, TXT$, 10,     130, 50, 20
+    CONTROL ADD LABEL, hDlg1, %IDC_LABEL5, TXT$, 10,  130, 50, 20
 
     TXT$ = "Y Index"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YINDEX , SCANstruc.YIndexSTR, 100, 160, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YINDEX , SCANstruc.YIndexSTR, 100, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL6, TXT$, 10,     160, 50, 20
 
     TXT$ = "X Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSPEED , SCANstruc.XSpeedSTR, 100, 190, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XSPEED , SCANstruc.XSpeedSTR, 100, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL7, TXT$, 10,     190, 50, 20
 
     TXT$ = "Y Speed"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSPEED , SCANstruc.YSpeedSTR, 100, 220, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YSPEED , SCANstruc.YSpeedSTR, 100, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL8, TXT$, 10,     220, 50, 20
 
     TXT$ = "X POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPOS, SCANstruc.XPosStr, 410, 10, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPOS, SCANstruc.XPosStr, 410, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL9, TXT$,    300, 10, 50, 20
 
     TXT$ = "Y POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPOS, SCANstruc.YPosStr, 410, 40, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPOS, SCANstruc.YPosStr, 410, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL10, TXT$, 300,    40, 50, 20
 
     TXT$ = "X CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XCTIN , SCANstruc.XCtrStr, 410, 70, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XCTIN , SCANstruc.XCtrStr, 410, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL11, TXT$, 300,     70, 50, 20
 
     TXT$ = "Y CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YCTIN , SCANstruc.YCtrStr, 410, 100, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YCTIN , SCANstruc.YCtrStr, 410, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL12, TXT$, 300,     100, 50, 20
 
     TXT$ = "X +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPLUSMIN , SCANstruc.XPlusSTR, 410, 130, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XPLUSMIN , SCANstruc.XPlusSTR, 410, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL13, TXT$, 300,     130, 50, 20
 
     TXT$ = "Y +/-"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPLUSMIN , SCANstruc.YPlusSTR, 410, 160, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YPLUSMIN , SCANstruc.YPlusSTR, 410, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL14, TXT$, 300,     160, 50, 20
 
     TXT$ = "INDEX"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_INDEX , SCANstruc.IndexYSTR, 410, 190, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_INDEX , SCANstruc.IndexYSTR, 410, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL15, TXT$, 300,     190, 50, 20
 
     TXT$ = "IDX H/L"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_IDXHL, SCANstruc.IndexLowStr, 410, 220, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_IDXHL, SCANstruc.IndexLowStr, 410, 220, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL16, TXT$, 300,     220, 50, 20
 
     TXT$ = "X ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XONOFF, SCANstruc.XEnableSTR, 730, 10, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_XONOFF, SCANstruc.XEnableSTR, 730, 10, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL17, TXT$,    600, 10, 60, 20
 
     TXT$ = "Y ON/OFF"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YONOFF, SCANstruc.YEnableSTR, 730, 40, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_YONOFF, SCANstruc.YEnableSTR, 730, 40, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL18, TXT$, 600,    40, 60, 20
 
     TXT$ = "AUTO HD"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_AUTOHD , SCANstruc.AutoHoldSTR, 730, 70, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_AUTOHD , SCANstruc.AutoHoldSTR, 730, 70, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL19, TXT$, 600,     70, 60, 20
 
     TXT$ = "DUALRAS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_DUALRAS ,SCANstruc.DualRasSTR, 730, 100, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_DUALRAS ,SCANstruc.DualRasSTR, 730, 100, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL20, TXT$, 600,     100, 60, 20
 
     TXT$ = "OVERLAP"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_OVERLAP , SCANstruc.OverLapStr, 730, 130, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_OVERLAP , SCANstruc.OverLapStr, 730, 130, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL21, TXT$, 600,     130, 60, 20
 
     TXT$ = "A POS"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_APOS , SCANstruc.APosStr, 730, 160, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_APOS , SCANstruc.APosStr, 730, 160, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL22, TXT$, 600,     160, 60, 20
 
     TXT$ = "A CT/IN"
-    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_ACTIN, SCANstruc.ACtrStr, 730, 190, 80, 12, , , _
+    CONTROL ADD TEXTBOX, hDlg1, %IDC_EB_ACTIN, SCANstruc.ACtrStr, 730, 190, 80, 20, , , _
     CALL EditControlCallback() ' Use default styles
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL23, TXT$, 600,     190, 60, 20
 
@@ -429,7 +474,7 @@ CALLBACK FUNCTION EditControlCallback()
                     CALL ResetPosition(Servo4)
                 END IF
     'A CT/IN
-            CASE %ID_EB_ACTIN
+            CASE %IDC_EB_ACTIN
                 CONTROL GET TEXT hDlg1, %IDC_EB_ACTIN TO TXT$
                  IF GoodLNG(TXT$) THEN
                     SCANstruc.ACtr = ABS(VAL(TXT$))

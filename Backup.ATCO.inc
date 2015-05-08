@@ -1118,3 +1118,49 @@ LOCAL Cmd AS STRING
   Glo.CmdPwm(2) = 0
 
 END SUB
+DECLARE SUB StopYMtr ()
+SUB StopYMtr
+  LOCAL Cmd AS STRING
+
+  Cmd$ = CHR$(&H17) + CHR$(StopAbrupt)
+
+  SendCmd Servo3, Cmd$
+
+  Glo.CmdPwm(3) = 0
+
+END SUB
+DECLARE SUB CalEncoder (YXAxis)
+SUB CalEncoder (EncNum)
+  LOCAL AxisNum AS INTEGER
+  'puts servo in velocity mode
+  CALL StopMtrs
+
+  CALL GetXyPos
+  IF EncNum = Servo1 OR EncNum = Servo4 THEN
+    AxisNum = Servo1
+  ELSE
+    AxisNum = Servo3
+  END IF
+
+  IF AxisNum = Servo1 THEN 'X
+'    CALL PrintStr(1, 1, "Move X Axis to Start")
+ '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
+    IF EncNum = Servo1 THEN
+'      CALL PrintStr(4, 1, "X Pos: ")
+'      CALL PrintStr(4, 8, SCANstruc.XPosStr)
+    ELSE
+'      CALL PrintStr(4, 1, "A Pos: ")
+'      CALL PrintStr(4, 8, SCANstruc.APosStr)
+    END IF
+  ELSE           'Servo3 Y
+'    CALL PrintStr(1, 1, "Move Y Axis to Start")
+'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
+'    CALL PrintStr(4, 1, "Y Pos: ")
+'    CALL PrintStr(4, 8, SCANstruc.YPosStr)
+  END IF
+  MFlag = 1
+  GOSUB MoveAxis
+
+
+
+END SUB

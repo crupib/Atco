@@ -91,6 +91,8 @@ CONST OnIndexSelected = 64
 CONST OnPeSelected = 128
 CONST OnCeSelected = 256
 CONST HomeFlagMask = &HFE0F
+CONST PosDir = -1
+CONST NegDir = 0
 '****************************************************************************************************
 '************************************************************************************
 '* Motor control globals
@@ -115,6 +117,8 @@ GLOBAL XSpd()  AS LONG
 GLOBAL YSpd()  AS LONG
 GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
+
+
 '****************************************************************************************************
 TYPE GloRecord
    NumModules AS INTEGER
@@ -1129,19 +1133,18 @@ SUB StopYMtr
   Glo.CmdPwm(3) = 0
 
 END SUB
+
 DECLARE SUB CalEncoder (YXAxis)
 SUB CalEncoder (EncNum)
-  LOCAL AxisNum AS INTEGER
+  LOCAL AxisNum, MFlag AS INTEGER
   'puts servo in velocity mode
   CALL StopMtrs
-
   CALL GetXyPos
   IF EncNum = Servo1 OR EncNum = Servo4 THEN
     AxisNum = Servo1
   ELSE
     AxisNum = Servo3
   END IF
-
   IF AxisNum = Servo1 THEN 'X
 '    CALL PrintStr(1, 1, "Move X Axis to Start")
  '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
@@ -1160,7 +1163,218 @@ SUB CalEncoder (EncNum)
   END IF
   MFlag = 1
   GOSUB MoveAxis
+ ' IF KeyPress = KeyEsc THEN
+ '   CALL StopMtrs
+ '   EXIT SUB
+ ' END IF
 
+  IF AxisNum = Servo1 THEN 'X
+ '   CALL PrintStr(1, 1, "Move X Axis to End  ")
+ '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
+    IF EncNum = Servo1 THEN
+ '     CALL PrintStr(4, 1, "X Pos: ")
+'      CALL PrintStr(4, 8, SCANstruc.XPosStr)
+    ELSE
+ '     CALL PrintStr(4, 1, "A Pos: ")
+ '     CALL PrintStr(4, 8, SCANstruc.APosStr)
+    END IF
+  ELSE
+ '   CALL PrintStr(1, 1, "Move Y Axis to End  ")
+'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
+'    CALL PrintStr(4, 1, "Y Pos: ")
+ '   CALL PrintStr(4, 8, SCANstruc.YPosStr)
+  END IF
 
+  MFlag = 2
+  GOSUB MoveAxis
+
+  'IF KeyPress = KeyEsc THEN
+ '   CALL StopMtrs
+  '  EXIT SUB
+ ' END IF
+
+ ' CALL PrintClrStr(2, 1, " ")
+'  CALL PrintClrStr(1, 1, "Enter Dis: ")
+ ' CALL SetLcdPos(1, 12)
+
+  GOSUB GetDis
+
+  EXIT SUB
+
+  GetDis:
+    LOCAL EndCts AS LONG
+    LOCAL StartCts AS LONG
+    LOCAL Temp AS STRING
+    Temp$ = SPACE$(10)
+    'CALL KEdit(Temp$, XCode)  'get input
+    'IF XCode = KeyEnter THEN
+    '  IF VAL(Temp$) > 0 THEN
+    IF AxisNum = Servo1 THEN
+      IF  EncNum = Servo1 THEN
+        SCANstruc.XCal = VAL(Temp$)
+        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
+      ELSE
+        SCANstruc.ACal = VAL(Temp$)
+        SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
+      END IF
+    ELSE
+      SCANstruc.YCal = VAL(Temp$)
+      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
+    END IF
+    IF ABS(EndCts& - StartCts&) > 0 THEN
+      IF AxisNum = Servo1 THEN
+        IF EncNum = Servo1 THEN
+          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+        ELSE
+          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
+          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+        END IF
+      ELSE
+        SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
+        SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+      END IF
+    END IF
+'      END IF
+'    END IF
+RETURN
+
+MoveAxis:
+  LOCAL KeyPress AS INTEGER
+  DO
+  '    DO
+  '    LOOP UNTIL KeyInBuff
+  '    KeyPress = GetSelectKey
+'    IF (KeyPress = KeyUP AND AxisNum = 1) THEN
+    IF (AxisNum = 1) THEN
+     CALL MoveXVel(PosDir)
+     DO
+       CALL GetXyPos
+       IF EncNum = Servo1 THEN
+  '       CALL PrintStr(4, 8, SCANstruc.XPosStr)
+       ELSE
+  '       CALL PrintStr(4, 8, SCANstruc.APosStr)
+       END IF
+     LOOP WHILE KeyDown
+     CALL StopMtrs
+     'FlushKeys
+    ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
+     CALL MoveXVel(NegDir)
+     DO
+       CALL GetXyPos
+       IF EncNum = Servo1 THEN
+     '    CALL PrintStr(4, 8, SCANstruc.XPosStr)
+       ELSE
+      '   CALL PrintStr(4, 8, SCANstruc.APosStr)
+       END IF
+     LOOP WHILE KeyDown
+     CALL StopMtrs
+     'FlushKeys
+    ELSEIF KeyPress = (KeyLft AND AxisNum = 3) THEN
+     CALL MoveYVel(NegDir)
+     DO
+       CALL GetXyPos
+    '   CALL PrintStr(4, 8, SCANstruc.YPosStr)
+     LOOP WHILE KeyDown
+     CALL StopMtrs
+     'FlushKeys
+
+    ELSEIF KeyPress = (KeyRgt AND AxisNum = 3) THEN
+     CALL MoveYVel(PosDir)
+     DO
+       CALL GetXyPos
+   '    CALL PrintStr(4, 8, SCANstruc.YPosStr)
+     LOOP WHILE KeyDown
+     CALL StopMtrs
+     'FlushKeys
+   END IF
+  LOOP UNTIL KeyPress = (KeyEsc OR KeyPress = KeyEnter)
+
+  CALL GetXyPos
+
+  IF MFlag = 1 THEN      'start position cts
+    IF AxisNum = Servo1 THEN  'X encoder cal
+      IF EncNum = Servo1 THEN
+    StartCts& = Glo.Position(Servo1)
+      ELSE
+    StartCts& = Glo.Position(Servo4)
+      END IF
+    ELSE                 'Y encoder cal
+      StartCts& = Glo.Position(Servo3)
+    END IF
+  ELSE                   'end position cts
+    IF AxisNum = Servo1 THEN  'X encoder cal
+      IF EncNum = Servo1 THEN
+    EndCts& = Glo.Position(Servo1)
+      ELSE
+    EndCts& = Glo.Position(Servo4)
+      END IF
+    ELSE                 'Y encoder cal
+      EndCts& = Glo.Position(Servo3)
+    END IF
+  END IF
+RETURN
+
+END SUB
+DECLARE SUB MoveXVel (dir)
+SUB MoveXVel (MoveDir)
+   LOCAL ControlByte AS INTEGER
+   LOCAL X1, X2 AS LONG
+   LOCAL Cmd AS STRING
+   CALL SetHomeCap 'stop on limit 1
+
+   IF MoveDir = PosDir THEN
+     ControlByte = LoadVel OR LoadAcc OR PosMode OR VelMode
+   ELSE
+     ControlByte = LoadVel OR LoadAcc OR PosMode OR VelMode OR RevDir
+   END IF
+
+   X1& = XVel(Glo.AdVal(4))  'glo.CmdVelocity(Servo1)
+   X2& = XAcel(Glo.AdVal(4)) 'glo.CmdAccel(Servo1)
+
+   'build the command string
+   Cmd$ = CHR$(&H94) + CHR$(ControlByte) + LongToStr(X1&) + LongToStr(X2&)
+
+   SendCmd Servo1, Cmd$
+
+   SendCmd Servo2, Cmd$
+
+   CALL GoXMtrs
+
+END SUB
+
+DECLARE SUB MoveYVel (dir)
+SUB MoveYVel (MoveDir)
+   LOCAL ControlByte AS INTEGER
+   LOCAL X1, X2 AS LONG
+   LOCAL Cmd AS STRING
+   CALL SetHomeCap 'stop on limit 1
+
+   IF MoveDir = PosDir THEN
+     ControlByte = LoadVel OR LoadAcc OR PosMode OR VelMode
+   ELSE
+     ControlByte = LoadVel OR LoadAcc OR PosMode OR VelMode OR RevDir
+   END IF
+
+   X1& = YVel(Glo.Ad3)  'glo.CmdVelocity(Servo3)
+   X2& = YAcel(Glo.Ad3) 'glo.CmdAccel(Servo3)
+
+   'build the command string
+   Cmd$ = CHR$(&H94) + CHR$(ControlByte) + LongToStr(X1&) + LongToStr(X2&)
+
+   SendCmd Servo3, Cmd$
+
+   CALL GoYMtr
+
+END SUB
+DECLARE SUB SetHomeCap ()
+SUB SetHomeCap
+  LOCAL address AS INTEGER
+  LOCAL Cmd AS STRING
+  address = &HFF   'all Mtrs
+
+  Cmd$ = CHR$(&H19) + CHR$(&H9)
+
+  SendCmd address, Cmd$
 
 END SUB

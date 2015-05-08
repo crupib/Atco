@@ -22,6 +22,7 @@
 %IDC_LABEL21 = 4005
 %IDC_LABEL22 = 4006
 %IDC_LABEL23 = 4007
+%IDC_LABEL24 = 4008
 
 %IDC_EB_XSTART = 111
 %IDC_EB_XEND = 113
@@ -49,6 +50,7 @@
 %IDC_TextBox   = 123
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
+%IDC_EB_XAXISTART = 3008
 
 %OPT1 = 1001
 %OPT2 = 1002
@@ -94,8 +96,14 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
     DIALOG SHOW STATE hDlg, %SW_SHOWNORMAL
 END FUNCTION
 CALLBACK FUNCTION BTN_CALX_CALL()
-'    MSGBOX "Cal x, hit OK to continue",, "Title of subroutine 123"
-    CALL CalEncoder(Servo1)
+    MSGBOX "Cal x, hit OK to continue",, "Title of subroutine 123"
+    CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISTART, %SW_SHOW
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
+
+'    CALL CalEncoder(Servo1)
 END FUNCTION
 CALLBACK FUNCTION BTN_CALY_CALL()
     MSGBOX "Cal y, hit OK to continue",, "Title of subroutine 123"
@@ -136,6 +144,15 @@ CALLBACK FUNCTION BTN_CALENC_CALL()
           DIALOG GET SIZE hDlg2 TO x, x
           DIALOG DOEVENTS  0
     LOOP WHILE x&
+    IF SCANstruc.XHigh < SCANstruc.XLow THEN
+        SWAP SCANstruc.XHigh, SCANstruc.XLow
+        SWAP SCANstruc.XHighStr, SCANstruc.XLowStr
+    END IF
+    IF SCANstruc.YHigh < SCANstruc.YLow THEN
+        SWAP SCANstruc.YHigh, SCANstruc.YLow
+        SWAP SCANstruc.YHighStr, SCANstruc.YLowStr
+    END IF
+
     DIALOG SHOW STATE hDlg, %SW_SHOWNORMAL
 END FUNCTION
 
@@ -208,6 +225,20 @@ FUNCTION BUILDCALWINDOW() AS LONG
     CONTROL ADD BUTTON, hDlg2,%CALA_BUTTON, "CAL &A Encoder", 100, 300, 300, 50,%BS_PUSHLIKE , , _
     CALL BTN_CALA_CALL()
     CONTROL SET FONT hDlg2, %CALA_BUTTON, NormalFont&
+
+    TXT$ = "Move X Axis to Start"
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_XAXISTART, SCANstruc.XPosStr, 750, 100, 80, 20, , , _
+    CALL EditControlCallback() ' Use default styles
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL24, TXT$,    550, 100, 100, 20
+    TXT$ = "Move X Axis to Start"
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_XAXISTART, SCANstruc.XPosStr, 750, 100, 80, 20, , , _
+    CALL EditControlCallback() ' Use default styles
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL24, TXT$,    550, 100, 100, 20
+
+
+    CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISTART, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_HIDE
+
 
 END FUNCTION
 

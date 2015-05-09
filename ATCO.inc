@@ -94,6 +94,8 @@ CONST HomeFlagMask = &HFE0F
 CONST PosDir = -1
 CONST NegDir = 0
 '****************************************************************************************************
+
+
 '************************************************************************************
 '* Motor control globals
 GLOBAL filenum AS INTEGER
@@ -1135,6 +1137,7 @@ SUB StopYMtr
 END SUB
 
 DECLARE SUB CalEncoder (YXAxis)
+
 SUB CalEncoder (EncNum)
   LOCAL AxisNum, MFlag AS INTEGER
   'puts servo in velocity mode
@@ -1169,6 +1172,7 @@ SUB CalEncoder (EncNum)
  ' END IF
 
   IF AxisNum = Servo1 THEN 'X
+     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Move X Axis to End  "
  '   CALL PrintStr(1, 1, "Move X Axis to End  ")
  '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
     IF EncNum = Servo1 THEN

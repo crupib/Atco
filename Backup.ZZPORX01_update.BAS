@@ -1204,7 +1204,7 @@ SUB CalEncoder (EncNum)
   CALL GetXyPos
 
   CALL ClrLCD
-  Encoder = EncNum
+
   IF EncNum = Servo1 OR EncNum = Servo4 THEN
     AxisNum = Servo1
   ELSE

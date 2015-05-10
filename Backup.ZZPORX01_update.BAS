@@ -1315,7 +1315,7 @@ MoveAxis:
 
       KeyPress = GetSelectKey
 
-      IF (KeyPress = KeyUP AND AxisNum = 1) THEN
+    IF (KeyPress = KeyUP AND AxisNum = 1) THEN
     CALL MoveXVel(PosDir)
     DO
        CALL GetXyPos

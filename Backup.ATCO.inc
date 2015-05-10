@@ -94,38 +94,7 @@ CONST HomeFlagMask = &HFE0F
 CONST PosDir = -1
 CONST NegDir = 0
 '****************************************************************************************************
-'Windows consts, variables, routines, etc....
-%IDC_LABEL1 = 1112
-%IDC_LABEL2 = 1113
-%IDC_LABEL3 = 1114
-%IDC_LABEL4 = 1115
-%IDC_LABEL5 = 1116
-%IDC_LABEL6 = 1117
-%IDC_LABEL7 = 1118
-%IDC_LABEL8 = 1119
-%IDC_LABEL9 = 1110
-%IDC_LABEL10 = 1101
-%IDC_LABEL11 = 1102
-%IDC_LABEL12 = 1103
-%IDC_LABEL13 = 1104
-%IDC_LABEL14 = 1105
-%IDC_LABEL15 = 1106
-%IDC_LABEL16 = 4000
-%IDC_LABEL17 = 4001
-%IDC_LABEL18 = 4002
-%IDC_LABEL19 = 4003
-%IDC_LABEL20 = 4004
-%IDC_LABEL21 = 4005
-%IDC_LABEL22 = 4006
-%IDC_LABEL23 = 4007
-%IDC_LABEL24 = 4008
-%IDC_LABEL25 = 4009
-%IDC_LABEL26 = 4010
-%IDC_LABEL27 = 4011
-%IDC_LABEL28 = 4012
-%IDC_LABEL29 = 4013
-%IDC_LABEL30 = 4014
-%IDC_LABEL31 = 4015
+
 
 '************************************************************************************
 '* Motor control globals

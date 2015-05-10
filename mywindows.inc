@@ -113,18 +113,13 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
 END FUNCTION
 
 CALLBACK FUNCTION BTN_CALX_CALL()
-    'MSGBOX "Cal x, hit OK to continue",, "Title of subroutine 123"
     CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
- '   CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISEND, %SW_SHOW
- '   CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
- '   CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
-    CALL CalEncoder(Servo1)
+    CALL CalXEncoder(Servo1)
 END FUNCTION
-SUB CalEncoder (EncNum)
+SUB CalXEncoder (EncNum)
   LOCAL AxisNum, MFlag AS INTEGER
-  'puts servo in velocity mode
   CALL StopMtrs
   CALL GetXyPos
   IF EncNum = Servo1 OR EncNum = Servo4 THEN
@@ -136,24 +131,15 @@ SUB CalEncoder (EncNum)
      CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISTART, %SW_SHOW
      CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
      CONTROL SHOW STATE hDlg2, %IDC_LABEL27, %SW_SHOW
-
-    IF EncNum = Servo1 THEN
-       CONTROL SET TEXT hDlg1, %IDC_LABEL27, "X Pos: "
-       CONTROL SET TEXT hDlg1, %IDC_EB_XAXISTART, SCANstruc.XPosStr
-    ELSE
-'      CALL PrintStr(4, 1, "A Pos: ")
-'      CALL PrintStr(4, 8, SCANstruc.APosStr)
-    END IF
-  ELSE           'Servo3 Y
-'    CALL PrintStr(1, 1, "Move Y Axis to Start")
-'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
-'    CALL PrintStr(4, 1, "Y Pos: ")
-'    CALL PrintStr(4, 8, SCANstruc.YPosStr)
+  END IF
+  IF EncNum = Servo1 THEN
+     CONTROL SET TEXT hDlg1, %IDC_LABEL27, "X Pos: "
+     CONTROL SET TEXT hDlg1, %IDC_EB_XAXISTART, SCANstruc.XPosStr
   END IF
   MFlag = 1
   'wlc
   EXIT SUB
-  GOSUB MoveAxis
+  GOSUB MoveAxisX
  ' IF KeyPress = KeyEsc THEN
  '   CALL StopMtrs
  '   EXIT SUB
@@ -163,26 +149,13 @@ SUB CalEncoder (EncNum)
      CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISEND, %SW_SHOW
      CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
      CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
- '   CALL PrintStr(1, 1, "Move X Axis to End  ")
- '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
-    IF EncNum = Servo1 THEN
-       CONTROL SET TEXT hDlg1, %IDC_LABEL25, "X Pos: "
-       CONTROL SET TEXT hDlg1, %IDC_EB_XAXISEND, SCANstruc.XPosStr
- '     CALL PrintStr(4, 1, "X Pos: ")
-'      CALL PrintStr(4, 8, SCANstruc.XPosStr)
-    ELSE
- '     CALL PrintStr(4, 1, "A Pos: ")
- '     CALL PrintStr(4, 8, SCANstruc.APosStr)
-    END IF
-  ELSE
- '   CALL PrintStr(1, 1, "Move Y Axis to End  ")
-'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
-'    CALL PrintStr(4, 1, "Y Pos: ")
- '   CALL PrintStr(4, 8, SCANstruc.YPosStr)
   END IF
-
+  IF EncNum = Servo1 THEN
+      CONTROL SET TEXT hDlg1, %IDC_LABEL25, "X Pos: "
+      CONTROL SET TEXT hDlg1, %IDC_EB_XAXISEND, SCANstruc.XPosStr
+  END IF
   MFlag = 2
-  GOSUB MoveAxis
+  GOSUB MoveAxisX
 
   'IF KeyPress = KeyEsc THEN
  '   CALL StopMtrs
@@ -231,57 +204,34 @@ SUB CalEncoder (EncNum)
         SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
       END IF
     END IF
-'      END IF
-'    END IF
 RETURN
-
-MoveAxis:
+MoveAxisX:
   LOCAL KeyPress AS INTEGER
   DO
       DO
+          'wlc
       LOOP UNTIL KeyPress
-
-    IF (KeyPress = KeyUP AND AxisNum = 1) THEN
-    CALL MoveXVel(PosDir)
-    DO
-       CALL GetXyPos
-       IF EncNum = Servo1 THEN
-         'CALL PrintStr(4, 8, SCANstruc.XPosStr)
-       ELSE
-         'CALL PrintStr(4, 8, SCANstruc.APosStr)
-       END IF
-    LOOP WHILE KeyDown
-    CALL StopMtrs
-
+      IF (KeyPress = KeyUP AND AxisNum = 1) THEN
+          CALL MoveXVel(PosDir)
+          DO
+            CALL GetXyPos
+            IF EncNum = Servo1 THEN
+               'CALL PrintStr(4, 8, SCANstruc.XPosStr)
+            END IF
+          LOOP WHILE KeyDown
+          CALL StopMtrs
       ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
-    CALL MoveXVel(NegDir)
-    DO
-       CALL GetXyPos
-       IF EncNum = Servo1 THEN
-         'CALL PrintStr(4, 8, SCANstruc.XPosStr)
-       ELSE
-         'CALL PrintStr(4, 8, SCANstruc.APosStr)
-       END IF
-    LOOP WHILE KeyDown
-    CALL StopMtrs
-
-      ELSEIF KeyPress = (KeyLft AND AxisNum = 3) THEN
-    CALL MoveYVel(NegDir)
-    DO
-       CALL GetXyPos
-       'CALL PrintStr(4, 8, SCANstruc.YPosStr)
-    LOOP WHILE KeyDown
-    CALL StopMtrs
-
-      ELSEIF KeyPress = (KeyRgt AND AxisNum = 3) THEN
-    CALL MoveYVel(PosDir)
-    DO
-       CALL GetXyPos
-       'CALL PrintStr(4, 8, SCANstruc.YPosStr)
-    LOOP WHILE KeyDown
-    CALL StopMtrs
-
+          CALL MoveXVel(NegDir)
+          DO
+            CALL GetXyPos
+            IF EncNum = Servo1 THEN
+              'CALL PrintStr(4, 8, SCANstruc.XPosStr)
+              CONTROL SET TEXT hDlg1, %IDC_EB_XAXISEND, SCANstruc.XPosStr
+            END IF
+          LOOP WHILE KeyDown
+          CALL StopMtrs
       END IF
+
   LOOP UNTIL KeyPress = (KeyEsc OR KeyPress = KeyEnter)
 
   CALL GetXyPos
@@ -289,9 +239,9 @@ MoveAxis:
   IF MFlag = 1 THEN      'start position cts
     IF AxisNum = Servo1 THEN  'X encoder cal
       IF EncNum = Servo1 THEN
-    StartCts& = Glo.Position(Servo1)
+        StartCts& = Glo.Position(Servo1)
       ELSE
-    StartCts& = Glo.Position(Servo4)
+        StartCts& = Glo.Position(Servo4)
       END IF
     ELSE                 'Y encoder cal
       StartCts& = Glo.Position(Servo3)
@@ -299,9 +249,9 @@ MoveAxis:
   ELSE                   'end position cts
     IF AxisNum = Servo1 THEN  'X encoder cal
       IF EncNum = Servo1 THEN
-    EndCts& = Glo.Position(Servo1)
+        EndCts& = Glo.Position(Servo1)
       ELSE
-    EndCts& = Glo.Position(Servo4)
+        EndCts& = Glo.Position(Servo4)
       END IF
     ELSE                 'Y encoder cal
       EndCts& = Glo.Position(Servo3)
@@ -311,10 +261,16 @@ RETURN
 
 END SUB
 CALLBACK FUNCTION BTN_CALY_CALL()
-    MSGBOX "Cal y, hit OK to continue",, "Title of subroutine 123"
+    CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
+    CALL CalYEncoder(Servo3)
 END FUNCTION
 CALLBACK FUNCTION BTN_CALA_CALL()
-    MSGBOX "Cal A, hit OK to continue",, "Title of subroutine 123"
+    CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
+    CALL CalAEncoder(Servo4)
 END FUNCTION
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
@@ -978,10 +934,11 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
             END IF
          END IF
          IF CBCTL = %IDC_EB_XAXISTART THEN
-            IF CBLPARAM = %VK_ENTER THEN
+            IF CBLPARAM = %VK_RETURN THEN
                 CONTROL SET TEXT hDlg1, %IDC_EB_XAXISTART, SCANstruc.XPosStr
             ELSEIF CBLPARAM = %VK_ESCAPE THEN
                 CONTROL SET TEXT hDlg1, %IDC_EB_XAXISTART, SCANstruc.XPosStr
+                CALL StopMtrs
             END IF
          END IF
       CASE %WM_DESTROY

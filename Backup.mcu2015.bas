@@ -109,7 +109,7 @@ FUNCTION PBMAIN () AS LONG
 '    END IF
     DIM GloErr AS INTEGER
 
-'    CalSet = FALSE
+    CalSet = FALSE
 '    IF NOT KeyDown THEN  'do not load if user has key pressed
 '      IF CalLoad(ThumbDisk + "0.M2K") THEN
 '       CalSet = TRUE
@@ -117,9 +117,9 @@ FUNCTION PBMAIN () AS LONG
 '    END IF
 
   'if no cal on disk or corrupt then set defaults
- '   IF NOT CalSet THEN
- '     CALL SetDefaults
-'    END IF
+    IF NOT CalSet THEN
+      CALL SetDefaults
+    END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
     CALL SetForAuto  'set velocity, etc. & motors on
     CALL DelayX(200)

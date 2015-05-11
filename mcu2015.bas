@@ -121,8 +121,8 @@ FUNCTION PBMAIN () AS LONG
       CALL SetDefaults
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
-    CALL SetForAuto  'set velocity, etc. & motors on
-    CALL DelayX(200)
+ '   CALL SetForAuto  'set velocity, etc. & motors on
+ '   CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
   '  UnhookWindowsHookEx ghMsgHook

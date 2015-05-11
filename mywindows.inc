@@ -166,11 +166,11 @@ SUB CalXEncoder (EncNum)
 '  CALL PrintClrStr(1, 1, "Enter Dis: ")
  ' CALL SetLcdPos(1, 12)
 
-  GOSUB GetDis
+  GOSUB GetDisX
 
   EXIT SUB
 
-  GetDis:
+  GetDisX:
     LOCAL EndCts AS LONG
     LOCAL StartCts AS LONG
     LOCAL Temp AS STRING
@@ -266,6 +266,148 @@ CALLBACK FUNCTION BTN_CALY_CALL()
     CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
     CALL CalYEncoder(Servo3)
 END FUNCTION
+SUB CalYEncoder (EncNum)
+  LOCAL AxisNum, MFlag AS INTEGER
+  CALL StopMtrs
+  CALL GetXyPos
+  IF EncNum = Servo1 OR EncNum = Servo4 THEN
+    AxisNum = Servo1
+  ELSE
+    AxisNum = Servo3
+  END IF
+  IF AxisNum = Servo1 THEN 'X
+     CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISTART, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL27, %SW_SHOW
+  END IF
+  IF EncNum = Servo1 THEN
+     CONTROL SET TEXT hDlg1, %IDC_LABEL27, "X Pos: "
+     CONTROL SET TEXT hDlg1, %IDC_EB_XAXISTART, SCANstruc.XPosStr
+  END IF
+  MFlag = 1
+  'wlc
+  EXIT SUB
+  GOSUB MoveAxisY
+ ' IF KeyPress = KeyEsc THEN
+ '   CALL StopMtrs
+ '   EXIT SUB
+ ' END IF
+
+  IF AxisNum = Servo1 THEN 'X
+     CONTROL SHOW STATE hDlg2, %IDC_EB_XAXISEND, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
+  END IF
+  IF EncNum = Servo1 THEN
+      CONTROL SET TEXT hDlg1, %IDC_LABEL25, "X Pos: "
+      CONTROL SET TEXT hDlg1, %IDC_EB_XAXISEND, SCANstruc.XPosStr
+  END IF
+  MFlag = 2
+  GOSUB MoveAxisY
+
+  'IF KeyPress = KeyEsc THEN
+ '   CALL StopMtrs
+  '  EXIT SUB
+ ' END IF
+
+ ' CALL PrintClrStr(2, 1, " ")
+'  CALL PrintClrStr(1, 1, "Enter Dis: ")
+ ' CALL SetLcdPos(1, 12)
+
+  GOSUB GetDis
+
+  EXIT SUB
+
+  GetDisY:
+    LOCAL EndCts AS LONG
+    LOCAL StartCts AS LONG
+    LOCAL Temp AS STRING
+    Temp$ = SPACE$(10)
+    'CALL KEdit(Temp$, XCode)  'get input
+    'IF XCode = KeyEnter THEN
+    '  IF VAL(Temp$) > 0 THEN
+    IF AxisNum = Servo1 THEN
+      IF  EncNum = Servo1 THEN
+        SCANstruc.XCal = VAL(Temp$)
+        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
+      ELSE
+        SCANstruc.ACal = VAL(Temp$)
+        SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
+      END IF
+    ELSE
+      SCANstruc.YCal = VAL(Temp$)
+      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
+    END IF
+    IF ABS(EndCts& - StartCts&) > 0 THEN
+      IF AxisNum = Servo1 THEN
+        IF EncNum = Servo1 THEN
+          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+        ELSE
+          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
+          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+        END IF
+      ELSE
+        SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
+        SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+      END IF
+    END IF
+RETURN
+MoveAxisY:
+  LOCAL KeyPress AS INTEGER
+  DO
+      DO
+          'wlc
+      LOOP UNTIL KeyPress
+      IF (KeyPress = KeyUP AND AxisNum = 1) THEN
+          CALL MoveXVel(PosDir)
+          DO
+            CALL GetXyPos
+            IF EncNum = Servo1 THEN
+               'CALL PrintStr(4, 8, SCANstruc.XPosStr)
+            END IF
+          LOOP WHILE KeyDown
+          CALL StopMtrs
+      ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
+          CALL MoveXVel(NegDir)
+          DO
+            CALL GetXyPos
+            IF EncNum = Servo1 THEN
+              'CALL PrintStr(4, 8, SCANstruc.XPosStr)
+              CONTROL SET TEXT hDlg1, %IDC_EB_XAXISEND, SCANstruc.XPosStr
+            END IF
+          LOOP WHILE KeyDown
+          CALL StopMtrs
+      END IF
+
+  LOOP UNTIL KeyPress = (KeyEsc OR KeyPress = KeyEnter)
+
+  CALL GetXyPos
+
+  IF MFlag = 1 THEN      'start position cts
+    IF AxisNum = Servo1 THEN  'X encoder cal
+      IF EncNum = Servo1 THEN
+        StartCts& = Glo.Position(Servo1)
+      ELSE
+        StartCts& = Glo.Position(Servo4)
+      END IF
+    ELSE                 'Y encoder cal
+      StartCts& = Glo.Position(Servo3)
+    END IF
+  ELSE                   'end position cts
+    IF AxisNum = Servo1 THEN  'X encoder cal
+      IF EncNum = Servo1 THEN
+        EndCts& = Glo.Position(Servo1)
+      ELSE
+        EndCts& = Glo.Position(Servo4)
+      END IF
+    ELSE                 'Y encoder cal
+      EndCts& = Glo.Position(Servo3)
+    END IF
+  END IF
+RETURN
+
+END SUB
 CALLBACK FUNCTION BTN_CALA_CALL()
     CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE

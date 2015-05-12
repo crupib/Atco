@@ -87,7 +87,7 @@
 %CALA_BUTTON  = 2083
 
 GLOBAL ghMsgHook   AS DWORD
-GLOBAL hDlg, hDlg1, hDlg2 AS DWORD, w, h AS LONG
+GLOBAL hDlg, hDlg1, hDlg2, hDlg3 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
 GLOBAL ExitSub, keypress AS INTEGER
@@ -170,6 +170,11 @@ SUB CalXEncoder (EncNum)
 GetDisX:
 RETURN
 MoveAxisX:
+ DO
+      SLEEP 5
+      LOOP UNTIL keypress
+ keypress = 1
+
 RETURN
 
 END SUB
@@ -188,6 +193,15 @@ CALLBACK FUNCTION BTN_SAVE_CALL()
 END FUNCTION
 CALLBACK FUNCTION BTN_AUTOSCAN_CALL()
     MSGBOX "AUTOSCAN, hit OK to continue",, "Title of subroutine 123"
+    LOCAL  x      AS LONG
+    BUILDAUTOSCANWINDOW()
+    DIALOG SHOW MODELESS hDlg3, CALL DlgProcSetup
+    DIALOG ENABLE hDlg3
+     DO
+          ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg3 TO x, x
+          DIALOG DOEVENTS  0
+    LOOP WHILE x&
 END FUNCTION
 CALLBACK FUNCTION BTN_XSPDCTRL_CALL()
     MSGBOX "XSPD CTRL, hit OK to continue",, "Title of subroutine 123"
@@ -217,6 +231,19 @@ CALLBACK FUNCTION BTN_CALENC_CALL()
         SWAP SCANstruc.YHighStr, SCANstruc.YLowStr
     END IF
     DIALOG SHOW STATE hDlg1, %SW_SHOWNORMAL
+END FUNCTION
+FUNCTION BUILDAUTOSCANWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, "MCU 2015 Auto Scan", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg3
+    DIALOG SET USER hDlg3, 1, hdlg
+    DIALOG SET ICON hDlg3, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
 END FUNCTION
 
 FUNCTION BUILDWINDOW() AS LONG

@@ -7,6 +7,8 @@ DEFINT A-Z
 #INCLUDE "AtcoSer.inc"
 #INCLUDE "mywindows.inc"
 #INCLUDE "File.inc"
+GLOBAL hProcessRxBufferEvt  AS LONG
+GLOBAL sa                    AS SECURITY_ATTRIBUTES
 FUNCTION PBMAIN () AS LONG
 '*******************************************************************************************************
 'MCU                                                                                                   *
@@ -90,23 +92,23 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
- '   IsSplashActive = 1
- '   ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
- '   IF NOT OpenComPorts THEN
- '    MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
- '    DO
- '     EXIT FUNCTION
- '    LOOP
- '   END IF
- '   IF NOT InitNetWork THEN
- '    lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
-'     DO
- '      CALL DelayX(200)
- '      IF lResult& = %IDCANCEL THEN
-  '         EXIT FUNCTION
-  '     END IF
-  '   LOOP UNTIL InitNetWork
-'    END IF
+    IsSplashActive = 1
+    'ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+    IF NOT OpenComPorts THEN
+     MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
+     DO
+      EXIT FUNCTION
+     LOOP
+    END IF
+    IF NOT InitNetWork THEN
+     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
+     DO
+       CALL DelayX(200)
+       IF lResult& = %IDCANCEL THEN
+           EXIT FUNCTION
+       END IF
+     LOOP UNTIL InitNetWork
+    END IF
     DIM GloErr AS INTEGER
 
     CalSet = FALSE
@@ -115,14 +117,18 @@ FUNCTION PBMAIN () AS LONG
 '       CalSet = TRUE
  '     END IF
 '    END IF
+    hProcessRxBufferEvt = CreateEvent( sa, _      '   // no security attributes
+                                      %FALSE, _ '   // auto-reset event object
+                                      %FALSE, _ '   // initial state is nonsignaled
+                                      "")       '   // unnamed object
 
   'if no cal on disk or corrupt then set defaults
     IF NOT CalSet THEN
       CALL SetDefaults
     END IF
     Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
- '   CALL SetForAuto  'set velocity, etc. & motors on
- '   CALL DelayX(200)
+    CALL SetForAuto  'set velocity, etc. & motors on
+    CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
   '  UnhookWindowsHookEx ghMsgHook

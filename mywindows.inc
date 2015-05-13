@@ -25,15 +25,7 @@
 %IDC_LABEL24 = 4008
 %IDC_LABEL25 = 4009
 %IDC_LABEL26 = 4010
-%IDC_LABEL27 = 4011
-%IDC_LABEL28 = 4012
-%IDC_LABEL29 = 4013
-%IDC_LABEL30 = 4014
-%IDC_LABEL31 = 4015
-%IDC_LABEL32 = 4016
-%IDC_LABEL33 = 4017
-%IDC_LABEL34 = 4018
-%IDC_LABEL35 = 4019
+
 
 
 %IDC_EB_XSTART = 111
@@ -92,6 +84,8 @@ GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
 GLOBAL ExitSub, keypress AS INTEGER
 GLOBAL AxisNum, MFlag, GEncNum AS INTEGER
+
+
 '***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
                           BYVAL IsFile AS LONG, OPTIONAL BYVAL sAppName AS STRING, _
@@ -122,64 +116,24 @@ END FUNCTION
 CALLBACK FUNCTION BTN_CALA_CALL()
 END FUNCTION
 SUB CalXEncoder (EncNum)
-  ExitSub = 0
   GEncNum = EncNum
-  LOCAL AxisNum, MFlag AS INTEGER
+
   CALL StopMtrs
   CALL GetXyPos
   IF GEncNum = Servo1 OR GEncNum = Servo4 THEN
     AxisNum = Servo1
-  ELSE
-    AxisNum = Servo3
   END IF
   IF AxisNum = Servo1 THEN
      CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
+     CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
      CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
-     CONTROL SHOW STATE hDlg2, %IDC_LABEL27, %SW_SHOW
   END IF
   IF GEncNum = Servo1 THEN
-     CONTROL SET TEXT hDlg1, %IDC_LABEL27, "X Pos: "
-     CONTROL SET TEXT hDlg1, %IDC_EB_STARTEND, SCANstruc.XPosStr
+     CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
   END IF
-  MFlag = 1
-  'wlc
-  GOSUB MoveAxisX
-  IF exitsub THEN
-      EXIT SUB
-  END IF
-
-  IF AxisNum = Servo1 THEN 'X
-     CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_SHOW
-     CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
-     CONTROL SHOW STATE hDlg2, %IDC_LABEL27, %SW_SHOW
-  END IF
-  IF GEncNum = Servo1 THEN
-      CONTROL SET TEXT hDlg1, %IDC_LABEL27, "X Pos: "
-      CONTROL SET TEXT hDlg1, %IDC_EB_STARTEND, SCANstruc.XPosStr
-  END IF
-  MFlag = 2
-  GOSUB MoveAxisX
-  IF ExitSub THEN
-      EXIT SUB
-  END IF
-  ExitSub = 0
-  CONTROL SET TEXT hDlg1, %IDC_LABEL27, "Enter Dis : "
-  CONTROL SET TEXT hDlg1, %IDC_EB_STARTEND, "0"
-  EXIT SUB
-
-GetDisX:
-RETURN
-MoveAxisX:
- DO
-      SLEEP 5
-      LOOP UNTIL keypress
- keypress = 1
-
-RETURN
 
 END SUB
-
-
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
@@ -317,15 +271,18 @@ FUNCTION BUILDCALWINDOW() AS LONG
     CONTROL SET FONT hDlg2, %CALA_BUTTON, NormalFont&
 
     TXT$ = "Move X Axis to Start"
-    CONTROL ADD LABEL, hDlg2, %IDC_LABEL26, TXT$,    550, 50, 100, 20
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL24, TXT$,    550, 20, 100, 20
+    TXT$ = "Pos; Press Enter Key"
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL25, TXT$,    550, 50, 150, 20
+    TXT$ = "X Pos: "
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL26, TXT$,    550, 100, 150, 20
     CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
     CALL EditControlCallback() ' Use default styles
-    TXT$ = "Pos; Press Enter Key"
-    CONTROL ADD LABEL, hDlg2, %IDC_LABEL27, TXT$,    550, 100, 150, 20
 
     CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_HIDE
 
 END FUNCTION
 
@@ -827,27 +784,40 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                 LOCAL TXT AS STRING
                 TXT$     = SPACE$(10)
                 CONTROL GET TEXT hDlg2, %IDC_EB_STARTEND TO TXT$
-                IF AxisNum = Servo1 THEN
-                    IF  GEncNum = Servo1 THEN
-                        SCANstruc.XCal = VAL(TXT$)
-                        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
-                    END IF
-                END IF
-                 IF ABS(EndCts& - StartCts&) > 0 THEN
+                IF mflag  <> 2 THEN
                     IF AxisNum = Servo1 THEN
-                        IF GEncNum = Servo1 THEN
-                            SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
-                            SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+                        IF  GEncNum = Servo1 THEN
+                            SCANstruc.XCal = VAL(TXT$)
+                            SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
                         END IF
                     END IF
+                    IF ABS(EndCts& - StartCts&) > 0 THEN
+                        IF AxisNum = Servo1 THEN
+                            IF GEncNum = Servo1 THEN
+                             SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+                             SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+                            END IF
+                        END IF
+                    END IF
+
+                    IF AxisNum = Servo1 THEN 'X
+                       CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move X Axis to End  "
+                    END IF
+                    IF GEncNum = Servo1 THEN
+                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
+                    END IF
                 END IF
+                    IF MFlag = 2 THEN
+                         CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
+                         CONTROL SET TEXT hDlg2, %IDC_LABEL25, ""
+                         CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Enter Dis : "
+                         CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, "0"
+                    END IF
             ELSEIF CBLPARAM = %VK_ESCAPE THEN
                 MSGBOX "Escape"
                 CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
                 CALL StopMtrs
-                ExitSub = 1
             ELSEIF CBLPARAM = %VK_UP THEN
-                 MSGBOX "UP"
                 IF (AxisNum = 1) THEN
                     CALL MoveXVel(PosDir)
                     CALL GetXyPos
@@ -859,6 +829,7 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
             END IF
             ELSEIF CBLPARAM = %VK_DOWN THEN
                  MSGBOX "Down"
+                 MFlag = 2
                 IF (AxisNum = 1) THEN
                     CALL MoveXVel(NegDir)
                     CALL GetXyPos

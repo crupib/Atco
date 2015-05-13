@@ -3,9 +3,9 @@ Copyright (c) 1996-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197085 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197083 total lines}
 Target compilation:  mcu2015.EXE
-Compile time:  0.8 seconds, at 14781375 lines/minute
+Compile time:  0.8 seconds, at 14781225 lines/minute
 
 35712 bytes compiled code, 49684 bytes RTLibrary,
 1544 bytes string literals, and 7444 bytes dgroup.

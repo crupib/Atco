@@ -25,6 +25,9 @@
 %IDC_LABEL24 = 4008
 %IDC_LABEL25 = 4009
 %IDC_LABEL26 = 4010
+%IDC_LABEL27 = 4011
+%IDC_LABEL28 = 4012
+%IDC_LABEL29 = 4013
 
 %IDC_EB_XSTART = 111
 %IDC_EB_XEND = 113
@@ -52,7 +55,8 @@
 %IDC_TextBox   = 123
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
-%IDC_EB_STARTEND = 3008
+%IDC_EB_STARTENDX = 3008
+%IDC_EB_STARTENDY = 3009
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003
@@ -162,16 +166,32 @@ FUNCTION BUILDCALWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg2, %IDC_LABEL25, TXT$,    550, 50, 150, 20
     TXT$ = "X Pos: "
     CONTROL ADD LABEL, hDlg2, %IDC_LABEL26, TXT$,    550, 100, 150, 20
-    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTENDX, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
     CALL EditControlCallback() ' Use default styles
 
-    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_HIDE
+    TXT$ = "Move Y Axis to Start"
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL27, TXT$,    550, 20, 100, 20
+    TXT$ = "Pos; Press Enter Key"
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL28, TXT$,    550, 50, 150, 20
+    TXT$ = "Y Pos: "
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL29, TXT$,    550, 100, 150, 20
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTENDY, SCANstruc.YPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
+    CALL EditControlCallback() ' Use default styles
+
+
+    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTENDX, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_HIDE
 
+    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTENDY, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL27, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL28, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL29, %SW_HIDE
+
+
 END FUNCTION
-                                      FUNCTION BUILDSETUPWINDOW() AS LONG
+FUNCTION BUILDSETUPWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
     LOCAL TXT AS STRING
@@ -317,6 +337,84 @@ END FUNCTION
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
 END FUNCTION
+CALLBACK FUNCTION DlgProc () AS LONG
+
+END FUNCTION
+FUNCTION EditSubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_XPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit2SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_YPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit3SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_INDEX, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit4SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_IDXHL , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit5SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_XONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit6SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_YONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit7SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_AUTOHD  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+
+FUNCTION Edit8SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_DUALRAS  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit9SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         keypress = 1
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_STARTEND  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+
 '________________________________________________________________________________________
 '
 ' Splash Dialog Box function

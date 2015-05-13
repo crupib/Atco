@@ -412,7 +412,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                      CONTROL SET TEXT hDlg2, %IDC_LABEL25, ""
                      CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Enter Dis : "
                      CONTROL SET TEXT hDlg2, %IDC_EB_STARTENDX, "0"
-                     MFlag = 0
                      TXT$ = SPACE$(10)
                      CONTROL GET TEXT hDlg2, %IDC_EB_STARTENDX TO TXT$
                      IF VAL(TXT$) > 0 THEN
@@ -432,7 +431,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                             END IF
                           END IF
                     END IF
-
                  END IF
             ELSEIF CBLPARAM = %VK_ESCAPE THEN
                 CONTROL SET TEXT hDlg2, %IDC_EB_STARTENDX, SCANstruc.XPosStr
@@ -443,18 +441,18 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                     CALL MoveXVel(PosDir)
                     CALL GetXyPos
                     IF GEncNum = Servo1 THEN
-                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTENDX, SCANstruc.XPosStr
+                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
                     END IF
                 END IF
                 CALL StopMtrs
             END IF
             ELSEIF CBLPARAM = %VK_DOWN THEN
-                 MFlag = 2
+                MFlag = 2
                 IF (AxisNum = 1) THEN
                     CALL MoveXVel(NegDir)
                     CALL GetXyPos
                     IF GEncNum = Servo1 THEN
-                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTENDX, SCANstruc.XPosStr
+                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
                     END IF
                 END IF
                 CALL StopMtrs

@@ -55,7 +55,7 @@
 %IDC_TextBox   = 123
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
-%IDC_EB_STARTEND = 3008
+%IDC_EB_STARTENDX = 3008
 %IDC_EB_STARTENDY = 3009
 %OPT1 = 1001
 %OPT2 = 1002
@@ -167,7 +167,7 @@ FUNCTION BUILDCALWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg2, %IDC_LABEL25, TXT$,    550, 50, 150, 20
     TXT$ = "X Pos: "
     CONTROL ADD LABEL, hDlg2, %IDC_LABEL26, TXT$,    550, 100, 150, 20
-    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTENDX, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
     CALL EditControlCallback() ' Use default styles
 
     TXT$ = "Move Y Axis to Start"
@@ -180,7 +180,7 @@ FUNCTION BUILDCALWINDOW() AS LONG
     CALL EditControlCallback() ' Use default styles
 
 
-    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTENDX, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_HIDE
     CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_HIDE
@@ -406,7 +406,7 @@ FUNCTION Edit9SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&)
    SELECT CASE wMsg&
       CASE %WM_KEYUP
          keypress = 1
-         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_STARTEND  , wParm&
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_STARTENDX  , wParm&
    END SELECT
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)

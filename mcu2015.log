@@ -4,9 +4,15 @@ Englewood, Florida USA
 All Rights Reserved
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197069 total lines}
 Target compilation:  mcu2015.EXE
 Compile time:  0.8 seconds, at 14780175 lines/minute
+=======
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197055 total lines}
+Target compilation:  mcu2015.EXE
+Compile time:  0.8 seconds, at 14779125 lines/minute
+>>>>>>> parent of 2c224f2... Work - refactor
 =======
 Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197055 total lines}
 Target compilation:  mcu2015.EXE
@@ -105,7 +111,10 @@ C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\ATCO.INC
 C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\ATCOSER.INC
 C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\MYWINDOWS.INC
 <<<<<<< HEAD
+<<<<<<< HEAD
 C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\MYWINDOWSDEF.INC
+=======
+>>>>>>> parent of 2c224f2... Work - refactor
 =======
 >>>>>>> parent of 2c224f2... Work - refactor
 C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\FILE.INC

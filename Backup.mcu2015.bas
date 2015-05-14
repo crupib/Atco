@@ -7,8 +7,7 @@ DEFINT A-Z
 #INCLUDE "AtcoSer.inc"
 #INCLUDE "mywindows.inc"
 #INCLUDE "File.inc"
-GLOBAL hProcessRxBufferEvt  AS LONG
-GLOBAL sa                    AS SECURITY_ATTRIBUTES
+
 FUNCTION PBMAIN () AS LONG
 '*******************************************************************************************************
 'MCU                                                                                                   *
@@ -92,8 +91,8 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
-    IsSplashActive = 1
-    'ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+    IsSplashActive = 0
+    ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
     IF NOT OpenComPorts THEN
      MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
      DO
@@ -117,10 +116,6 @@ FUNCTION PBMAIN () AS LONG
 '       CalSet = TRUE
  '     END IF
 '    END IF
-    hProcessRxBufferEvt = CreateEvent( sa, _      '   // no security attributes
-                                      %FALSE, _ '   // auto-reset event object
-                                      %FALSE, _ '   // initial state is nonsignaled
-                                      "")       '   // unnamed object
 
   'if no cal on disk or corrupt then set defaults
     IF NOT CalSet THEN

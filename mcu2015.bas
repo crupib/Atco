@@ -91,8 +91,8 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
-    IsSplashActive = 1
-    'ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+'    IsSplashActive = 1
+ '   ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
     IF NOT OpenComPorts THEN
      MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
      DO

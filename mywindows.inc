@@ -96,6 +96,7 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
     BUILDSETUPWINDOW()
     DIALOG SHOW MODELESS hDlg1, CALL DlgProcSetup
     DIALOG ENABLE hDlg1
+    DIALOG SHOW STATE hDlg1, %SW_SHOWNORMAL
     DO
           ' Allow messages to be dispatched
           DIALOG GET SIZE hDlg1 TO x, x
@@ -655,7 +656,7 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
          CONTROL HANDLE CBHNDL, %IDC_EB_YONOFF TO hEdit5
          CONTROL HANDLE CBHNDL, %IDC_EB_AUTOHD TO hEdit6
          CONTROL HANDLE CBHNDL, %IDC_EB_DUALRAS TO hEdit7
-         CONTROL HANDLE CBHNDL, %IDC_EB_STARTEND TO hEdit8
+  '       CONTROL HANDLE CBHNDL, %IDC_EB_STARTEND TO hEdit8
          gOldEditClassProc = SetWindowLong(hEdit, %GWL_WNDPROC, CODEPTR(EditSubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit1, %GWL_WNDPROC, CODEPTR(Edit2SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit2, %GWL_WNDPROC, CODEPTR(Edit3SubClassProc))
@@ -664,7 +665,8 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
          gOldEditClassProc = SetWindowLong(hEdit5, %GWL_WNDPROC, CODEPTR(Edit6SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit6, %GWL_WNDPROC, CODEPTR(Edit7SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit7, %GWL_WNDPROC, CODEPTR(Edit8SubClassProc))
-         gOldEditClassProc = SetWindowLong(hEdit8, %GWL_WNDPROC, CODEPTR(Edit9SubClassProc))
+  '       gOldEditClassProc = SetWindowLong(hEdit8, %GWL_WNDPROC, CODEPTR(Edit9SubClassProc))
+
       CASE %WM_KEYDOWN
          IF CBCTL = %IDC_EB_XPLUSMIN THEN
             IF CBLPARAM = %VK_RIGHT THEN
@@ -826,7 +828,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                     END IF
                 END IF
                 CALL StopMtrs
-            END IF
             ELSEIF CBLPARAM = %VK_DOWN THEN
                  MSGBOX "Down"
                  MFlag = 2
@@ -853,6 +854,7 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                     END IF
                 END IF
             END IF
+        END IF
       CASE %WM_DESTROY
          'Important! Remove the subclassing
          SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc

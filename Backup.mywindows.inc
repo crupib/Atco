@@ -96,6 +96,7 @@ CALLBACK FUNCTION BTN_SETUP_CALL()
     BUILDSETUPWINDOW()
     DIALOG SHOW MODELESS hDlg1, CALL DlgProcSetup
     DIALOG ENABLE hDlg1
+    DIALOG SHOW STATE hDlg1, %SW_SHOWNORMAL
     DO
           ' Allow messages to be dispatched
           DIALOG GET SIZE hDlg1 TO x, x
@@ -665,6 +666,8 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
          gOldEditClassProc = SetWindowLong(hEdit6, %GWL_WNDPROC, CODEPTR(Edit7SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit7, %GWL_WNDPROC, CODEPTR(Edit8SubClassProc))
          gOldEditClassProc = SetWindowLong(hEdit8, %GWL_WNDPROC, CODEPTR(Edit9SubClassProc))
+         DIALOG REDRAW hDlg1
+
       CASE %WM_KEYDOWN
          IF CBCTL = %IDC_EB_XPLUSMIN THEN
             IF CBLPARAM = %VK_RIGHT THEN
@@ -817,7 +820,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                 MSGBOX "Escape"
                 CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
                 CALL StopMtrs
-                ExitSub = 1
             ELSEIF CBLPARAM = %VK_UP THEN
                 IF (AxisNum = 1) THEN
                     CALL MoveXVel(PosDir)
@@ -827,7 +829,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                     END IF
                 END IF
                 CALL StopMtrs
-            END IF
             ELSEIF CBLPARAM = %VK_DOWN THEN
                  MSGBOX "Down"
                  MFlag = 2
@@ -854,6 +855,7 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                     END IF
                 END IF
             END IF
+        END IF
       CASE %WM_DESTROY
          'Important! Remove the subclassing
          SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc

@@ -347,3 +347,317 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg1, %IDC_LABEL23, TXT$, 600,     190, 60, 20
 
  END FUNCTION
+ FUNCTION BUILDCALWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, "MCU 2015 Calibrate Encoders", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg2
+    DIALOG SET USER hDlg2, 1, hdlg
+    DIALOG SET ICON hDlg2, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2, %CALX_BUTTON, "CAL &X Encoder", 100, 100, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALX_CALL()
+    CONTROL SET FONT hDlg2, %CALX_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2, %CALY_BUTTON, "CAL &Y Encoder", 100, 200, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALY_CALL()
+    CONTROL SET FONT hDlg2, %CALY_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg2,%CALA_BUTTON, "CAL &A Encoder", 100, 300, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_CALA_CALL()
+    CONTROL SET FONT hDlg2, %CALA_BUTTON, NormalFont&
+
+    TXT$ = "Move X Axis to Start"
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL24, TXT$,    550, 20, 100, 20
+    TXT$ = "Pos; Press Enter Key"
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL25, TXT$,    550, 50, 150, 20
+    TXT$ = "X Pos: "
+    CONTROL ADD LABEL, hDlg2, %IDC_LABEL26, TXT$,    550, 100, 150, 20
+    CONTROL ADD TEXTBOX, hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr, 850, 100, 80, 20,%WS_TABSTOP  , , _
+    CALL EditControlCallback() ' Use default styles
+
+    CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_HIDE
+
+END FUNCTION
+FUNCTION BUILDWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, 0, "Atco MCU2015",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
+    DIALOG SET ICON hDlg, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+
+    CONTROL ADD BUTTON, hDlg, %SETUP_BUTTON, "Set&up", 100, 100, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_SETUP_CALL()
+    CONTROL SET FONT hDlg, %SETUP_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg, %JOYSTICK_BUTTON, "&Joy Stick", 100, 200, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_JOYSTICK_CALL()
+    CONTROL SET FONT hDlg, %JOYSTICK_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%AJOG, "A-Jo&g", 100, 300, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_AJOG_CALL()
+    CONTROL SET FONT hDlg, %AJOG, NormalFont&
+
+
+    CONTROL ADD BUTTON, hDlg,%SAVE, "&Save", 100, 400, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_SAVE_CALL()
+    CONTROL SET FONT hDlg, %SAVE, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%AUTOSCAN, "&Auto Scan", 600, 100, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_AUTOSCAN_CALL()
+    CONTROL SET FONT hDlg, %AUTOSCAN, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%XSPDCTRL, "&XSPD CTRL", 600, 200, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_XSPDCTRL_CALL()
+    CONTROL SET FONT hDlg, %XSPDCTRL, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%MJOG, "&M-Jog", 600, 300, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_MJOG_CALL()
+    CONTROL SET FONT hDlg, %MJOG, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%LOAD, "&Load", 600, 400, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_LOAD_CALL()
+    CONTROL SET FONT hDlg, %LOAD, NormalFont&
+
+END FUNCTION
+FUNCTION BUILDAUTOSCANWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, "MCU 2015 Auto Scan", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg3
+    DIALOG SET USER hDlg3, 1, hdlg
+    DIALOG SET ICON hDlg3, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+END FUNCTION
+CALLBACK FUNCTION EditControlCallback()
+    LOCAL TXT AS STRING
+    LOCAL InkeyVar AS STRING
+    IF CB.CTLMSG = %EN_CHANGE THEN
+       SELECT CASE CB.CTL
+    'X START
+            CASE %IDC_EB_XSTART
+                CONTROL GET TEXT hDlg1, %IDC_EB_XSTART TO TXT$
+                IF GoodSNG(TXT$) THEN
+                  SCANstruc.XLow = ABS(VAL(TXT$))
+                  SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+                END IF
+    'X END
+            CASE %IDC_EB_XEND
+                CONTROL GET TEXT hDlg1, %IDC_EB_XEND TO TXT$
+                IF GoodSNG(TXT$) THEN
+                   SCANstruc.XHigh = ABS(VAL(TXT$))
+                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+                END IF
+    'Y START
+            CASE %IDC_EB_YSTART
+                CONTROL GET TEXT hDlg1, %IDC_EB_YSTART TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
+
+    'Y END
+           CASE %IDC_EB_YEND
+                CONTROL GET TEXT hDlg1, %IDC_EB_YEND TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YHigh = ABS(VAL(TXT$))
+                       SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+                END IF
+                'X INDEX
+           CASE %IDC_EB_XINDEX
+                CONTROL GET TEXT hDlg1, %IDC_EB_XINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XIndex = ABS(VAL(TXT$))
+                       SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+                END IF
+    'Y INDEX
+           CASE %IDC_EB_YINDEX
+                CONTROL GET TEXT hDlg1, %IDC_EB_YINDEX TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YIndex = ABS(VAL(TXT$))
+                       SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
+                END IF
+    'X SPEED
+            CASE %IDC_EB_XSPEED
+                CONTROL GET TEXT hDlg1, %IDC_EB_XSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XSpeed = ABS(VAL(TXT$))
+                       SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
+                END IF
+    'Y SPEED
+            CASE %IDC_EB_YSPEED
+                CONTROL GET TEXT hDlg1, %IDC_EB_YSPEED TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YSpeed = ABS(VAL(TXT$))
+                       SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
+                END IF
+    'X POS
+            CASE %IDC_EB_XPOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_XPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XPos = ABS(VAL(TXT$))
+                       SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+                       SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+                       CALL ResetPosition(Servo1)
+                       CALL ResetPosition(Servo2)
+                END IF
+    'Y POS
+            CASE %IDC_EB_YPOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_YPOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YPos = VAL(TXT$)
+                       SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+                       SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
+                       CALL ResetPosition(Servo3)
+                END IF
+    'X CT/IN
+            CASE %IDC_EB_XCTIN
+                CONTROL GET TEXT hDlg1, %IDC_EB_XCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                       SCANstruc.XCtr = ABS(VAL(TXT$))
+                       SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
+                END IF
+    'Y CT/IN
+            CASE %IDC_EB_YCTIN
+
+                CONTROL GET TEXT hDlg1, %IDC_EB_YCTIN TO TXT$
+                IF GoodLNG(TXT$) THEN
+                     SCANstruc.YCtr = ABS(VAL(TXT$))
+                     SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
+                END IF
+    'X +/-
+            CASE %IDC_EB_XPLUSMIN
+
+    'Y +/-
+            CASE %IDC_EB_YPLUSMIN
+    'Index
+            CASE %IDC_EB_INDEX
+    'IDX/HL
+            CASE %IDC_EB_IDXHL
+    'X ON/OFF
+            CASE %IDC_EB_XONOFF
+    'Y ON/OFF
+            CASE %IDC_EB_YONOFF
+    'Auto HD
+            CASE %IDC_EB_AUTOHD
+    'DUALRAS
+            CASE %IDC_EB_DUALRAS
+            CASE %IDC_EB_OVERLAP
+                CONTROL GET TEXT hDlg1, %IDC_EB_OVERLAP TO TXT$
+                IF GoodSNG(TXT$) THEN
+                    SCANstruc.OverLap = ABS(VAL(TXT$))
+                    SCANstruc.OverLapStr = QStr$(SCANstruc.OverLap, 10)
+                END IF
+    'A POS
+            CASE %IDC_EB_APOS
+                CONTROL GET TEXT hDlg1, %IDC_EB_APOS TO TXT$
+                IF GoodSNG(TXT$) THEN
+                    SCANstruc.APos = ABS(VAL(TXT$))
+                    SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+                    SCANstruc.AOffset = GetXCord(CLNG(SCANstruc.APos * SCANstruc.ACtr))
+                    CALL ResetPosition(Servo4)
+                END IF
+    'A CT/IN
+            CASE %IDC_EB_ACTIN
+                CONTROL GET TEXT hDlg1, %IDC_EB_ACTIN TO TXT$
+                 IF GoodLNG(TXT$) THEN
+                    SCANstruc.ACtr = ABS(VAL(TXT$))
+                    SCANstruc.ACtrStr = QStr$(SCANstruc.ACtr, 10)
+                 END IF
+    'Calibrate x y a
+            CASE %IDC_EB_STARTEND
+
+       END SELECT
+ END IF
+
+END FUNCTION
+FUNCTION EditSubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_XPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit2SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_YPLUSMIN, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit3SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_INDEX, wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit4SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, %IDC_EB_IDXHL , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit5SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_XONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit6SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_YONOFF  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit7SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_AUTOHD  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+
+FUNCTION Edit8SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_DUALRAS  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit9SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         keypress = 1
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_STARTEND  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION

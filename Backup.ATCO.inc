@@ -119,7 +119,7 @@ GLOBAL XSpd()  AS LONG
 GLOBAL YSpd()  AS LONG
 GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
-
+GLOBAL controlbyte AS BYTE
 
 '****************************************************************************************************
 TYPE GloRecord
@@ -1138,188 +1138,7 @@ END SUB
 
 DECLARE SUB CalEncoder (YXAxis)
 
-SUB CalEncoder (EncNum)
-  LOCAL AxisNum, MFlag AS INTEGER
-  'puts servo in velocity mode
-  CALL StopMtrs
-  CALL GetXyPos
-  IF EncNum = Servo1 OR EncNum = Servo4 THEN
-    AxisNum = Servo1
-  ELSE
-    AxisNum = Servo3
-  END IF
-  IF AxisNum = Servo1 THEN 'X
-'    CALL PrintStr(1, 1, "Move X Axis to Start")
- '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
-    IF EncNum = Servo1 THEN
-'      CALL PrintStr(4, 1, "X Pos: ")
-'      CALL PrintStr(4, 8, SCANstruc.XPosStr)
-    ELSE
-'      CALL PrintStr(4, 1, "A Pos: ")
-'      CALL PrintStr(4, 8, SCANstruc.APosStr)
-    END IF
-  ELSE           'Servo3 Y
-'    CALL PrintStr(1, 1, "Move Y Axis to Start")
-'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
-'    CALL PrintStr(4, 1, "Y Pos: ")
-'    CALL PrintStr(4, 8, SCANstruc.YPosStr)
-  END IF
-  MFlag = 1
-  GOSUB MoveAxis
- ' IF KeyPress = KeyEsc THEN
- '   CALL StopMtrs
- '   EXIT SUB
- ' END IF
 
-  IF AxisNum = Servo1 THEN 'X
-     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Move X Axis to End  "
- '   CALL PrintStr(1, 1, "Move X Axis to End  ")
- '   CALL PrintStr(2, 1, "Pos; Press Enter Key")
-    IF EncNum = Servo1 THEN
- '     CALL PrintStr(4, 1, "X Pos: ")
-'      CALL PrintStr(4, 8, SCANstruc.XPosStr)
-    ELSE
- '     CALL PrintStr(4, 1, "A Pos: ")
- '     CALL PrintStr(4, 8, SCANstruc.APosStr)
-    END IF
-  ELSE
- '   CALL PrintStr(1, 1, "Move Y Axis to End  ")
-'    CALL PrintStr(2, 1, "Pos; Press Enter Key")
-'    CALL PrintStr(4, 1, "Y Pos: ")
- '   CALL PrintStr(4, 8, SCANstruc.YPosStr)
-  END IF
-
-  MFlag = 2
-  GOSUB MoveAxis
-
-  'IF KeyPress = KeyEsc THEN
- '   CALL StopMtrs
-  '  EXIT SUB
- ' END IF
-
- ' CALL PrintClrStr(2, 1, " ")
-'  CALL PrintClrStr(1, 1, "Enter Dis: ")
- ' CALL SetLcdPos(1, 12)
-
-  GOSUB GetDis
-
-  EXIT SUB
-
-  GetDis:
-    LOCAL EndCts AS LONG
-    LOCAL StartCts AS LONG
-    LOCAL Temp AS STRING
-    Temp$ = SPACE$(10)
-    'CALL KEdit(Temp$, XCode)  'get input
-    'IF XCode = KeyEnter THEN
-    '  IF VAL(Temp$) > 0 THEN
-    IF AxisNum = Servo1 THEN
-      IF  EncNum = Servo1 THEN
-        SCANstruc.XCal = VAL(Temp$)
-        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
-      ELSE
-        SCANstruc.ACal = VAL(Temp$)
-        SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
-      END IF
-    ELSE
-      SCANstruc.YCal = VAL(Temp$)
-      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
-    END IF
-    IF ABS(EndCts& - StartCts&) > 0 THEN
-      IF AxisNum = Servo1 THEN
-        IF EncNum = Servo1 THEN
-          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
-          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
-        ELSE
-          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
-          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
-        END IF
-      ELSE
-        SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
-        SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
-      END IF
-    END IF
-'      END IF
-'    END IF
-RETURN
-
-MoveAxis:
-  LOCAL KeyPress AS INTEGER
-  DO
-  '    DO
-  '    LOOP UNTIL KeyInBuff
-  '    KeyPress = GetSelectKey
-'    IF (KeyPress = KeyUP AND AxisNum = 1) THEN
-    IF (AxisNum = 1) THEN
-     CALL MoveXVel(PosDir)
-     DO
-       CALL GetXyPos
-       IF EncNum = Servo1 THEN
-  '       CALL PrintStr(4, 8, SCANstruc.XPosStr)
-       ELSE
-  '       CALL PrintStr(4, 8, SCANstruc.APosStr)
-       END IF
-     LOOP WHILE KeyDown
-     CALL StopMtrs
-     'FlushKeys
-    ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
-     CALL MoveXVel(NegDir)
-     DO
-       CALL GetXyPos
-       IF EncNum = Servo1 THEN
-     '    CALL PrintStr(4, 8, SCANstruc.XPosStr)
-       ELSE
-      '   CALL PrintStr(4, 8, SCANstruc.APosStr)
-       END IF
-     LOOP WHILE KeyDown
-     CALL StopMtrs
-     'FlushKeys
-    ELSEIF KeyPress = (KeyLft AND AxisNum = 3) THEN
-     CALL MoveYVel(NegDir)
-     DO
-       CALL GetXyPos
-    '   CALL PrintStr(4, 8, SCANstruc.YPosStr)
-     LOOP WHILE KeyDown
-     CALL StopMtrs
-     'FlushKeys
-
-    ELSEIF KeyPress = (KeyRgt AND AxisNum = 3) THEN
-     CALL MoveYVel(PosDir)
-     DO
-       CALL GetXyPos
-   '    CALL PrintStr(4, 8, SCANstruc.YPosStr)
-     LOOP WHILE KeyDown
-     CALL StopMtrs
-     'FlushKeys
-   END IF
-  LOOP UNTIL KeyPress = (KeyEsc OR KeyPress = KeyEnter)
-
-  CALL GetXyPos
-
-  IF MFlag = 1 THEN      'start position cts
-    IF AxisNum = Servo1 THEN  'X encoder cal
-      IF EncNum = Servo1 THEN
-    StartCts& = Glo.Position(Servo1)
-      ELSE
-    StartCts& = Glo.Position(Servo4)
-      END IF
-    ELSE                 'Y encoder cal
-      StartCts& = Glo.Position(Servo3)
-    END IF
-  ELSE                   'end position cts
-    IF AxisNum = Servo1 THEN  'X encoder cal
-      IF EncNum = Servo1 THEN
-    EndCts& = Glo.Position(Servo1)
-      ELSE
-    EndCts& = Glo.Position(Servo4)
-      END IF
-    ELSE                 'Y encoder cal
-      EndCts& = Glo.Position(Servo3)
-    END IF
-  END IF
-RETURN
-
-END SUB
 DECLARE SUB MoveXVel (dir)
 SUB MoveXVel (MoveDir)
    LOCAL ControlByte AS INTEGER
@@ -1396,5 +1215,126 @@ SUB GoYMtr
   LOCAL Cmd AS STRING
   Cmd$ = CHR$(&H5)
   SendCmd Servo3, Cmd$
+
+END SUB
+DECLARE SUB JogJoyStk ()
+SUB JogJoyStk
+  LOCAL StopOn AS INTEGER
+  LOCAL keyinbuff AS INTEGER 'to be removed
+  'add limit switch stop; enable with 'stop on find home'
+  'use PWM mode
+
+
+  IF NOT (SCANstruc.XEnable) THEN
+    'PrintClrStr 1, 1, "* Check Motors On *"
+    'PrintClrStr 2, 1, "*  Press Any Key  *"
+    DO
+    LOOP UNTIL KeyInBuff
+    'FlushKeys
+    EXIT SUB
+  END IF
+
+  'PrintStr 1, 1, "X Pos: "
+  'PrintStr 2, 1, "Y Pos: "
+  'PrintStr 3, 1, "A Pos: "
+
+  SetModePwm
+
+  StopOn = FALSE
+
+  DO
+
+      'IF GetSelectKey = KeyEsc THEN EXIT DO
+
+      'CALL PrintPos   'get stats also
+
+      'calculated PWM output based on A/D 1 & 2
+      IF Glo.Ad2 <= 127 THEN 'left
+     Glo.CmdPwm(2) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+     Glo.CmdPwm(1) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(2))
+      ELSE 'right
+     Glo.CmdPwm(1) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+     Glo.CmdPwm(2) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(1))
+      END IF
+
+
+      IF Glo.CmdPwm(1) = 0 AND Glo.CmdPwm(2) = 0 THEN
+    IF SCANstruc.AutoHold THEN
+      IF NOT StopOn THEN
+        CALL StopMtrs 'put into velocity mode and set velocity to 0
+        SetModeVel 'sets vel to 0
+        StopOn = TRUE
+      END IF
+    ELSE
+      GOSUB SetJoyPwm
+    END IF
+      ELSE
+    GOSUB SetJoyPwm
+      END IF
+
+  LOOP
+
+  'FlushKeys
+
+  IF SCANstruc.AutoHold THEN
+    CALL StopMtrs 'put into velocity mode and set velocity to 0
+    SetModeVel 'sets vel to 0
+  ELSE
+    SetModePwm  'put into pwm mode and set output to zero
+  END IF
+
+  EXIT SUB
+
+SetJoyPwm:
+
+  CALL SetPwm(Servo1, Glo.CmdPwm(1))
+  CALL SetPwm(Servo2, Glo.CmdPwm(2))
+  GoXMtrs
+  StopOn = FALSE
+  RETURN
+
+END SUB
+DECLARE SUB SetModePwm
+SUB SetModePwm
+  LOCAL Cmd AS STRING
+  LOCAL x AS INTEGER
+  ControlByte = LoadPWM OR StartNow
+  x = 0
+  'Build the command string
+  Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
+
+  SendCmd &HFF, Cmd$
+
+END SUB
+DECLARE SUB SetModeVel ()
+SUB SetModeVel
+    LOCAL Cmd AS STRING
+    LOCAL X1 AS LONG
+    ControlByte = LoadVel OR PosMode OR VelMode OR StartNow
+
+    X1& = 0  'velocity
+
+    'build the command string
+    Cmd$ = CHR$(&H54) + CHR$(ControlByte) + LongToStr(X1&)
+
+    SendCmd &HFF, Cmd$
+
+END SUB
+DECLARE SUB SetPwm (MtrNum, PVal)
+SUB SetPwm (MtrNum, PwmVal)
+    LOCAL x AS INTEGER
+    IF PwmVal > 0 THEN
+      ControlByte = LoadPWM
+      x = PwmVal
+    ELSE
+      ControlByte = LoadPWM OR RevDir
+      x = -(PwmVal)  'Neg of a Neg number = postive number
+    END IF
+
+    'Build the command string
+    Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
+
+    SendCmd MtrNum, Cmd$
+
 
 END SUB

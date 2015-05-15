@@ -63,13 +63,15 @@ SUB CalEncoder (EncNum)
 END SUB
 
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
-    MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
+'    MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
+    CALL SetForAuto
+    JogJoyStk
 END FUNCTION
 
 CALLBACK FUNCTION BTN_AJOG_CALL()
-    MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
+'    MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
     CALL SetForAuto
-'    JogAuto
+    JogAuto
 END FUNCTION
 
 CALLBACK FUNCTION BTN_SAVE_CALL()
@@ -148,7 +150,6 @@ LOCAL i AS LONG
                 END IF
                 CALL StopMtrs
             ELSEIF CBLPARAM = %VK_DOWN THEN
-                 MFlag = 2
                  IF (AxisNum = 1) THEN
                     CALL MoveXVel(NegDir)
                     CALL GetXyPos
@@ -160,44 +161,53 @@ LOCAL i AS LONG
                  END IF
 
                  CALL StopMtrs
+             ELSEIF CBLPARAM = %VK_LEFT THEN
+                 IF (AxisNum = 3) THEN
+                    CALL MoveYVel(NegDir)
+                    CALL GetXyPos
+                    CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.YPosStr
+                 END IF
+                 CALL StopMtrs
+             ELSEIF CBLPARAM = %VK_RIGHT THEN
+                 IF (AxisNum = 3) THEN
+                    CALL MoveYVel(PosDir)
+                    CALL GetXyPos
+                    CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.YPosStr
+                 END IF
+                 CALL StopMtrs
 
-'            elseIF CBLPARAM = %VK_RETURN THEN
-'                LOCAL EndCts AS LONG
-'                LOCAL StartCts AS LONG
-'                LOCAL TXT AS STRING
-'                TXT$     = SPACE$(10)
- '               CONTROL GET TEXT hDlg2, %IDC_EB_STARTEND TO TXT$
- '               IF mflag  <> 2 THEN
- '                   IF AxisNum = Servo1 THEN
- '                       IF  GEncNum = Servo1 THEN
-'                            SCANstruc.XCal = VAL(TXT$)
-'                            SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
-'                        END IF
-'                    END IF
-'                    IF ABS(EndCts& - StartCts&) > 0 THEN
-'                        IF AxisNum = Servo1 THEN
-'                            IF GEncNum = Servo1 THEN
-'                             SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
-'                             SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
-'                            END IF
-'                        END IF
-'                    END IF
-'
-'                    IF AxisNum = Servo1 THEN 'X
-'                       CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move X Axis to End  "
-'                    END IF
-'                    IF GEncNum = Servo1 THEN
-'                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, SCANstruc.XPosStr
-''                    END IF
-'                END IF
-'                    IF MFlag = 2 THEN
-'                         CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
-'                         CONTROL SET TEXT hDlg2, %IDC_LABEL25, ""
-'                         CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Enter Dis : "
-'                         CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, "0"
-'                    END IF
+             ELSEIF CBLPARAM = %VK_RETURN THEN
+                LOCAL EndCts AS LONG
+                LOCAL StartCts AS LONG
+                LOCAL TXT AS STRING
+                TXT$     = SPACE$(10)
+                CALL GetXyPos
+                CONTROL GET TEXT hDlg2, %IDC_EB_STARTEND TO TXT$
+                IF MFlag = 1 THEN      'start position cts
+                     IF AxisNum = Servo1 THEN  'X encoder cal
+                        IF GEncNum = Servo1 THEN
+                            StartCts& = Glo.Position(Servo1)
+                        ELSE
+                            StartCts& = Glo.Position(Servo4)
+                        END IF
+                     ELSE
+                            StartCts& = Glo.Position(Servo3)
+                     END IF
+               ELSE                   'end position cts
+                     IF AxisNum = Servo1 THEN  'X encoder cal
+                          IF GEncNum = Servo1 THEN
+                                EndCts& = Glo.Position(Servo1)
+                          ELSE
+                                EndCts& = Glo.Position(Servo4)
+                          END IF
+                     ELSE                 'Y encoder cal
+                          EndCts& = Glo.Position(Servo3)
+                     END IF
+              END IF
+
             ELSEIF CBLPARAM = %VK_ESCAPE THEN
                 CALL StopMtrs
+            END IF
          END IF
       CASE %WM_DESTROY
          'Important! Remove the subclassing

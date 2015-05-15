@@ -119,7 +119,7 @@ GLOBAL XSpd()  AS LONG
 GLOBAL YSpd()  AS LONG
 GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
-
+GLOBAL controlbyte AS BYTE
 
 '****************************************************************************************************
 TYPE GloRecord
@@ -1215,5 +1215,127 @@ SUB GoYMtr
   LOCAL Cmd AS STRING
   Cmd$ = CHR$(&H5)
   SendCmd Servo3, Cmd$
+
+END SUB
+DECLARE SUB JogJoyStk ()
+SUB JogJoyStk
+  LOCAL StopOn AS INTEGER
+  LOCAL keyinbuff AS INTEGER 'to be removed
+  'add limit switch stop; enable with 'stop on find home'
+  'use PWM mode
+
+
+  IF NOT (SCANstruc.XEnable) THEN
+    'PrintClrStr 1, 1, "* Check Motors On *"
+    'PrintClrStr 2, 1, "*  Press Any Key  *"
+    DO
+    LOOP UNTIL KeyInBuff
+    'FlushKeys
+    EXIT SUB
+  END IF
+
+  'PrintStr 1, 1, "X Pos: "
+  'PrintStr 2, 1, "Y Pos: "
+  'PrintStr 3, 1, "A Pos: "
+
+  SetModePwm
+
+  StopOn = FALSE
+
+  DO
+
+      'IF GetSelectKey = KeyEsc THEN EXIT DO
+
+      'CALL PrintPos   'get stats also
+
+      'calculated PWM output based on A/D 1 & 2
+      IF Glo.Ad2 <= 127 THEN 'left
+     Glo.CmdPwm(2) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+     Glo.CmdPwm(1) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(2))
+      ELSE 'right
+     Glo.CmdPwm(1) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+     Glo.CmdPwm(2) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(1))
+      END IF
+
+
+      IF Glo.CmdPwm(1) = 0 AND Glo.CmdPwm(2) = 0 THEN
+    IF SCANstruc.AutoHold THEN
+      IF NOT StopOn THEN
+        CALL StopMtrs 'put into velocity mode and set velocity to 0
+        SetModeVel 'sets vel to 0
+        StopOn = TRUE
+      END IF
+    ELSE
+      GOSUB SetJoyPwm
+    END IF
+      ELSE
+    GOSUB SetJoyPwm
+      END IF
+
+  LOOP
+
+  'FlushKeys
+
+  IF SCANstruc.AutoHold THEN
+    CALL StopMtrs 'put into velocity mode and set velocity to 0
+    SetModeVel 'sets vel to 0
+  ELSE
+    SetModePwm  'put into pwm mode and set output to zero
+  END IF
+
+  EXIT SUB
+
+SetJoyPwm:
+
+  CALL SetPwm(Servo1, Glo.CmdPwm(1))
+  CALL SetPwm(Servo2, Glo.CmdPwm(2))
+  GoXMtrs
+  StopOn = FALSE
+  RETURN
+
+END SUB
+DECLARE SUB SetModePwm
+SUB SetModePwm
+  LOCAL Cmd AS STRING
+  LOCAL x AS INTEGER
+  ControlByte = LoadPWM OR StartNow
+  x = 0
+  'Build the command string
+  Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
+
+  SendCmd &HFF, Cmd$
+
+END SUB
+DECLARE SUB SetModeVel ()
+SUB SetModeVel
+    LOCAL Cmd AS STRING
+    LOCAL X1 AS LONG
+    ControlByte = LoadVel OR PosMode OR VelMode OR StartNow
+
+    X1& = 0  'velocity
+
+    'build the command string
+    Cmd$ = CHR$(&H54) + CHR$(ControlByte) + LongToStr(X1&)
+
+    SendCmd &HFF, Cmd$
+
+END SUB
+DECLARE SUB SetPwm (MtrNum, PVal)
+SUB SetPwm (MtrNum, PwmVal)
+    LOCAL x AS INTEGER
+    LOCAL Cmd AS STRING
+    IF PwmVal > 0 THEN
+      ControlByte = LoadPWM
+      x = PwmVal
+    ELSE
+      ControlByte = LoadPWM OR RevDir
+      x = -(PwmVal)  'Neg of a Neg number = postive number
+    END IF
+
+    'Build the command string
+    Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
+
+    SendCmd MtrNum, Cmd$
+
 
 END SUB

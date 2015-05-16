@@ -120,7 +120,7 @@ GLOBAL YSpd()  AS LONG
 GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
 GLOBAL controlbyte AS BYTE
-
+GLOBAL ExitSub AS INTEGER
 '****************************************************************************************************
 TYPE GloRecord
    NumModules AS INTEGER
@@ -1215,8 +1215,8 @@ SUB GoYMtr
   LOCAL Cmd AS STRING
   Cmd$ = CHR$(&H5)
   SendCmd Servo3, Cmd$
-
 END SUB
+
 DECLARE SUB JogJoyStk ()
 SUB JogJoyStk
   LOCAL StopOn AS INTEGER
@@ -1225,14 +1225,14 @@ SUB JogJoyStk
   'use PWM mode
 
 
-  IF NOT (SCANstruc.XEnable) THEN
+'  IF NOT (SCANstruc.XEnable) THEN
     'PrintClrStr 1, 1, "* Check Motors On *"
     'PrintClrStr 2, 1, "*  Press Any Key  *"
-    DO
-    LOOP UNTIL KeyInBuff
+'    DO
+'    LOOP UNTIL KeyInBuff
     'FlushKeys
-    EXIT SUB
-  END IF
+'    EXIT SUB
+'  END IF
 
   'PrintStr 1, 1, "X Pos: "
   'PrintStr 2, 1, "Y Pos: "
@@ -1242,37 +1242,35 @@ SUB JogJoyStk
 
   StopOn = FALSE
 
-  DO
+'  DO
 
-      'IF GetSelectKey = KeyEsc THEN EXIT DO
-
-      'CALL PrintPos   'get stats also
+'      IF ExitSub THEN EXIT DO
 
       'calculated PWM output based on A/D 1 & 2
-      IF Glo.Ad2 <= 127 THEN 'left
-     Glo.CmdPwm(2) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
-     Glo.CmdPwm(1) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(2))
-      ELSE 'right
-     Glo.CmdPwm(1) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
-     Glo.CmdPwm(2) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(1))
-      END IF
 
+      IF Glo.Ad2 <= 127 THEN 'left
+        Glo.CmdPwm(2) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+        Glo.CmdPwm(1) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(2))
+      ELSE 'right
+        Glo.CmdPwm(1) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
+        Glo.CmdPwm(2) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(1))
+      END IF
 
       IF Glo.CmdPwm(1) = 0 AND Glo.CmdPwm(2) = 0 THEN
-    IF SCANstruc.AutoHold THEN
-      IF NOT StopOn THEN
-        CALL StopMtrs 'put into velocity mode and set velocity to 0
-        SetModeVel 'sets vel to 0
-        StopOn = TRUE
+         IF SCANstruc.AutoHold THEN
+           IF NOT StopOn THEN
+            CALL StopMtrs 'put into velocity mode and set velocity to 0
+            SetModeVel 'sets vel to 0
+            StopOn = TRUE
+           END IF
+         ELSE
+         GOSUB SetJoyPwm
       END IF
-    ELSE
-      GOSUB SetJoyPwm
-    END IF
       ELSE
-    GOSUB SetJoyPwm
+         GOSUB SetJoyPwm
       END IF
 
-  LOOP
+'  LOOP
 
   'FlushKeys
 
@@ -1294,6 +1292,7 @@ SetJoyPwm:
   RETURN
 
 END SUB
+
 DECLARE SUB SetModePwm
 SUB SetModePwm
   LOCAL Cmd AS STRING
@@ -1306,6 +1305,7 @@ SUB SetModePwm
   SendCmd &HFF, Cmd$
 
 END SUB
+
 DECLARE SUB SetModeVel ()
 SUB SetModeVel
     LOCAL Cmd AS STRING
@@ -1320,6 +1320,7 @@ SUB SetModeVel
     SendCmd &HFF, Cmd$
 
 END SUB
+
 DECLARE SUB SetPwm (MtrNum, PVal)
 SUB SetPwm (MtrNum, PwmVal)
     LOCAL x AS INTEGER
@@ -1336,6 +1337,5 @@ SUB SetPwm (MtrNum, PwmVal)
     Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
 
     SendCmd MtrNum, Cmd$
-
 
 END SUB

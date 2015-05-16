@@ -62,12 +62,6 @@ SUB CalEncoder (EncNum)
   Mflag = 1
 END SUB
 
-CALLBACK FUNCTION BTN_JOYSTICK_CALL()
-'    MSGBOX "JoyStick, hit OK to continue",, "Title of subroutine 123"
-    CALL SetForAuto
-    JogJoyStk
-END FUNCTION
-
 CALLBACK FUNCTION BTN_AJOG_CALL()
 '    MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
     CALL SetForAuto
@@ -126,6 +120,54 @@ END FUNCTION
 
 CALLBACK FUNCTION DlgProc () AS LONG
 ' Empty
+END FUNCTION
+
+CALLBACK FUNCTION BTN_JOYSTICK_CALL()
+
+    LOCAL  x      AS LONG
+    BUILDJOYWINDOW()
+
+    DIALOG SHOW MODELESS hDlg4, CALL DlgProcJoyStk
+    CALL SetForAuto
+    JogJoyStk
+    DIALOG ENABLE hDlg4
+     DO
+          ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg4 TO x, x
+          DIALOG DOEVENTS  0
+    LOOP WHILE x&
+END FUNCTION
+CALLBACK FUNCTION DlgProcJoyStk () AS LONG
+LOCAL i AS LONG
+   SELECT CASE CBMSG
+      CASE %WM_INITDIALOG
+         'Subclass the editbox control
+         STATIC  hEdit9, hEditA, hEditB AS LONG
+         CONTROL HANDLE CBHNDL, %IDC_EB_XPOSPRINT  TO hEdit9
+         CONTROL HANDLE CBHNDL, %IDC_EB_YPOSPRINT  TO hEditA
+         CONTROL HANDLE CBHNDL, %IDC_EB_APOSPRINT  TO hEditB
+         gOldEditClassProc = SetWindowLong(hEdit9, %GWL_WNDPROC, CODEPTR(Edit9SubClassProc))
+         gOldEditClassProc = SetWindowLong(hEditA, %GWL_WNDPROC, CODEPTR(EditASubClassProc))
+         gOldEditClassProc = SetWindowLong(hEditB, %GWL_WNDPROC, CODEPTR(EditBSubClassProc))
+         Exitsub = 0
+
+      CASE %WM_KEYDOWN
+         IF CBCTL = (%IDC_EB_XPOSPRINT OR %IDC_EB_YPOSPRINT OR %IDC_EB_APOSPRINT )THEN
+            IF CBLPARAM = %VK_ESCAPE THEN
+                ExitSub = 1
+            END IF
+         END IF
+         CALL GetXyPos
+         CONTROL SET TEXT hDlg4, %IDC_EB_XPOSPRINT, SCANstruc.XPosStr
+         CONTROL SET TEXT hDlg4, %IDC_EB_YPOSPRINT, SCANstruc.YPosStr
+         CONTROL SET TEXT hDlg4, %IDC_EB_APOSPRINT, SCANstruc.APosStr
+         JogJoyStk
+      CASE %WM_DESTROY
+         'Important! Remove the subclassing
+         SetWindowLong hEdit9, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEditA, %GWL_WNDPROC, gOldEditClassProc
+         SetWindowLong hEditB, %GWL_WNDPROC, gOldEditClassProc
+   END SELECT
 END FUNCTION
 
 CALLBACK FUNCTION DlgProcCalEnc () AS LONG

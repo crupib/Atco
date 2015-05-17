@@ -64,6 +64,7 @@
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
 %IDC_EB_STARTEND = 3008
+%ID_Timer = 500   'ID of timer
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003
@@ -91,7 +92,7 @@ GLOBAL ghMsgHook   AS DWORD
 GLOBAL hDlg, hDlg1, hDlg2, hDlg3, hDlg4 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
-GLOBAL ExitSub, keypress AS INTEGER
+GLOBAL keypress AS INTEGER
 GLOBAL AxisNum, MFlag, GEncNum AS INTEGER
 
 
@@ -117,8 +118,6 @@ DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
 '#If Not %Def(%FUNCTION_SPLASH)
 
 '%FUNCTION_SPLASH = 1
-
-
 
 
 '------------------------------------------------------------------------------
@@ -626,9 +625,13 @@ CALLBACK FUNCTION EditControlCallback()
                  END IF
     'Calibrate x y a
             CASE %IDC_EB_STARTEND
+
             CASE %IDC_EB_XPOSPRINT
+    '            exitsub = 1
             CASE %IDC_EB_YPOSPRINT
+    '            exitsub = 1
             CASE %IDC_EB_APOSPRINT
+     '           exitsub = 1
 
        END SELECT
  END IF

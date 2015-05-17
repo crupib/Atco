@@ -1242,9 +1242,9 @@ SUB JogJoyStk
 
   StopOn = FALSE
 
-'  DO
-
-'      IF ExitSub THEN EXIT DO
+  DO
+      DIALOG DOEVENTS  1
+      IF ExitSub THEN EXIT DO
 
       'calculated PWM output based on A/D 1 & 2
 
@@ -1270,7 +1270,7 @@ SUB JogJoyStk
          GOSUB SetJoyPwm
       END IF
 
-'  LOOP
+  LOOP
 
   'FlushKeys
 

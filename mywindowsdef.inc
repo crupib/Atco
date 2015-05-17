@@ -1,5 +1,6 @@
 
 'Windows consts, variables, routines, etc....
+%ID_Timer = 500
 %IDC_LABEL1 = 1112
 %IDC_LABEL2 = 1113
 %IDC_LABEL3 = 1114
@@ -64,6 +65,7 @@
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
 %IDC_EB_STARTEND = 3008
+%ID_Timer = 500   'ID of timer
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003
@@ -117,8 +119,6 @@ DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
 '#If Not %Def(%FUNCTION_SPLASH)
 
 '%FUNCTION_SPLASH = 1
-
-
 
 
 '------------------------------------------------------------------------------
@@ -626,9 +626,13 @@ CALLBACK FUNCTION EditControlCallback()
                  END IF
     'Calibrate x y a
             CASE %IDC_EB_STARTEND
+
             CASE %IDC_EB_XPOSPRINT
+    '            exitsub = 1
             CASE %IDC_EB_YPOSPRINT
+    '            exitsub = 1
             CASE %IDC_EB_APOSPRINT
+     '           exitsub = 1
 
        END SELECT
  END IF

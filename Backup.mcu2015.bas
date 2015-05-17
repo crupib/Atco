@@ -1,6 +1,7 @@
 #COMPILE EXE
 #DIM ALL
 #INCLUDE "Win32API.inc"
+#INCLUDE "DDT.INC"
 #RESOURCE ICON, exeICON, "ATCO.ico"
 DEFINT A-Z
 #INCLUDE "ATCO.inc"
@@ -91,8 +92,8 @@ FUNCTION PBMAIN () AS LONG
    '
    '  - check PIC, power on, etc..
    '***********************************************
-    IsSplashActive = 0
-    ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+'    IsSplashActive = 1
+ '   ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
     IF NOT OpenComPorts THEN
      MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
      DO

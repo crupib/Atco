@@ -1221,30 +1221,16 @@ DECLARE SUB JogJoyStk ()
 SUB JogJoyStk
   LOCAL StopOn AS INTEGER
   LOCAL keyinbuff AS INTEGER 'to be removed
+  LOCAL COUNT AS LONG
   'add limit switch stop; enable with 'stop on find home'
   'use PWM mode
-
-
-'  IF NOT (SCANstruc.XEnable) THEN
-    'PrintClrStr 1, 1, "* Check Motors On *"
-    'PrintClrStr 2, 1, "*  Press Any Key  *"
-'    DO
-'    LOOP UNTIL KeyInBuff
-    'FlushKeys
-'    EXIT SUB
-'  END IF
-
-  'PrintStr 1, 1, "X Pos: "
-  'PrintStr 2, 1, "Y Pos: "
-  'PrintStr 3, 1, "A Pos: "
-
   SetModePwm
 
   StopOn = FALSE
 
-  DO
-      DIALOG DOEVENTS  0
-      IF ExitSub THEN EXIT DO
+  'DO
+  '    DIALOG DOEVENTS to count
+  '    IF ExitSub THEN EXIT DO
 
       'calculated PWM output based on A/D 1 & 2
 
@@ -1270,7 +1256,7 @@ SUB JogJoyStk
          GOSUB SetJoyPwm
       END IF
 
-  LOOP
+ ' LOOP
 
   'FlushKeys
 

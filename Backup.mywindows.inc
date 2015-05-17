@@ -121,9 +121,10 @@ END FUNCTION
 CALLBACK FUNCTION DlgProc () AS LONG
 ' Empty
 END FUNCTION
+GLOBAL hTimer AS LONG
 
 CALLBACK FUNCTION BTN_JOYSTICK_CALL()
-
+    LOCAL COUNT AS LONG
     LOCAL  x      AS LONG
     BUILDJOYWINDOW()
 
@@ -131,55 +132,32 @@ CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     CALL SetForAuto
     CALL JogJoyStk
     DIALOG ENABLE hDlg4
-     DO
+    DO
           ' Allow messages to be dispatched
           DIALOG GET SIZE hDlg4 TO x, x
-          DIALOG DOEVENTS  0
+          DIALOG DOEVENTS TO COUNT
     LOOP WHILE x&
 END FUNCTION
-
+CALLBACK FUNCTION BTN_JOYSTOP_CALL()
+    Exitsub = 1
+END FUNCTION
 CALLBACK FUNCTION DlgProcJoyStk () AS LONG
 LOCAL i AS LONG
+
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
          'Subclass the editbox control
-         STATIC  hEditA, hEditB, hEditC AS LONG
-         CONTROL HANDLE CBHNDL, %IDC_EB_XPOSPRINT  TO hEditA
-         CONTROL HANDLE CBHNDL, %IDC_EB_YPOSPRINT  TO hEditB
-         CONTROL HANDLE CBHNDL, %IDC_EB_APOSPRINT  TO hEditC
-         gOldEditClassProc = SetWindowLong(hEditA, %GWL_WNDPROC, CODEPTR(EditASubClassProc))
-         gOldEditClassProc = SetWindowLong(hEditB, %GWL_WNDPROC, CODEPTR(EditBSubClassProc))
-         gOldEditClassProc = SetWindowLong(hEditC, %GWL_WNDPROC, CODEPTR(EditCSubClassProc))
-       '  SetTimer(CBHNDL, %ID_Timer, 5, ByVal %NULL)
+         htimer = SetTimer(CBHNDL, &hFFFF, 1, BYVAL %NULL)
+         DIALOG POST CBHNDL, %WM_TIMER, &hFFFF, 0
          Exitsub = 0
-   '   CASE %WM_TIMER
-    '     CALL GetXyPos
-   '      CONTROL SET TEXT hDlg4, %IDC_EB_XPOSPRINT, SCANstruc.XPosStr
-   '      CONTROL SET TEXT hDlg4, %IDC_EB_YPOSPRINT, SCANstruc.YPosStr
-   '      CONTROL SET TEXT hDlg4, %IDC_EB_APOSPRINT, SCANstruc.APosStr
-      CASE %WM_KEYDOWN
-         IF CBCTL = (%IDC_EB_XPOSPRINT)THEN
-            IF CBLPARAM = %VK_ESCAPE THEN
-                ExitSub = 1
-            END IF
-         END IF
-         IF CBCTL = (%IDC_EB_YPOSPRINT)THEN
-            IF CBLPARAM = %VK_ESCAPE THEN
-                ExitSub = 1
-            END IF
-         END IF
-         IF CBCTL = (%IDC_EB_APOSPRINT )THEN
-            IF CBLPARAM = %VK_ESCAPE THEN
-                ExitSub = 1
-            END IF
-         END IF
-
+      CASE %WM_TIMER
+            CALL GetXyPos
+            CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
+            CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
+            CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
       CASE %WM_DESTROY
          'Important! Remove the subclassing
-         SetWindowLong hEditC, %GWL_WNDPROC, gOldEditClassProc
-         SetWindowLong hEditA, %GWL_WNDPROC, gOldEditClassProc
-         SetWindowLong hEditB, %GWL_WNDPROC, gOldEditClassProc
-        ' KillTimer CBHNDL, %ID_Timer
+         KillTimer hDlg4, &hFFFF
    END SELECT
 END FUNCTION
 

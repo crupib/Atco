@@ -1228,9 +1228,9 @@ SUB JogJoyStk
 
   StopOn = FALSE
 
-  'DO
-  '    DIALOG DOEVENTS to count
-  '    IF ExitSub THEN EXIT DO
+  DO
+      DIALOG DOEVENTS 1
+      IF ExitSub THEN EXIT DO
 
       'calculated PWM output based on A/D 1 & 2
 
@@ -1256,7 +1256,7 @@ SUB JogJoyStk
          GOSUB SetJoyPwm
       END IF
 
- ' LOOP
+  LOOP
 
   'FlushKeys
 
@@ -1323,5 +1323,21 @@ SUB SetPwm (MtrNum, PwmVal)
     Cmd$ = CHR$(&H24) + CHR$(ControlByte) + CHR$(x)
 
     SendCmd MtrNum, Cmd$
+
+END SUB
+DECLARE SUB JogAuto ()
+SUB JogAuto
+
+  'add limit switch stop; enable with 'stop on find home'
+
+  'reset x encoders to insure they match
+  CALL SetXCtrs
+
+  StopMtrs  'stop motors in velocity mode
+  SetModeVel 'sets vel to 0
+
+  'REMED
+  'add home postion (limit button hit) check in case of error!
+
 
 END SUB

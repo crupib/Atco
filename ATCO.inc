@@ -1325,3 +1325,29 @@ SUB SetPwm (MtrNum, PwmVal)
     SendCmd MtrNum, Cmd$
 
 END SUB
+DECLARE SUB JogAuto ()
+SUB JogAuto
+
+  'add limit switch stop; enable with 'stop on find home'
+
+  'reset x encoders to insure they match
+  CALL SetXCtrs
+
+  StopMtrs  'stop motors in velocity mode
+  SetModeVel 'sets vel to 0
+
+  'REMED
+  'add home postion (limit button hit) check in case of error!
+
+
+END SUB
+DECLARE SUB SetXCtrs ()
+SUB SetXCtrs
+
+  CALL GetXyPos
+  SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+  SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+  CALL ResetPosition(Servo1)
+  CALL ResetPosition(Servo2)
+
+END SUB

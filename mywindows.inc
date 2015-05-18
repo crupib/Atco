@@ -62,12 +62,56 @@ SUB CalEncoder (EncNum)
   Mflag = 1
 END SUB
 
+CALLBACK FUNCTION BTN_AJOGSTOP_CALL()
+    CALL StopMtrs
+    SetModeVel 'sets vel to 0
+END FUNCTION
 CALLBACK FUNCTION BTN_AJOG_CALL()
 '    MSGBOX "A-Jog, hit OK to continue",, "Title of subroutine 123"
-    CALL SetForAuto
-'    JogAuto
-END FUNCTION
+    LOCAL COUNT AS LONG
+    LOCAL  x      AS LONG
 
+    BUILDAJOGWINDOW()
+
+    DIALOG SHOW MODELESS hDlg4, CALL DlgProcAJog
+    CALL SetForAuto
+    JogAuto
+
+    DIALOG ENABLE hDlg4
+    DO
+          ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg4 TO x, x
+          DIALOG DOEVENTS TO COUNT
+    LOOP WHILE x&
+END FUNCTION
+CALLBACK FUNCTION DlgProcAJog () AS LONG
+LOCAL i AS LONG
+   SELECT CASE CBMSG
+      CASE %WM_INITDIALOG
+      CASE %WM_LBUTTONDOWN
+          CALL MoveXVel(PosDir)
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
+      CASE %WM_RBUTTONDOWN
+          CALL MoveXVel(NegDir)
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
+      CASE %WM_LBUTTONUP
+          CALL MoveYVel(NegDir)
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
+      CASE %WM_RBUTTONUP
+          CALL MoveYVel(PosDir)
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
+      CASE %WM_DESTROY
+         'Important! Remove the subclassing
+   END SELECT
+END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
     MSGBOX "SAVE, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
@@ -154,6 +198,8 @@ LOCAL i AS LONG
             CONTROL SET TEXT hDlg4, %IDC_LABEL_XPOSPRINT, SCANstruc.XPosStr
             CONTROL SET TEXT hDlg4, %IDC_LABEL_YPOSPRINT, SCANstruc.YPosStr
             CONTROL SET TEXT hDlg4, %IDC_LABEL_APOSPRINT, SCANstruc.APosStr
+      CASE %WM_LBUTTONDOWN
+            exitsub = 1
       CASE %WM_DESTROY
          'Important! Remove the subclassing
          KillTimer hDlg4, &hFFFF

@@ -1327,7 +1327,6 @@ MoveAxis:
     LOOP WHILE KeyDown
     CALL StopMtrs
     FlushKeys
-
       ELSEIF (KeyPress = KeyDN AND AxisNum = 1) THEN
     CALL MoveXVel(NegDir)
     DO

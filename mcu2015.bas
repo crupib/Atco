@@ -50,42 +50,9 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
-    StartLPos(0) = &H0
-    StartLPos(1) = &H40
-    StartLPos(2) = &H14
-    StartLPos(3) = &H54
+
   'new keypad layout
-    KeyTable(0) = ""
-    KeyTable(1) = CHR$(0) + CHR$(77) 'RgtArrow
-    KeyTable(2) = CHR$(0) + CHR$(75) 'LftArrow
-    KeyTable(3) = CHR$(0) + CHR$(80) 'DnArrow
-    KeyTable(4) = CHR$(0) + CHR$(72) 'UpArrow
-    KeyTable(5) = CHR$(13)           'Ent
-    KeyTable(6) = CHR$(32)           'Space
-    KeyTable(7) = CHR$(8)            'BkSpace
-    KeyTable(8) = CHR$(27)           'ESC
-    KeyTable(9) = CHR$(46)           '.
-    KeyTable(10) = CHR$(57)          '9
-    KeyTable(11) = CHR$(54)          '6
-    KeyTable(12) = CHR$(51)          '3
-    KeyTable(13) = CHR$(48)          '0
-    KeyTable(14) = CHR$(56)          '8
-    KeyTable(15) = CHR$(53)          '5
-    KeyTable(16) = CHR$(50)          '2
-    KeyTable(17) = CHR$(46)          '.
-    KeyTable(18) = CHR$(55)          '7
-    KeyTable(19) = CHR$(52)          '4
-    KeyTable(20) = CHR$(49)          '1
-    DIM  ExtKey(49 TO 57, 0 TO 3) AS INTEGER
-    ExtKey(49, 0) = 49: ExtKey(49, 1) = 65: ExtKey(49, 2) = 66: ExtKey(49, 3) = 67
-    ExtKey(50, 0) = 50: ExtKey(50, 1) = 68: ExtKey(50, 2) = 69: ExtKey(50, 3) = 70
-    ExtKey(51, 0) = 51: ExtKey(51, 1) = 71: ExtKey(51, 2) = 72: ExtKey(51, 3) = 73
-    ExtKey(52, 0) = 52: ExtKey(52, 1) = 74: ExtKey(52, 2) = 75: ExtKey(52, 3) = 76
-    ExtKey(53, 0) = 53: ExtKey(53, 1) = 77: ExtKey(53, 2) = 78: ExtKey(53, 3) = 79
-    ExtKey(54, 0) = 54: ExtKey(54, 1) = 80: ExtKey(54, 2) = 81: ExtKey(54, 3) = 82
-    ExtKey(55, 0) = 55: ExtKey(55, 1) = 83: ExtKey(55, 2) = 84: ExtKey(55, 3) = 85
-    ExtKey(56, 0) = 56: ExtKey(56, 1) = 86: ExtKey(56, 2) = 87: ExtKey(56, 3) = 88
-    ExtKey(57, 0) = 57: ExtKey(57, 1) = 89: ExtKey(57, 2) = 90: ExtKey(57, 3) = 196
+
    '***********************************************
    'Open & Check Com Buffers, Report & Fix errors
    '

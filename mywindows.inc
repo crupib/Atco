@@ -88,6 +88,9 @@ CALLBACK FUNCTION DlgProcAJog () AS LONG
 LOCAL i AS LONG
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
+           STATIC  hEdit9 AS LONG
+           CONTROL HANDLE CBHNDL, %IDC_LABEL_XPOSAJOG TO hEdit9
+           gOldEditClassProc = SetWindowLong(hEdit9, %GWL_WNDPROC, CODEPTR(EditASubClassProc))
       CASE %WM_LBUTTONDOWN
           CALL MoveXVel(PosDir)
           CALL GetXyPos
@@ -100,13 +103,13 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-      CASE %WM_LBUTTONDBLCLK
+      CASE  %WM_MBUTTONDOWN
           CALL MoveYVel(NegDir)
           CALL GetXyPos
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-      CASE %WM_RBUTTONDBLCLK
+      CASE %WM_MOUSEWHEEL
           CALL MoveYVel(PosDir)
           CALL GetXyPos
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
@@ -114,6 +117,7 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
       CASE %WM_DESTROY
          'Important! Remove the subclassing
+          SetWindowLong hEdit9, %GWL_WNDPROC, gOldEditClassProc
    END SELECT
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()

@@ -441,7 +441,7 @@ FUNCTION BUILDAJOGWINDOW() AS LONG
     TXT$ = "A Pos: "
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL36, TXT$,    550, 200, 150, 20
     TXT$ = ""
-    CONTROL ADD LABEL, hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr, 850, 100, 80, 20
+    CONTROL ADD LABEL, hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr, 850, 100, 80, 20 ,%WS_TABSTOP
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr, 850, 150, 80, 20
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr, 850, 200, 80, 20,
     CONTROL ADD BUTTON, hDlg5, %STOP_AJOY, "Stop AJOG", 100, 100, 200, 50,%BS_PUSHLIKE , , _
@@ -774,6 +774,15 @@ FUNCTION Edit9SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&)
       CASE %WM_KEYUP
          keypress = 1
          DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_EB_STARTEND  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION EditASubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         keypress = 1
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_LABEL_XPOSAJOG  , wParm&
    END SELECT
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)

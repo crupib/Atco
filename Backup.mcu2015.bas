@@ -40,7 +40,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  CalSet AS INTEGER
     DIM lResult AS LONG
   '****************************************************************************************************
- '   ghMsgHook = SetWindowsHookEx(%WH_MSGFILTER, CODEPTR(MsgFilterProc), %NULL, GetCurrentThreadId())
+    ghMsgHook = SetWindowsHookEx(%WH_MSGFILTER, CODEPTR(MsgFilterProc), %NULL, GetCurrentThreadId())
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
     PICPort ="COM1"
@@ -50,10 +50,7 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
- '   StartLPos(0) = &H0
-    StartLPos(1) = &H40
-    StartLPos(2) = &H14
-    StartLPos(3) = &H54
+
   'new keypad layout
 
    '***********************************************
@@ -96,6 +93,6 @@ FUNCTION PBMAIN () AS LONG
     CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
-  '  UnhookWindowsHookEx ghMsgHook
+    UnhookWindowsHookEx ghMsgHook
 
 END FUNCTION

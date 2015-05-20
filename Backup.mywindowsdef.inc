@@ -40,6 +40,9 @@
 %IDC_LABEL35 = 4019
 %IDC_LABEL36 = 4020
 
+%IDC_LABEL40 = 4021
+%IDC_LABEL41 = 4022
+%IDC_LABEL42 = 4023
 
 %IDC_LABEL_XPOSPRINT = 311
 %IDC_LABEL_YPOSPRINT = 312
@@ -48,6 +51,10 @@
 %IDC_LABEL_XPOSAJOG = 314
 %IDC_LABEL_YPOSAJOG = 315
 %IDC_LABEL_APOSAJOG = 316
+
+%IDC_LABEL_XPOSASCAN = 317
+%IDC_LABEL_YPOSASCAN = 318
+%IDC_LABEL_APOSASCAN = 319
 
 %IDC_EB_XSTART = 111
 %IDC_EB_XEND = 113
@@ -167,9 +174,23 @@ FUNCTION MsgFilterProc _
   lRetVal = CallNextHookEx(ghMsgHook, nCode, wParam, BYVAL lParam)
 
   IF nCode = %MSGF_DIALOGBOX THEN
+    MSGBOX "dialog"
     IF @ptmsg.message = %WM_KEYDOWN THEN
-        IF wParam = %VK_BACK THEN
-            MSGBOX "MsgFilterProc: WM_KEYDOWN"
+        MSGBOX "keydown"
+        IF wParam = %VK_DOWN THEN
+            CALL MoveYVel(NegDir)
+            CALL GetXyPos
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+            lRetVal = 0  ' 1
+        END IF
+        IF wParam = %VK_UP THEN
+            CALL MoveYVel(PosDir)
+                CALL GetXyPos
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
             lRetVal = 0  ' 1
         END IF
      END IF
@@ -540,7 +561,17 @@ FUNCTION BUILDAUTOSCANWINDOW() AS LONG
     CONTROL SET FONT hDlg3, %BEGIN, NormalFont&
     CONTROL ADD BUTTON, hDlg3,%ALL0, "&All0", 600, 600, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_ALL0_CALL()
-    CONTROL SET FONT hDlg, %ALL0, NormalFont&
+    CONTROL SET FONT hDlg3, %ALL0, NormalFont&
+    TXT$ = "X Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL40, TXT$,    550, 100, 150, 20
+    TXT$ = "Y Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL41, TXT$,    550, 150, 150, 20
+    TXT$ = "A Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL42, TXT$,    550, 200, 150, 20
+    TXT$ = ""
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_XPOSASCAN, SCANstruc.XPosStr, 850, 100, 80, 20
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_YPOSASCAN, SCANstruc.YPosStr, 850, 150, 80, 20
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_APOSASCAN, SCANstruc.APosStr, 850, 200, 80, 20,
 
 END FUNCTION
 

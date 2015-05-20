@@ -3,18 +3,18 @@ Copyright (c) 1996-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197407 total lines}
-Target compilation:  mcu2015.EXE
-Compile time:  0.8 seconds, at 14805525 lines/minute
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\msgfilter.bas   {194633 total lines}
+Target compilation:  msgfilter.EXE
+Compile time:  0.8 seconds, at 14597475 lines/minute
 
-39440 bytes compiled code, 49684 bytes RTLibrary,
-1612 bytes string literals, and 7476 bytes dgroup.
+1024 bytes compiled code, 39168 bytes RTLibrary,
+88 bytes string literals, and 2788 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 102928 bytes   Memory image: 58772 bytes.
+Disk image: 47616 bytes   Memory image: 42044 bytes.
 
 Component Files:
 ----------------
-C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas
+C:\Users\Bill\Documents\GitHub\Atco\msgfilter.bas
 D:\PBWIN10\WINAPI\WIN32API.INC
 D:\PBWIN10\WINAPI\SDKDDKVER.INC
 D:\PBWIN10\WINAPI\NTSTATUS.INC
@@ -95,11 +95,6 @@ D:\PBWIN10\WINAPI\MCX.INC
 D:\PBWIN10\WINAPI\MMSYSTEM.INC
 D:\PBWIN10\WINAPI\URLMON.INC
 D:\PBWIN10\WINAPI\WINDOWSX.INC
-C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\ATCO.INC
-C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\ATCOSER.INC
-C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\MYWINDOWS.INC
-C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\MYWINDOWSDEF.INC
-C:\USERS\BILL\DOCUMENTS\GITHUB\ATCO\FILE.INC
 
 
 Code Extracted:
@@ -559,18 +554,3 @@ COMBO_FINDSTRING
 COMBO_SELECTSTRING
 COMBOBOX_DIR
 COMBOBOX_FINDSTRINGEXACT
-KEYDOWN
-CALLOAD
-CLOSECOMMPORT
-DELETECOMMBUFFERS
-CLOSECOMPORTS
-SHOWSPLASHDLG
-DLGSPLASHPROC
-MSGFILTERPROC
-DFREAD
-DFREAD2
-DFWRITE
-DFWRITE2
-FCREATE
-FOPEN
-FCLOSE

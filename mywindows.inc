@@ -88,6 +88,7 @@ CALLBACK FUNCTION DlgProcAJog () AS LONG
 LOCAL i AS LONG
    SELECT CASE CBMSG
       CASE %WM_INITDIALOG
+
       CASE %WM_LBUTTONDOWN
           CALL MoveXVel(PosDir)
           CALL GetXyPos
@@ -100,19 +101,20 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-      CASE %WM_LBUTTONDBLCLK
+      CASE %WM_MOUSEWHEEL
           CALL MoveYVel(NegDir)
           CALL GetXyPos
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-      CASE %WM_RBUTTONDBLCLK
+      CASE %WM_MBUTTONDOWN
           CALL MoveYVel(PosDir)
           CALL GetXyPos
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
       CASE %WM_DESTROY
+
          'Important! Remove the subclassing
    END SELECT
 END FUNCTION

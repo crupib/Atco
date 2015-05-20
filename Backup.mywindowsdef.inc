@@ -174,9 +174,23 @@ FUNCTION MsgFilterProc _
   lRetVal = CallNextHookEx(ghMsgHook, nCode, wParam, BYVAL lParam)
 
   IF nCode = %MSGF_DIALOGBOX THEN
+    MSGBOX "dialog"
     IF @ptmsg.message = %WM_KEYDOWN THEN
-        IF wParam = %VK_BACK THEN
-            MSGBOX "MsgFilterProc: WM_KEYDOWN"
+        MSGBOX "keydown"
+        IF wParam = %VK_DOWN THEN
+            CALL MoveYVel(NegDir)
+            CALL GetXyPos
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+            CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+            lRetVal = 0  ' 1
+        END IF
+        IF wParam = %VK_UP THEN
+            CALL MoveYVel(PosDir)
+                CALL GetXyPos
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+                CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
             lRetVal = 0  ' 1
         END IF
      END IF

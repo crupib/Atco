@@ -117,7 +117,11 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+<<<<<<< HEAD
       CASE %WM_MOUSEWHEEL
+=======
+      CASE %WM_MBUTTONDOWN
+>>>>>>> d19fb3555cf8673cd7a5cfdaf64962bbca4dfa9d
           CALL MoveYVel(PosDir)
           CALL GetXyPos
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
@@ -126,7 +130,7 @@ LOCAL i AS LONG
       CASE %WM_DESTROY
 
          'Important! Remove the subclassing
-          SetWindowLong hEdit, %GWL_WNDPROC, gOldEditClassProc
+          SetWindowLong hEdit9, %GWL_WNDPROC, gOldEditClassProc
    END SELECT
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()

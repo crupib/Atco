@@ -103,7 +103,6 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-      CASE  %WM_MBUTTONDOWN
 
       CASE %WM_MOUSEWHEEL
           CALL MoveYVel(NegDir)
@@ -112,7 +111,6 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
 
-
       CASE %WM_MBUTTONDOWN
 
           CALL MoveYVel(PosDir)
@@ -120,6 +118,33 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+
+      CASE %WM_KEYDOWN
+           IF CBLPARAM = %VK_UP  THEN
+               CALL MoveYVel(PosDir)
+               CALL GetXyPos
+               CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+               CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+               CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_DOWN THEN
+              CALL MoveYVel(NegDir)
+              CALL GetXyPos
+              CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+              CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+              CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_RIGHT THEN
+             CALL MoveXVel(PosDir)
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_LEFT THEN
+             CALL MoveXVel(NegDir)
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+          END IF
       CASE %WM_DESTROY
 
          'Important! Remove the subclassing

@@ -1276,32 +1276,32 @@ GetDis:
     CALL KEdit(Temp$, XCode)  'get input
     IF XCode = KeyEnter THEN
       IF VAL(Temp$) > 0 THEN
-    IF AxisNum = Servo1 THEN
-      IF EncNum = Servo1 THEN
-        SCANstruc.XCal = VAL(Temp$)
-        SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
-      ELSE
-        SCANstruc.ACal = VAL(Temp$)
-        SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
-      END IF
-    ELSE
-      SCANstruc.YCal = VAL(Temp$)
-      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
-    END IF
-    IF ABS(EndCts& - StartCts&) > 0 THEN
-      IF AxisNum = Servo1 THEN
-        IF EncNum = Servo1 THEN
-          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
-          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
-        ELSE
-          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
-          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
-        END IF
-      ELSE
-        SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
-        SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
-      END IF
-    END IF
+                    IF AxisNum = Servo1 THEN
+                      IF EncNum = Servo1 THEN
+                         SCANstruc.XCal = VAL(Temp$)
+                         SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
+                      ELSE
+                         SCANstruc.ACal = VAL(Temp$)
+                         SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
+                      END IF
+                  ELSE
+                      SCANstruc.YCal = VAL(Temp$)
+                      SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
+                  END IF
+            IF ABS(EndCts& - StartCts&) > 0 THEN
+                    IF AxisNum = Servo1 THEN
+                      IF EncNum = Servo1 THEN
+                        SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+                        SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+                      ELSE
+                        SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
+                        SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+                      END IF
+                    ELSE
+                      SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
+                      SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+                    END IF
+            END IF
       END IF
     END IF
 

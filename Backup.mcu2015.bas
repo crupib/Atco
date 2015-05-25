@@ -7,7 +7,7 @@ DEFINT A-Z
 #INCLUDE "AtcoSer.inc"
 #INCLUDE "mywindows.inc"
 #INCLUDE "File.inc"
-
+GLOBAL filename AS STRING
 FUNCTION PBMAIN () AS LONG
 '*******************************************************************************************************
 'MCU                                                                                                   *
@@ -40,7 +40,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  CalSet AS INTEGER
     DIM lResult AS LONG
   '****************************************************************************************************
-    ghMsgHook = SetWindowsHookEx(%WH_MSGFILTER, CODEPTR(MsgFilterProc), %NULL, GetCurrentThreadId())
+ '   ghMsgHook = SetWindowsHookEx(%WH_MSGFILTER, CODEPTR(MsgFilterProc), %NULL, GetCurrentThreadId())
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
     PICPort ="COM1"
@@ -93,6 +93,6 @@ FUNCTION PBMAIN () AS LONG
     CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
-    UnhookWindowsHookEx ghMsgHook
+  '  UnhookWindowsHookEx ghMsgHook
 
 END FUNCTION

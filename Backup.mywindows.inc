@@ -23,44 +23,12 @@ CALLBACK FUNCTION BTN_CALX_CALL()
 END FUNCTION
 
 CALLBACK FUNCTION BTN_CALY_CALL
+    ExitSub = 0
+    CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
+    CalEncoder(Servo3)
 END FUNCTION
-
-CALLBACK FUNCTION BTN_CALA_CALL()
-END FUNCTION
-
-SUB CalEncoder (EncNum)
-  LOCAL TXT AS STRING
-  GEncNum = EncNum
-  CALL StopMtrs
-  CALL GetXyPos
-  IF GEncNum = Servo1 OR GEncNum = Servo4 THEN
-    AxisNum = Servo1
-  ELSE
-    AxisNum = Servo3
-  END IF
-  CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_SHOW
-  CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
-  CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
-  CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
-  IF AxisNum = Servo1 THEN
-     CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move X Axis to Start"
-     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
-     IF GEncNum = Servo1 THEN
-        CONTROL SET TEXT hDlg2, %IDC_LABEL26, "X Pos: "
-        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.XPosStr
-     ELSE
-         CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
-         CONTROL SET TEXT hDlg2, %IDC_LABEL26, "A Pos: "
-         CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.APosStr
-     END IF
-  ELSE
-     CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move Y Axis to Start"
-     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
-     CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Y Pos: "
-     CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.YPosStr
-  END IF
-  Mflag = 1
-END SUB
 
 CALLBACK FUNCTION BTN_AJOGSTOP_CALL()
     CALL StopMtrs
@@ -118,6 +86,7 @@ LOCAL i AS LONG
           CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
           CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+
       CASE %WM_KEYDOWN
            IF CBLPARAM = %VK_UP  THEN
                CALL MoveYVel(PosDir)
@@ -131,7 +100,19 @@ LOCAL i AS LONG
               CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
               CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
               CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
-           END IF
+           ELSEIF CBLPARAM = %VK_RIGHT THEN
+             CALL MoveXVel(PosDir)
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_LEFT THEN
+             CALL MoveXVel(NegDir)
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_XPOSAJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_YPOSAJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg5, %IDC_LABEL_APOSAJOG, SCANstruc.APosStr
+          END IF
       CASE %WM_DESTROY
 
          'Important! Remove the subclassing
@@ -139,7 +120,8 @@ LOCAL i AS LONG
    END SELECT
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
-    MSGBOX "SAVE, hit OK to continue",, "Title of subroutine 123"
+    DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","",%OFN_OVERWRITEPROMPT TO filename
+     MSGBOX filename
 END FUNCTION
 
 CALLBACK FUNCTION BTN_AUTOSCAN_CALL()
@@ -237,6 +219,47 @@ LOCAL i AS LONG
    END SELECT
 END FUNCTION
 
+CALLBACK FUNCTION BTN_CALA_CALL()
+    ExitSub = 0
+    CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALY_BUTTON, %SW_HIDE
+    CONTROL SHOW STATE hDlg2, %CALA_BUTTON, %SW_HIDE
+    CALL CalEncoder(Servo4)
+END FUNCTION
+
+SUB CalEncoder (EncNum)
+  LOCAL TXT AS STRING
+  GEncNum = EncNum
+  CALL StopMtrs
+  CALL GetXyPos
+  IF GEncNum = Servo1 OR GEncNum = Servo4 THEN
+    AxisNum = Servo1
+  ELSE
+    AxisNum = Servo3
+  END IF
+  CONTROL SHOW STATE hDlg2, %IDC_EB_STARTEND, %SW_SHOW
+  CONTROL SHOW STATE hDlg2, %IDC_LABEL24, %SW_SHOW
+  CONTROL SHOW STATE hDlg2, %IDC_LABEL25, %SW_SHOW
+  CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_SHOW
+  IF AxisNum = Servo1 THEN
+     CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move X Axis to Start"
+     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
+     IF GEncNum = Servo1 THEN
+        CONTROL SET TEXT hDlg2, %IDC_LABEL26, "X Pos: "
+        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.XPosStr
+     ELSE
+         CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
+         CONTROL SET TEXT hDlg2, %IDC_LABEL26, "A Pos: "
+         CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.APosStr
+     END IF
+  ELSE
+     CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move Y Axis to Start"
+     CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
+     CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Y Pos: "
+     CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.YPosStr
+  END IF
+  Mflag = 1
+END SUB
 CALLBACK FUNCTION DlgProcCalEnc () AS LONG
 LOCAL i AS LONG
    SELECT CASE CBMSG
@@ -302,7 +325,7 @@ LOCAL i AS LONG
                      ELSE
                             StartCts& = Glo.Position(Servo3)
                      END IF
-               ELSE                   'end position cts
+                ELSE                   'end position cts
                      IF AxisNum = Servo1 THEN  'X encoder cal
                           IF GEncNum = Servo1 THEN
                                 EndCts& = Glo.Position(Servo1)
@@ -312,8 +335,62 @@ LOCAL i AS LONG
                      ELSE                 'Y encoder cal
                           EndCts& = Glo.Position(Servo3)
                      END IF
+                END IF
+              IF MFlag = 1 THEN      'start position cts
+                 IF AxisNum = Servo1 THEN
+                    CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move X Axis to End"
+                    CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
+                    IF GEncNum = Servo1 THEN
+                        CONTROL SET TEXT hDlg2, %IDC_LABEL26, "X Pos: "
+                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.XPosStr
+                    ELSE
+                        CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
+                        CONTROL SET TEXT hDlg2, %IDC_LABEL26, "A Pos: "
+                        CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.APosStr
+                    END IF
+                 ELSE
+                    CONTROL SET TEXT hDlg2, %IDC_LABEL24, "Move Y Axis to End"
+                    CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Pos; Press Enter Key"
+                    CONTROL SET TEXT hDlg2, %IDC_LABEL26, "Y Pos: "
+                    CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, ScanStruc.YPosStr
+                END IF
               END IF
-
+              IF mflag = 2 THEN
+                  CONTROL SET TEXT hDlg2, %IDC_LABEL24, ""
+                  CONTROL SET TEXT hDlg2, %IDC_LABEL25, "Enter Dis: "
+                  CONTROL SET TEXT hDlg2, %IDC_LABEL26, ""
+                  CONTROL SET TEXT hDlg2, %IDC_EB_STARTEND, "0"
+                  CONTROL GET TEXT hDlg2, %IDC_EB_STARTEND TO TXT$
+                  IF VAL(TXT$) > 0 THEN
+                     IF AxisNum = Servo1 THEN
+                       IF GEncNum = Servo1 THEN
+                          SCANstruc.XCal = VAL(TXT$)
+                          SCANstruc.XCalStr = QStr(SCANstruc.XCal, 10)
+                       ELSE
+                          SCANstruc.ACal = VAL(TXT$)
+                          SCANstruc.ACalStr = QStr(SCANstruc.ACal, 10)
+                       END IF
+                     ELSE
+                        SCANstruc.YCal = VAL(TXT$)
+                        SCANstruc.YCalStr = QStr(SCANstruc.YCal, 10)
+                     END IF
+                  END IF
+                  IF ABS(EndCts& - StartCts&) > 0 THEN
+                     IF AxisNum = Servo1 THEN
+                       IF GEncNum = Servo1 THEN
+                          SCANstruc.XCtr = ABS(EndCts& - StartCts&) / SCANstruc.XCal
+                          SCANstruc.XCtrStr = QStr(SCANstruc.XCtr, 10)
+                       ELSE
+                          SCANstruc.ACtr = ABS(EndCts& - StartCts&) / SCANstruc.ACal
+                          SCANstruc.ACtrStr = QStr(SCANstruc.ACtr, 10)
+                       END IF
+                     ELSE
+                      SCANstruc.YCtr = ABS(EndCts& - StartCts&) / SCANstruc.YCal
+                      SCANstruc.YCtrStr = QStr(SCANstruc.YCtr, 10)
+                     END IF
+                  END IF
+              END IF
+              mflag = 2
             ELSEIF CBLPARAM = %VK_ESCAPE THEN
                 CALL StopMtrs
             END IF

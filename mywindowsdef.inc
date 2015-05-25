@@ -122,7 +122,7 @@ GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
 GLOBAL keypress AS INTEGER
 GLOBAL AxisNum, MFlag, GEncNum AS INTEGER
-
+GLOBAL filename AS STRING
 
 '***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _
@@ -622,7 +622,6 @@ CALLBACK FUNCTION EditControlCallback()
                        SCANstruc.YLow = ABS(VAL(TXT$))
                        SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
                 END IF
-
     'Y END
            CASE %IDC_EB_YEND
                 CONTROL GET TEXT hDlg1, %IDC_EB_YEND TO TXT$
@@ -661,6 +660,7 @@ CALLBACK FUNCTION EditControlCallback()
     'X POS
             CASE %IDC_EB_XPOS
                 CONTROL GET TEXT hDlg1, %IDC_EB_XPOS TO TXT$
+                MSGBOX TXT$
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.XPos = ABS(VAL(TXT$))
                        SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)

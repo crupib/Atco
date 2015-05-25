@@ -466,7 +466,7 @@ FUNCTION BUILDAJOGWINDOW() AS LONG
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL36, TXT$,    550, 200, 150, 20
 
 
-    TXT$ = "Keyboard short cuts"
+    TXT$ = "Keyboard short cuts:"
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL54, TXT$,    550, 250, 150, 20
 
     TXT$ = "X POS <-"
@@ -622,7 +622,6 @@ CALLBACK FUNCTION EditControlCallback()
                        SCANstruc.YLow = ABS(VAL(TXT$))
                        SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
                 END IF
-
     'Y END
            CASE %IDC_EB_YEND
                 CONTROL GET TEXT hDlg1, %IDC_EB_YEND TO TXT$
@@ -661,6 +660,7 @@ CALLBACK FUNCTION EditControlCallback()
     'X POS
             CASE %IDC_EB_XPOS
                 CONTROL GET TEXT hDlg1, %IDC_EB_XPOS TO TXT$
+                MSGBOX TXT$
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.XPos = ABS(VAL(TXT$))
                        SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)

@@ -870,47 +870,7 @@ FUNCTION KeyDown
 
 END FUNCTION
 
-DECLARE FUNCTION CalLoad (FileNumber$)
 
-FUNCTION CalLoad (FileNumber$)
-   LOCAL TempStr AS HEADER
-   LOCAL ECode AS INTEGER
-   LOCAL BytesRead AS INTEGER
-   TempStr.hdr = HdrVer
-   CALL FOpen (filenum, 0,0, FileNumber$, ECode)
-   IF ECode THEN
-     CalLoad = FALSE
-     EXIT FUNCTION
-   END IF
-
-   'read header label
-'   CALL DFRead(HANDLE, VARSEG(HdrVer), VARPTR(HdrVer), LEN(HdrVer), BytesRead&, ECode)
-   CALL DFRead(filenum, TempStr, 0, BytesRead, ECode)
-   IF ECode THEN GOTO ExitCalLoad
-
-   'Verify correct header
-   IF HdrVer <> TempStr THEN
-     ECode = TRUE
-     GOTO ExitCalLoad
-   END IF
-   CALL DFRead2(filenum, ScanStruc, LEN(SCANparms), BytesRead, ECode)
-   'CALL DFRead(HANDLE, VARSEG(SCAN), VARPTR(SCAN), LEN(SCAN), BytesRead&, ECode)
-   IF ECode THEN GOTO ExitCalLoad
-
-
-ExitCalLoad:
-   HdrVer = TempStr 'in case of corrupt hdr read
-   CALL FClose(filenum)
-   IF ECode THEN
-     CalLoad = FALSE
-   ELSE
-     CalLoad = TRUE
-   END IF
-
-   EXIT FUNCTION
-
-
-END FUNCTION
 
 DECLARE SUB SetDefaults
 SUB SetDefaults
@@ -1373,4 +1333,35 @@ FUNCTION CalSave(filename AS STRING)
     ELSE
       CalSave = TRUE
     END IF
+END FUNCTION
+
+DECLARE FUNCTION CalLoad(filename AS STRING)
+  ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+FUNCTION CalLoad(filename AS STRING)
+   LOCAL ecode AS INTEGER
+   LOCAL BytesRead AS INTEGER
+   LOCAL filenumber AS INTEGER
+   LOCAL temphdr AS HEADER
+   CALL FOpen (filenum, 0,0, filename, ECode)
+   IF ECode THEN
+     CalLoad = FALSE
+     EXIT FUNCTION
+   END IF
+   CALL DFRead(filenum, BYVAL VARPTR(temphdr),0,BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalLoad
+   'Verify correct header
+   IF HdrVer <> Temphdr THEN
+     ECode = TRUE
+     GOTO ExitCalLoad
+   END IF
+   CALL DFRead2(filenum, ScanStruc, LEN(SCANStruc), BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalLoad
+ExitCalLoad:
+   HdrVer = Temphdr 'in case of corrupt hdr read
+   CALL FClose(filenum)
+   IF ECode THEN
+     CalLoad = FALSE
+   ELSE
+     CalLoad = TRUE
+   END IF
 END FUNCTION

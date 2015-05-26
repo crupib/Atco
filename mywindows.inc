@@ -122,9 +122,16 @@ END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
 
     DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
-    CalSave(filename)
+    IF NOT CalSave(filename) THEN
+        MSGBOX "Unable to save file!"
+    END IF
 END FUNCTION
-
+CALLBACK FUNCTION BTN_LOAD_CALL()
+    DISPLAY OPENFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+    IF NOT CalLoad(filename) THEN
+       MSGBOX "Unable to Load file!"
+    END IF
+END FUNCTION
 CALLBACK FUNCTION BTN_AUTOSCAN_CALL()
     MSGBOX "AUTOSCAN, hit OK to continue",, "Title of subroutine 123"
     LOCAL  x      AS LONG
@@ -151,9 +158,6 @@ CALLBACK FUNCTION BTN_MJOG_CALL()
     MSGBOX "MJOG, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
 
-CALLBACK FUNCTION BTN_LOAD_CALL()
-    MSGBOX "Load, hit OK to continue",, "Title of subroutine 123"
-END FUNCTION
 
 CALLBACK FUNCTION BTN_CALENC_CALL()
     LOCAL  x      AS LONG

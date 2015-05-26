@@ -46,3 +46,5 @@ Backup.circle.bas
 Backup.circle.inc
 circle.log
 circle.EXE
+Backup.*
+*.log

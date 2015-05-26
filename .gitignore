@@ -48,3 +48,6 @@ circle.log
 circle.EXE
 Backup.*
 *.log
+*.exe
+*.EXE
+*.cal

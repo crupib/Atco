@@ -120,8 +120,9 @@ LOCAL i AS LONG
    END SELECT
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
-    DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","",%OFN_OVERWRITEPROMPT TO filename
-    MSGBOX filename
+
+    DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+    CalSave(filename)
 END FUNCTION
 
 CALLBACK FUNCTION BTN_AUTOSCAN_CALL()

@@ -121,6 +121,7 @@ GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
 GLOBAL controlbyte AS BYTE
 GLOBAL ExitSub AS INTEGER
+
 '****************************************************************************************************
 TYPE GloRecord
    NumModules AS INTEGER
@@ -1341,3 +1342,35 @@ SUB JogAuto
 
 
 END SUB
+DECLARE SUB SetXCtrs ()
+SUB SetXCtrs
+  CALL GetXyPos
+  SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+  SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+  CALL ResetPosition(Servo1)
+  CALL ResetPosition(Servo2)
+END SUB
+
+DECLARE FUNCTION CalSave(filename AS STRING)
+  ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+FUNCTION CalSave(filename AS STRING)
+    LOCAL ecode AS INTEGER
+    LOCAL BytesRead AS INTEGER
+    LOCAL filenumber AS INTEGER
+    FCreate (filenumber, 0, filename, ECode)
+    IF ECode THEN
+       CalSave = FALSE
+       EXIT FUNCTION
+    END IF
+    CALL DFWrite(filenum, BYVAL VARPTR(HdrVer), 0, BytesRead, ECode)
+    IF NOT ECode THEN GOTO ExitCalSave
+        CALL DFWrite2(filenum, BYVAL VARPTR(SCANstruc),LEN(HdrVer), BytesRead, ECode)
+    IF NOT ECode THEN GOTO ExitCalSave
+    ExitCalSave:
+    CALL FClose(filenum)
+    IF ECode THEN
+      CalSave = FALSE
+    ELSE
+      CalSave = TRUE
+    END IF
+END FUNCTION

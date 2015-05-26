@@ -120,8 +120,25 @@ LOCAL i AS LONG
    END SELECT
 END FUNCTION
 CALLBACK FUNCTION BTN_SAVE_CALL()
-    DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","",%OFN_OVERWRITEPROMPT TO filename
-     MSGBOX filename
+    LOCAL ecode AS INTEGER
+    LOCAL BytesRead AS INTEGER
+    DISPLAY SAVEFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+    FCreate (filenumber, 0, filename, ECode)
+    IF ECode THEN
+       CalSave = FALSE
+       EXIT FUNCTION
+   END IF
+   CALL DFWrite(filenum, BYVAL VARPTR(HdrVer), 0, BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalSave
+        CALL DFWrite2(filenum, BYVAL VARPTR(SCANparm),LEN(HdrVer), BytesRead, ECode)
+   IF ECode THEN GOTO ExitCalSave
+   ExitCalSave:
+   CALL FClose(filenum)
+   IF ECode THEN
+     CalSave = FALSE
+   ELSE
+     CalSave = TRUE
+   END IF
 END FUNCTION
 
 CALLBACK FUNCTION BTN_AUTOSCAN_CALL()

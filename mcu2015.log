@@ -3,14 +3,14 @@ Copyright (c) 1996-2011 PowerBasic Inc.
 Englewood, Florida USA
 All Rights Reserved
 
-Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197537 total lines}
+Primary source:  C:\Users\Bill\Documents\GitHub\Atco\mcu2015.bas   {197551 total lines}
 Target compilation:  mcu2015.EXE
-Compile time:  0.8 seconds, at 14815275 lines/minute
+Compile time:  0.8 seconds, at 14816325 lines/minute
 
-42608 bytes compiled code, 53428 bytes RTLibrary,
-1788 bytes string literals, and 7696 bytes dgroup.
+44512 bytes compiled code, 56604 bytes RTLibrary,
+1836 bytes string literals, and 7816 bytes dgroup.
 Executable stack size:  1048576 bytes.
-Disk image: 110608 bytes   Memory image: 62912 bytes.
+Disk image: 116240 bytes   Memory image: 66256 bytes.
 
 Component Files:
 ----------------
@@ -564,13 +564,7 @@ CALLOAD
 CLOSECOMMPORT
 DELETECOMMBUFFERS
 CLOSECOMPORTS
-SHOWSPLASHDLG
-DLGSPLASHPROC
 MSGFILTERPROC
 DFREAD
 DFREAD2
-DFWRITE
-DFWRITE2
-FCREATE
 FOPEN
-FCLOSE

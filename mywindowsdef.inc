@@ -123,6 +123,7 @@ GLOBAL gOldEditClassProc AS LONG
 GLOBAL keypress AS INTEGER
 GLOBAL AxisNum, MFlag, GEncNum AS INTEGER
 GLOBAL filename AS STRING
+GLOBAL filenumber AS INTEGER
 
 '***************************************************************************************************************************************
 DECLARE SUB ShowSplashDlg(BYVAL nDelay AS LONG, BYVAL sBitmapID AS STRING, _

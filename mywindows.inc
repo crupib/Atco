@@ -100,6 +100,7 @@ LOCAL i AS LONG
       CASE %WM_MBUTTONDOWN
 
           CALL ManYLFT
+          SetModePwm
           CALL GetXyPos
           CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
           CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
@@ -135,6 +136,7 @@ LOCAL i AS LONG
              CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
            ELSEIF CBLPARAM = %VK_LEFT THEN
              CALL ManYLFT
+             SetModePwm
              CALL GetXyPos
              CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
              CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr

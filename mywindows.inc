@@ -127,7 +127,7 @@ CALLBACK FUNCTION BTN_SAVE_CALL()
     END IF
 END FUNCTION
 CALLBACK FUNCTION BTN_LOAD_CALL()
-    DISPLAY OPENFILE  hdlg, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+    DISPLAY OPENFILE  hdlg, , , "Load File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
     IF NOT CalLoad(filename) THEN
        MSGBOX "Unable to Load file!"
     END IF

@@ -1328,7 +1328,7 @@ FUNCTION CalSave(filename AS STRING)
     IF NOT ECode THEN GOTO ExitCalSave
     ExitCalSave:
     CALL FClose(filenum)
-    IF ECode THEN
+    IF NOT ECode THEN
       CalSave = FALSE
     ELSE
       CalSave = TRUE
@@ -1343,23 +1343,22 @@ FUNCTION CalLoad(filename AS STRING)
    LOCAL filenumber AS INTEGER
    LOCAL temphdr AS HEADER
    CALL FOpen (filenum, 0,0, filename, ECode)
-   IF ECode THEN
+   IF NOT ECode THEN
      CalLoad = FALSE
      EXIT FUNCTION
    END IF
    CALL DFRead(filenum, BYVAL VARPTR(temphdr),0,BytesRead, ECode)
-   IF ECode THEN GOTO ExitCalLoad
+   IF NOT ECode THEN GOTO ExitCalLoad
    'Verify correct header
    IF HdrVer <> Temphdr THEN
      ECode = TRUE
      GOTO ExitCalLoad
    END IF
-   CALL DFRead2(filenum, ScanStruc, LEN(SCANStruc), BytesRead, ECode)
-   IF ECode THEN GOTO ExitCalLoad
+   CALL DFRead2(filenum, BYVAL VARPTR (ScanStruc), LEN(temphdr), BytesRead, ECode)
+   IF NOT ECode THEN GOTO ExitCalLoad
 ExitCalLoad:
-   HdrVer = Temphdr 'in case of corrupt hdr read
    CALL FClose(filenum)
-   IF ECode THEN
+   IF NOT ECode THEN
      CalLoad = FALSE
    ELSE
      CalLoad = TRUE

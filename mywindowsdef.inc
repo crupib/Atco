@@ -50,6 +50,12 @@
 %IDC_LABEL53 = 8023
 %IDC_LABEL54 = 8024
 
+%IDC_LABEL80 = 9021
+%IDC_LABEL81 = 9022
+%IDC_LABEL82 = 9023
+%IDC_LABEL83 = 9023
+%IDC_LABEL84 = 9024
+
 %IDC_LABEL_XPOSPRINT = 311
 %IDC_LABEL_YPOSPRINT = 312
 %IDC_LABEL_APOSPRINT = 313
@@ -57,6 +63,10 @@
 %IDC_LABEL_XPOSAJOG = 314
 %IDC_LABEL_YPOSAJOG = 315
 %IDC_LABEL_APOSAJOG = 316
+
+%IDC_LABEL_XPOSMJOG = 3914
+%IDC_LABEL_YPOSMJOG = 3915
+%IDC_LABEL_APOSMJOG = 3916
 
 %IDC_LABEL_XPOSASCAN = 317
 %IDC_LABEL_YPOSASCAN = 318
@@ -101,6 +111,7 @@
 %OPT9 = 1009
 %STOP_JOY = 5000
 %STOP_AJOY = 6000
+%STOP_MJOY = 11000
 %SETUP_BUTTON = 2000
 %JOYSTICK_BUTTON = 2010
 %AJOG = 2020
@@ -117,7 +128,7 @@
 %NEXT  = 6001
 %ALL0  = 6002
 GLOBAL ghMsgHook   AS DWORD
-GLOBAL hDlg, hDlg1, hDlg2, hDlg3, hDlg4, hDlg5 AS DWORD, w, h AS LONG
+GLOBAL hDlg, hDlg1, hDlg2, hDlg3, hDlg4, hDlg5, hDlg6 AS DWORD, w, h AS LONG
 GLOBAL IsSplashActive AS LONG
 GLOBAL gOldEditClassProc AS LONG
 GLOBAL keypress AS INTEGER
@@ -480,9 +491,38 @@ FUNCTION BUILDAJOGWINDOW() AS LONG
     TXT$ = "Y NEG v"
     CONTROL ADD LABEL, hDlg5, %IDC_LABEL53, TXT$,    550, 370, 150, 20
 
+END FUNCTION
 
+FUNCTION BUILDMJOYWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, "MCU 2015 Manual Jog", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg6
+    DIALOG SET USER hDlg6, 1, hdlg
+    DIALOG SET ICON hDlg6, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
 
+    TXT$ = "* Check Motors On *"
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL80, TXT$,    550, 20, 150, 20
+    TXT$ = "*  Press Any Key  *"
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL81, TXT$,    550, 50, 150, 20
+    TXT$ = "X Pos: "
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL82, TXT$,    550, 100, 150, 20
+    TXT$ = "Y Pos: "
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL83, TXT$,    550, 150, 150, 20
+    TXT$ = "A Pos: "
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL84, TXT$,    550, 200, 150, 20
+    TXT$ = ""
 
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr, 850, 100, 80, 20, %WS_TABSTOP
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr, 850, 150, 80, 20
+    CONTROL ADD LABEL, hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr, 850, 200, 80, 20,
+    CONTROL ADD BUTTON, hDlg6, %STOP_MJOY, "Stop Manual JoyStick", 100, 100, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_MJOYSTOP_CALL()
 END FUNCTION
 
 FUNCTION BUILDJOYWINDOW() AS LONG
@@ -575,15 +615,19 @@ FUNCTION BUILDAUTOSCANWINDOW() AS LONG
     DIALOG SET ICON hDlg3, exeICON$   '
     FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
     GRAPHIC SET FONT NormalFont&
+
     CONTROL ADD BUTTON, hDlg3,%BEGIN, "&Begin", 600, 400, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_BEGIN_CALL()
-    CONTROL SET FONT hDlg3, %NEXT, NormalFont&
+    CONTROL SET FONT hDlg3, %BEGIN, NormalFont&
+
     CONTROL ADD BUTTON, hDlg3,%NEXT, "&Next", 600, 500, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_NEXT_CALL()
-    CONTROL SET FONT hDlg3, %BEGIN, NormalFont&
+    CONTROL SET FONT hDlg3, %NEXT, NormalFont&
+
     CONTROL ADD BUTTON, hDlg3,%ALL0, "&All0", 600, 600, 200, 50,%BS_PUSHLIKE , , _
     CALL BTN_ALL0_CALL()
     CONTROL SET FONT hDlg3, %ALL0, NormalFont&
+
     TXT$ = "X Pos: "
     CONTROL ADD LABEL, hDlg3, %IDC_LABEL40, TXT$,    550, 100, 150, 20
     TXT$ = "Y Pos: "
@@ -819,6 +863,15 @@ FUNCTION EditASubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&)
       CASE %WM_KEYUP
          keypress = 1
          DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_LABEL_XPOSAJOG  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit11SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         keypress = 1
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_LABEL_XPOSMJOG  , wParm&
    END SELECT
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)

@@ -1364,3 +1364,60 @@ ExitCalLoad:
      CalLoad = TRUE
    END IF
 END FUNCTION
+DECLARE SUB JogMan ()
+SUB JogMan
+  SetModePwm
+END SUB
+SUB ManXDN
+
+    CALL SetHomeCap 'stop on limit 1
+
+    'calculated PWM output based on pots
+    Glo.CmdPwm(1) = -(XSpd(Glo.AdVal(4)))
+    Glo.CmdPwm(2) = Glo.CmdPwm(1)
+
+    CALL SetPwm(Servo1, Glo.CmdPwm(1))
+    CALL SetPwm(Servo2, Glo.CmdPwm(2))
+
+    GoXMtrs
+
+END SUB
+
+SUB ManXUP
+
+    CALL SetHomeCap 'stop on limit 1
+
+    'calculated PWM output based on pots
+    Glo.CmdPwm(1) = XSpd(Glo.AdVal(4))
+    Glo.CmdPwm(2) = Glo.CmdPwm(1)
+
+    CALL SetPwm(Servo1, Glo.CmdPwm(1))
+    CALL SetPwm(Servo2, Glo.CmdPwm(2))
+
+    GoXMtrs
+
+END SUB
+
+SUB ManYLFT
+
+    CALL SetHomeCap 'stop on limit 1
+
+    Glo.CmdPwm(3) = -(YSpd(Glo.Ad3))   '(-) = reverse motion
+
+    CALL SetPwm(Servo3, Glo.CmdPwm(3))
+
+    GoYMtr
+
+END SUB
+
+SUB ManYRGT
+
+    CALL SetHomeCap 'stop on limit 1
+
+    Glo.CmdPwm(3) = YSpd(Glo.Ad3)   '(-) = reverse motion
+
+    CALL SetPwm(Servo3, Glo.CmdPwm(3))
+
+    GoYMtr
+
+END SUB

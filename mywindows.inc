@@ -52,6 +52,101 @@ CALLBACK FUNCTION BTN_AJOG_CALL()
           DIALOG DOEVENTS TO COUNT
     LOOP WHILE x&
 END FUNCTION
+
+CALLBACK FUNCTION BTN_MJOG_CALL()
+    LOCAL COUNT AS LONG
+    LOCAL  x      AS LONG
+    BUILDMJOYWINDOW()
+    DIALOG SHOW MODELESS hDlg6, CALL DlgProcMJog
+    CALL SetForAuto
+    JogMan
+    DO
+     ' Allow messages to be dispatched
+          DIALOG GET SIZE hDlg6 TO x, x
+          DIALOG DOEVENTS  0
+    LOOP WHILE x&
+END FUNCTION
+
+CALLBACK FUNCTION DlgProcMJog () AS LONG
+LOCAL i AS LONG
+   SELECT CASE CBMSG
+      CASE %WM_INITDIALOG
+           STATIC  hEdit10 AS LONG
+           CONTROL HANDLE CBHNDL, %IDC_LABEL_XPOSMJOG TO hEdit10
+           gOldEditClassProc = SetWindowLong(hEdit10, %GWL_WNDPROC, CODEPTR(Edit11SubClassProc))
+      CASE %WM_LBUTTONDOWN
+          CALL ManXUP
+          SetModePwm
+          CALL GetXyPos
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+      CASE %WM_RBUTTONDOWN
+          CALL ManXDN
+          SetModePwm
+          CALL GetXyPos
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+
+      CASE %WM_MOUSEWHEEL
+          CALL ManYRGT
+          SetModePwm
+          CALL GetXyPos
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+
+      CASE %WM_MBUTTONDOWN
+
+          CALL ManYLFT
+          CALL GetXyPos
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+          CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+
+      CASE %WM_KEYDOWN
+           IF CBLPARAM = %VK_UP  THEN
+               CALL ManXUP
+               SetModePwm
+               CALL GetXyPos
+               CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+               CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+               CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_DOWN THEN
+              CALL ManXDN
+              SetModePwm
+              CALL GetXyPos
+              CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+              CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+              CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_RIGHT THEN
+             CALL ManYRGT
+             SetModePwm
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_ESCAPE THEN
+             StopMtrs
+             SetModeVel
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+           ELSEIF CBLPARAM = %VK_LEFT THEN
+             CALL ManYLFT
+             CALL GetXyPos
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_XPOSMJOG, SCANstruc.XPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_YPOSMJOG, SCANstruc.YPosStr
+             CONTROL SET TEXT hDlg6, %IDC_LABEL_APOSMJOG, SCANstruc.APosStr
+          END IF
+      CASE %WM_DESTROY
+
+         'Important! Remove the subclassing
+          SetWindowLong hEdit10, %GWL_WNDPROC, gOldEditClassProc
+   END SELECT
+END FUNCTION
+
 CALLBACK FUNCTION DlgProcAJog () AS LONG
 LOCAL i AS LONG
    SELECT CASE CBMSG
@@ -154,10 +249,6 @@ CALLBACK FUNCTION BTN_XSPDCTRL_CALL()
     MSGBOX "XSPD CTRL, hit OK to continue",, "Title of subroutine 123"
 END FUNCTION
 
-CALLBACK FUNCTION BTN_MJOG_CALL()
-    MSGBOX "MJOG, hit OK to continue",, "Title of subroutine 123"
-END FUNCTION
-
 
 CALLBACK FUNCTION BTN_CALENC_CALL()
     LOCAL  x      AS LONG
@@ -201,6 +292,9 @@ CALLBACK FUNCTION BTN_JOYSTICK_CALL()
     LOOP WHILE x&
 END FUNCTION
 CALLBACK FUNCTION BTN_JOYSTOP_CALL()
+    Exitsub = 1
+END FUNCTION
+CALLBACK FUNCTION BTN_MJOYSTOP_CALL()
     Exitsub = 1
 END FUNCTION
 CALLBACK FUNCTION DlgProcJoyStk () AS LONG

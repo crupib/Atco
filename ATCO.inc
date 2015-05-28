@@ -1421,3 +1421,43 @@ SUB ManYRGT
     GoYMtr
 
 END SUB
+SUB BeginScan
+    CALL Profiler  'make sure scan ok before next scan add or subtract
+    CALL SetForAuto
+    ReSetMotors
+    SetXCtrs  'set x encoder cts to match
+    IF SCANstruc.IndexY THEN  'X Scan, Y Index
+      GOSUB XScan
+    ELSE : GOSUB YScan   'Y Scan, X Index
+    END IF
+    CALL GetXyPos
+END SUB
+
+SUB Profiler
+  SCANstruc.ScanFlag = 0
+
+  'check all scan cal parameters
+  IF SCANstruc.XHigh > SCANstruc.XLow THEN
+    IF SCANstruc.YHigh > SCANstruc.YLow THEN
+      IF (SCANstruc.XIndex > 0 AND SCANstruc.YIndex > 0) THEN
+    IF (SCANstruc.XPlus = TRUE OR SCANstruc.XPlus = FALSE) THEN
+      IF (SCANstruc.YPlus = TRUE OR SCANstruc.YPlus = FALSE) THEN
+        IF SCANstruc.XSpeed > 0 THEN
+          IF SCANstruc.YSpeed > 0 THEN
+        IF SCANstruc.XEnable THEN
+          IF SCANstruc.YEnable THEN
+            IF ProfileScan THEN
+              SCANstruc.ScanFlag = -1
+            ELSE
+              SCANstruc.ScanFlag = 0
+            END IF
+          END IF
+        END IF
+          END IF
+        END IF
+      END IF
+    END IF
+      END IF
+    END IF
+  END IF
+ END SUB

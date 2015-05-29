@@ -22,6 +22,12 @@ CALLBACK FUNCTION BTN_CALX_CALL()
     CALL CalEncoder(Servo1)
 END FUNCTION
 
+CALLBACK FUNCTION BTN_SCAN_CALL
+     LOCAL ProcessID AS LONG
+'     ProcessID& = Shell("Nozzle.exe", 1)  'does not wait
+     SHELL("Nozzle.exe", 1)  'waits
+END FUNCTION
+
 CALLBACK FUNCTION BTN_CALY_CALL
     ExitSub = 0
     CONTROL SHOW STATE hDlg2, %CALX_BUTTON, %SW_HIDE
@@ -255,7 +261,15 @@ CALLBACK FUNCTION BTN_BEGIN_CALL()
     BUILDAUTOSCAN()
 
     DIALOG SHOW MODELESS hDlg7, CALL DlgProcAUTO
-    Beginscan
+    CALL Profiler  'make sure scan ok before next scan add or subtract
+    CALL SetForAuto
+    ReSetMotors
+    SetXCtrs  'set x encoder cts to match
+    IF SCANstruc.IndexY THEN  'X Scan, Y Index
+      CALL XScan
+    ELSE : CALL YScan   'Y Scan, X Index
+    END IF
+    CALL GetXyPos
 
     DIALOG ENABLE hDlg7
     DO
@@ -526,6 +540,8 @@ LOCAL i AS LONG
    END SELECT
 END FUNCTION
 
+CALLBACK FUNCTION DlgProcAuTO () AS LONG
+END FUNCTION
 
 CALLBACK FUNCTION DlgProcSetup () AS LONG
  LOCAL i AS LONG

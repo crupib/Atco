@@ -7,6 +7,7 @@ DEFINT A-Z
 #INCLUDE "AtcoSer.inc"
 #INCLUDE "mywindows.inc"
 #INCLUDE "File.inc"
+#INCLUDE "splash.inc"    'used for splash screen
 
 FUNCTION PBMAIN () AS LONG
 '*******************************************************************************************************
@@ -40,7 +41,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  CalSet AS INTEGER
     DIM lResult AS LONG
   '****************************************************************************************************
- '   ghMsgHook = SetWindowsHookEx(%WH_MSGFILTER, CODEPTR(MsgFilterProc), %NULL, GetCurrentThreadId())
+
     HdrVer = "SCU-1.00"
     ThumbDisk = "C:\UCALS\"
     PICPort ="COM1"
@@ -50,8 +51,6 @@ FUNCTION PBMAIN () AS LONG
     WaitX = 1
     'joystick to pwm conversion table
     CALL SetTables
-
-  'new keypad layout
 
    '***********************************************
    'Open & Check Com Buffers, Report & Fix errors
@@ -81,6 +80,6 @@ FUNCTION PBMAIN () AS LONG
     CALL DelayX(200)
     BUILDWINDOW()
     DIALOG SHOW MODAL hDlg, CALL DlgProc
-  '  UnhookWindowsHookEx ghMsgHook
+
 
 END FUNCTION

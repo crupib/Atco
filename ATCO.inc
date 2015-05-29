@@ -253,6 +253,7 @@ GLOBAL SCANstruc AS scanparms
 TYPE HEADER
    hdr AS STRING * 20
 END TYPE
+
 '****************************************************************************************************
 DECLARE SUB DelayX (Millisec) '
 SUB DelayX (Millisec) '
@@ -1421,17 +1422,6 @@ SUB ManYRGT
     GoYMtr
 
 END SUB
-SUB BeginScan
-    CALL Profiler  'make sure scan ok before next scan add or subtract
-    CALL SetForAuto
-    ReSetMotors
-    SetXCtrs  'set x encoder cts to match
-    IF SCANstruc.IndexY THEN  'X Scan, Y Index
-      GOSUB XScan
-    ELSE : GOSUB YScan   'Y Scan, X Index
-    END IF
-    CALL GetXyPos
-END SUB
 
 SUB Profiler
   SCANstruc.ScanFlag = 0
@@ -1461,3 +1451,315 @@ SUB Profiler
     END IF
   END IF
  END SUB
+
+SUB ReSetMotors
+  LOCAL indexset AS INTEGER
+  LOCAL LoopPos AS LONG
+  CALL GetStatus(AllServos)
+
+  IF SCANstruc.IndexY THEN 'X Scan, Y Index
+    IF SCANstruc.IndexLow THEN    'indexing towards low position
+      SCANstruc.IndexInc = -1
+      IF SCANstruc.YPlus = TRUE THEN 'scanning positive direction
+    IndexSet = 1
+      ELSE
+    IndexSet = -1
+      END IF
+    ELSE   'POSDIR
+      SCANstruc.IndexInc = 1
+      IF SCANstruc.YPlus = TRUE THEN 'scanning positive direction
+    IndexSet = -1
+      ELSE
+    IndexSet = 1
+      END IF
+    END IF
+
+    LoopPos = CLNG(Glo.Position(3) / SCANstruc.YIndexCts) + IndexSet
+
+    IF SCANstruc.YPlus THEN  'Y positive direction
+       IF LoopPos > SCANstruc.YDataEnd THEN
+     SCANstruc.IndexCt = SCANstruc.YDataEnd
+       ELSEIF LoopPos < SCANstruc.YDataStart THEN
+     SCANstruc.IndexCt = SCANstruc.YDataStart
+       ELSE
+     SCANstruc.IndexCt = LoopPos
+       END IF
+    ELSE               'Y negative direction
+       IF LoopPos < -SCANstruc.YDataEnd THEN
+     SCANstruc.IndexCt = SCANstruc.YDataEnd
+       ELSEIF LoopPos > -SCANstruc.YDataStart THEN
+     SCANstruc.IndexCt = SCANstruc.YDataStart
+       ELSE
+     SCANstruc.IndexCt = ABS(LoopPos)
+       END IF
+     END IF
+
+  ELSE  'Y Scan, X Index
+
+    'IndexSet is used to backup 1 raster for overlap of scan restarts
+    IF SCANstruc.IndexLow THEN  'Index towards low position
+      SCANstruc.IndexInc = -1
+      IF SCANstruc.XPlus = TRUE THEN 'scanning positive counts direction
+    IndexSet = 1
+      ELSE
+    IndexSet = -1
+      END IF
+    ELSE                   'Index towards high position
+      SCANstruc.IndexInc = 1
+      IF SCANstruc.XPlus = TRUE THEN 'scanning positive counts direction
+    IndexSet = -1
+      ELSE
+    IndexSet = 1
+      END IF
+    END IF
+
+    LoopPos = CLNG(Glo.Position(1) / SCANstruc.XIndexCts) + IndexSet
+
+    IF SCANstruc.XPlus THEN  'X positive direction
+      IF LoopPos > SCANstruc.XDataEnd THEN
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
+      ELSEIF LoopPos < SCANstruc.XDataStart THEN
+    SCANstruc.IndexCt = SCANstruc.XDataStart
+      ELSE
+    SCANstruc.IndexCt = LoopPos
+      END IF
+    ELSE               'X negative direction
+      IF LoopPos < -SCANstruc.XDataEnd THEN
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
+      ELSEIF LoopPos > -SCANstruc.XDataStart THEN
+    SCANstruc.IndexCt = SCANstruc.XDataStart
+      ELSE
+    SCANstruc.IndexCt = ABS(LoopPos)
+      END IF
+    END IF
+
+    IF SCANstruc.NextFlag THEN
+      IF SCANstruc.IndexLow THEN  'Index towards low position
+    SCANstruc.IndexCt = SCANstruc.XDataEnd
+      ELSE                   'Index towards high position
+    SCANstruc.IndexCt = SCANstruc.XDataStart
+      END IF
+      SCANstruc.NextFlag = FALSE
+    END IF
+
+  END IF
+
+END SUB
+
+FUNCTION ProfileScan
+
+   IF GoodLNG(STR$(SCANstruc.XLow * SCANstruc.XCtr + 1)) THEN
+     SCANstruc.XStartCts = CLNG(SCANstruc.XLow * SCANstruc.XCtr)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   IF GoodLNG(STR$((SCANstruc.XHigh + SCANstruc.OverLap) * SCANstruc.XCtr + 1)) THEN
+     SCANstruc.XEndCts = CLNG((SCANstruc.XHigh + SCANstruc.OverLap) * SCANstruc.XCtr)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   IF GoodLNG(STR$(SCANstruc.YLow * SCANstruc.YCtr + 1)) THEN
+     SCANstruc.YStartCts = CLNG(SCANstruc.YLow * SCANstruc.YCtr)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   IF GoodLNG(STR$(SCANstruc.YHigh * SCANstruc.YCtr + 1)) THEN
+     SCANstruc.YEndCts = CLNG(SCANstruc.YHigh * SCANstruc.YCtr)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   IF GoodLNG(STR$(SCANstruc.XCtr * SCANstruc.XIndex + 1)) THEN
+     SCANstruc.XIndexCts = CLNG(SCANstruc.XCtr * SCANstruc.XIndex)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   IF GoodLNG(STR$(SCANstruc.YCtr * SCANstruc.YIndex + 1)) THEN
+     SCANstruc.YIndexCts = CLNG(SCANstruc.YCtr * SCANstruc.YIndex)
+   ELSE
+     ProfileScan = FALSE
+     EXIT FUNCTION
+   END IF
+
+   SCANstruc.XDataStart = CLNG(SCANstruc.XStartCts / SCANstruc.XIndexCts)
+   SCANstruc.XDataEnd = CLNG(SCANstruc.XEndCts / SCANstruc.XIndexCts)
+
+   SCANstruc.YDataStart = CLNG(SCANstruc.YStartCts / SCANstruc.YIndexCts)
+   SCANstruc.YDataEnd = CLNG(SCANstruc.YEndCts / SCANstruc.YIndexCts)
+
+   SCANstruc.IndexCt = SCANstruc.XDataStart
+
+   ProfileScan = TRUE
+
+   EXIT FUNCTION
+
+END FUNCTION
+
+SUB XScan
+    LOCAL MoveToPos1, MoveToPos2 AS LONG
+    LOCAL UStop AS BYTE
+    DO WHILE SCANstruc.IndexCt >= (SCANstruc.YDataStart AND SCANstruc.IndexCt) <= SCANstruc.YDataEnd
+      UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
+      IF UStop THEN EXIT DO 'check if user hit stop
+      IF SCANstruc.XCts > SCANstruc.XStartCts + (SCANstruc.XEndCts - SCANstruc.XStartCts) / 2 THEN
+     MoveToPos1& = SCANstruc.XStartCts
+     MoveToPos2& = SCANstruc.XEndCts
+      ELSE
+     MoveToPos1& = SCANstruc.XEndCts
+     MoveToPos2& = SCANstruc.XStartCts
+      END IF
+      UStop = DoX(MoveToPos1&) 'put x axis into position
+      IF UStop THEN EXIT DO 'check if user hit stop
+      IF SCANstruc.DualRas THEN
+    UStop = DoX(MoveToPos2&)'put x axis into position
+    IF UStop THEN EXIT DO 'check if user hit stop
+      END IF
+      SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
+    LOOP
+END SUB
+
+SUB YScan
+    LOCAL UStop AS BYTE
+    LOCAL MoveToPos1, MoveToPos2 AS LONG
+    DO WHILE SCANstruc.IndexCt >= (SCANstruc.XDataStart AND SCANstruc.IndexCt) <= SCANstruc.XDataEnd
+      UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
+      IF UStop THEN EXIT DO 'check if user hit stop
+      IF SCANstruc.YCts > SCANstruc.YStartCts + (SCANstruc.YEndCts - SCANstruc.YStartCts) / 2 THEN
+    MoveToPos1& = SCANstruc.YStartCts
+    MoveToPos2& = SCANstruc.YEndCts
+      ELSE
+    MoveToPos1& = SCANstruc.YEndCts
+    MoveToPos2& = SCANstruc.YStartCts
+      END IF
+      UStop = DoY(MoveToPos1&)'put y axis into position
+      IF UStop THEN EXIT DO 'check if user hit stop
+      IF SCANstruc.DualRas THEN
+    UStop = DoY(MoveToPos2&)'put y axis into position
+    IF UStop THEN EXIT DO 'check if user hit stop
+      END IF
+      SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
+    LOOP
+ END SUB
+
+DECLARE FUNCTION DoX (AbsPos&)
+
+FUNCTION DoX (MPos&)
+   LOCAL MoveToCts AS LONG
+   MoveToCts& = GetXCord(MPos&)
+
+   CALL MoveX(MoveToCts&)
+
+   DO
+     IF KeyDown <> 0 THEN 'user pressed KEYPAD
+
+       DoX = TRUE: EXIT FUNCTION
+     END IF
+     IF (Glo.Stat(Servo1) AND HomeInProg) THEN
+    'OK
+     ELSE  'user pressed ABORT switch
+    DoX = TRUE: EXIT FUNCTION
+     END IF
+     'PrintYPos
+     'PrintAPos
+     'PrintXPos
+   LOOP UNTIL ABS(SCANstruc.XCts - ABS(MoveToCts&)) < (SCANstruc.XCtr / 8) 'REM
+
+   DoX = FALSE: EXIT FUNCTION
+
+END FUNCTION
+
+DECLARE FUNCTION DoY (AbsPosY&)
+
+FUNCTION DoY (MPos&)
+   LOCAL MoveToCts AS LONG
+   MoveToCts& = GetYCord(MPos&)
+
+   CALL MoveY(MoveToCts&)
+
+   DO
+     IF KeyDown <> 0 THEN 'User pressed KEYPAD
+
+       DoY = TRUE: EXIT FUNCTION
+     END IF
+     IF (Glo.Stat(Servo3) AND HomeInProg) THEN
+    'OK
+     ELSE  'user pressed ABORT switch
+    DoY = TRUE: EXIT FUNCTION
+     END IF
+   '  PrintAPos
+   '  PrintXPos
+   '  PrintYPos
+   LOOP UNTIL (ABS(SCANstruc.YCts - ABS(MoveToCts&)) < (SCANstruc.YCtr / 8))
+
+   DoY = FALSE: EXIT FUNCTION
+
+END FUNCTION
+
+DECLARE SUB MoveX (PosCts&)
+SUB MoveX (PosCts&)
+   LOCAL ActPos AS LONG
+   LOCAL Cmd AS STRING
+   CALL SetHomeCap 'stop on limit 1
+
+   ControlByte = LoadPos OR LoadVel OR LoadAcc OR PosMode
+
+   '**********************************************************
+   'When user changes current position the counters get zeroed.
+   'Adjust move-to position offset accordingly
+   '**********************************************************
+   ActPos& = PosCts& - SCANstruc.XOffset
+
+   'Build the command string
+   Cmd$ = CHR$(&HD4) + CHR$(ControlByte) + LongToStr(ActPos&)
+   Cmd$ = Cmd$ + LongToStr(Glo.CmdVelocity(Servo1)) + LongToStr(Glo.CmdAccel(Servo1))
+
+   SendCmd Servo1, Cmd$
+
+   SendCmd Servo2, Cmd$
+
+   CALL GoMtrs
+
+END SUB
+DECLARE SUB MoveY (PosCts&)
+SUB MoveY (PosCts&)
+  LOCAL ActPos AS LONG
+  LOCAL Cmd AS STRING
+  CALL StopYMtr
+
+  CALL SetHomeCap 'stop on limit 1
+
+  ControlByte = LoadPos OR LoadVel OR LoadAcc OR PosMode
+
+  '**********************************************************
+  'When user changes current position the counters get zeroed.
+  'Adjust move-to position accordingly
+  ActPos& = PosCts& - SCANstruc.YOffset
+  '**********************************************************
+
+  'Build the command string
+  Cmd$ = CHR$(&HD4) + CHR$(ControlByte) + LongToStr(ActPos&)
+  Cmd$ = Cmd$ + LongToStr(Glo.CmdVelocity(Servo3)) + LongToStr(Glo.CmdAccel(Servo3))
+
+  SendCmd Servo3, Cmd$
+
+  'REMED
+  'CALL GoYMtr
+
+  CALL GoMtrs
+
+END SUB
+SUB GoMtrs
+  LOCAL Cmd AS STRING
+  Cmd$ = CHR$(&H5)
+  SendCmd AllServos, Cmd$
+
+END SUB

@@ -1,6 +1,7 @@
 'Windows consts, variables, routines, etc....
 
 #INCLUDE "CruBas.inc"
+
 %ID_TIMER = 500
 %IDC_LABEL1 = 1112
 %IDC_LABEL2 = 1113
@@ -118,7 +119,7 @@
 %IDC_UpDown = 124
 %IDC_LABSPIN = 125
 %IDC_EB_STARTEND = 3008
-%ID_Timer = 500   'ID of timer
+%ID_Timer = 500
 %OPT1 = 1001
 %OPT2 = 1002
 %OPT3 = 1003
@@ -150,7 +151,6 @@
 
 
 GLOBAL hDlg, hDlg1, hDlg2, hDlg3, hDlg4, hDlg5, hDlg6, hDlg7 AS DWORD, w, h AS LONG
-
 GLOBAL gOldEditClassProc AS LONG
 GLOBAL keypress AS INTEGER
 GLOBAL AxisNum, MFlag, GEncNum AS INTEGER
@@ -158,8 +158,59 @@ GLOBAL filename AS STRING
 GLOBAL filenumber AS INTEGER
 
 
+'=====================  Main window ===================================
+FUNCTION BUILDWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, 0, "Atco MCU2015",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
+    DIALOG SET ICON hDlg, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+
+    CONTROL ADD BUTTON, hDlg, %SETUP_BUTTON, "Set&up", 100, 100, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_SETUP_CALL()
+    CONTROL SET FONT hDlg, %SETUP_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg, %JOYSTICK_BUTTON, "&Joy Stick", 100, 200, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_JOYSTICK_CALL()
+    CONTROL SET FONT hDlg, %JOYSTICK_BUTTON, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%AJOG, "A-Jo&g", 100, 300, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_AJOG_CALL()
+    CONTROL SET FONT hDlg, %AJOG, NormalFont&
 
 
+    CONTROL ADD BUTTON, hDlg,%SAVE, "&Save", 100, 400, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_SAVE_CALL()
+    CONTROL SET FONT hDlg, %SAVE, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%AUTOSCAN, "&Auto Scan", 600, 100, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_AUTOSCAN_CALL()
+    CONTROL SET FONT hDlg, %AUTOSCAN, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%XSPDCTRL, "&XSPD CTRL", 600, 200, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_XSPDCTRL_CALL()
+    CONTROL SET FONT hDlg, %XSPDCTRL, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%MJOG, "&M-Jog", 600, 300, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_MJOG_CALL()
+    CONTROL SET FONT hDlg, %MJOG, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%LOAD, "&Load", 600, 400, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_LOAD_CALL()
+    CONTROL SET FONT hDlg, %LOAD, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg,%SCAN, "&Nozzle Scan Plan", 1100, 100, 300, 50,%BS_PUSHLIKE , , _
+    CALL BTN_SCAN_CALL()
+    CONTROL SET FONT hDlg, %SCAN, NormalFont&
+
+END FUNCTION
+
+
+'=====================  Setup window ===================================
 '===================================================================
 FUNCTION BUILDSETUPWINDOW() AS LONG
     LOCAL exeICON AS STRING
@@ -296,6 +347,7 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
 
  END FUNCTION
 
+'=====================  Calibrate window ===================================
  FUNCTION BUILDCALWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -336,6 +388,46 @@ FUNCTION BUILDSETUPWINDOW() AS LONG
     CONTROL SHOW STATE hDlg2, %IDC_LABEL26, %SW_HIDE
 END FUNCTION
 
+
+'=====================  Auto Scan 1st window ===================================
+FUNCTION BUILDAUTOSCANWINDOW() AS LONG
+    LOCAL exeICON AS STRING
+    LOCAL lResult AS LONG
+    LOCAL TXT AS STRING
+    exeICON = "exeICON"
+    LOCAL NormalFont&
+    DESKTOP GET SIZE TO w, h
+    DIALOG NEW PIXELS, hdlg, "MCU 2015 Auto Scan", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg3
+    DIALOG SET USER hDlg3, 1, hdlg
+    DIALOG SET ICON hDlg3, exeICON$   '
+    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
+    GRAPHIC SET FONT NormalFont&
+
+    CONTROL ADD BUTTON, hDlg3,%BEGIN, "&Begin", 600, 400, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_BEGIN_CALL()
+    CONTROL SET FONT hDlg3, %BEGIN, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg3,%NEXT, "&Next", 600, 500, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_NEXT_CALL()
+    CONTROL SET FONT hDlg3, %NEXT, NormalFont&
+
+    CONTROL ADD BUTTON, hDlg3,%ALL0, "&All0", 600, 600, 200, 50,%BS_PUSHLIKE , , _
+    CALL BTN_ALL0_CALL()
+    CONTROL SET FONT hDlg3, %ALL0, NormalFont&
+
+    TXT$ = "X Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL40, TXT$,    550, 100, 150, 20
+    TXT$ = "Y Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL41, TXT$,    550, 150, 150, 20
+    TXT$ = "A Pos: "
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL42, TXT$,    550, 200, 150, 20
+    TXT$ = ""
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_XPOSASCAN, SCANstruc.XPosStr, 850, 100, 80, 20
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_YPOSASCAN, SCANstruc.YPosStr, 850, 150, 80, 20
+    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_APOSASCAN, SCANstruc.APosStr, 850, 200, 80, 20,
+
+END FUNCTION
+'=====================  Auto scan running window ===================================
 FUNCTION BUILDAUTOSCAN() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -353,7 +445,7 @@ FUNCTION BUILDAUTOSCAN() AS LONG
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL_YPOSAUTO, SCANstruc.YPosStr, 850, 150, 80, 20
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL_APOSAUTO, SCANstruc.APosStr, 850, 200, 80, 20,
     CONTROL ADD BUTTON, hDlg7, %STOP_AUTO, "Stop Auto Scan", 100, 100, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_AUTOSTOP_CALL()
+            CALL BTN_AUTOSTOP_CALL()
 
     TXT$ = "* Check Motors On *"
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL100, TXT$,    550, 20, 150, 20
@@ -366,7 +458,6 @@ FUNCTION BUILDAUTOSCAN() AS LONG
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL103, TXT$,    550, 150, 150, 20
     TXT$ = "A Pos: "
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL104, TXT$,    550, 200, 150, 20
-
 
     TXT$ = "Keyboard short cuts:"
     CONTROL ADD LABEL, hDlg7, %IDC_LABEL105, TXT$,    550, 250, 150, 20
@@ -383,6 +474,7 @@ FUNCTION BUILDAUTOSCAN() AS LONG
 
 END FUNCTION
 
+'===================== A-Jog window ===================================
 FUNCTION BUILDAJOGWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -430,6 +522,7 @@ FUNCTION BUILDAJOGWINDOW() AS LONG
 
 END FUNCTION
 
+'=====================  M-Jog window ===================================
 FUNCTION BUILDMJOYWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -462,6 +555,7 @@ FUNCTION BUILDMJOYWINDOW() AS LONG
     CALL BTN_MJOYSTOP_CALL()
 END FUNCTION
 
+'=====================  JoyStick window ===================================
 FUNCTION BUILDJOYWINDOW() AS LONG
     LOCAL exeICON AS STRING
     LOCAL lResult AS LONG
@@ -494,94 +588,7 @@ FUNCTION BUILDJOYWINDOW() AS LONG
 END FUNCTION
 
 
-FUNCTION BUILDWINDOW() AS LONG
-    LOCAL exeICON AS STRING
-    LOCAL lResult AS LONG
-    exeICON = "exeICON"
-    LOCAL NormalFont&
-    DESKTOP GET SIZE TO w, h
-    DIALOG NEW PIXELS, 0, "Atco MCU2015",,, w, h,%WS_OVERLAPPEDWINDOW , 0 TO hDlg
-    DIALOG SET ICON hDlg, exeICON$   '
-    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
-    GRAPHIC SET FONT NormalFont&
-
-    CONTROL ADD BUTTON, hDlg, %SETUP_BUTTON, "Set&up", 100, 100, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_SETUP_CALL()
-    CONTROL SET FONT hDlg, %SETUP_BUTTON, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg, %JOYSTICK_BUTTON, "&Joy Stick", 100, 200, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_JOYSTICK_CALL()
-    CONTROL SET FONT hDlg, %JOYSTICK_BUTTON, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%AJOG, "A-Jo&g", 100, 300, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_AJOG_CALL()
-    CONTROL SET FONT hDlg, %AJOG, NormalFont&
-
-
-    CONTROL ADD BUTTON, hDlg,%SAVE, "&Save", 100, 400, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_SAVE_CALL()
-    CONTROL SET FONT hDlg, %SAVE, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%AUTOSCAN, "&Auto Scan", 600, 100, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_AUTOSCAN_CALL()
-    CONTROL SET FONT hDlg, %AUTOSCAN, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%XSPDCTRL, "&XSPD CTRL", 600, 200, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_XSPDCTRL_CALL()
-    CONTROL SET FONT hDlg, %XSPDCTRL, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%MJOG, "&M-Jog", 600, 300, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_MJOG_CALL()
-    CONTROL SET FONT hDlg, %MJOG, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%LOAD, "&Load", 600, 400, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_LOAD_CALL()
-    CONTROL SET FONT hDlg, %LOAD, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg,%SCAN, "&Nozzle Scan Plan", 1100, 100, 300, 50,%BS_PUSHLIKE , , _
-    CALL BTN_SCAN_CALL()
-    CONTROL SET FONT hDlg, %SCAN, NormalFont&
-
-END FUNCTION
-
-FUNCTION BUILDAUTOSCANWINDOW() AS LONG
-    LOCAL exeICON AS STRING
-    LOCAL lResult AS LONG
-    LOCAL TXT AS STRING
-    exeICON = "exeICON"
-    LOCAL NormalFont&
-    DESKTOP GET SIZE TO w, h
-    DIALOG NEW PIXELS, hdlg, "MCU 2015 Auto Scan", 0, 0, w, h, %WS_OVERLAPPEDWINDOW, TO hDlg3
-    DIALOG SET USER hDlg3, 1, hdlg
-    DIALOG SET ICON hDlg3, exeICON$   '
-    FONT NEW "myfont1",20 , 0, 0, 1 TO NormalFont&
-    GRAPHIC SET FONT NormalFont&
-
-    CONTROL ADD BUTTON, hDlg3,%BEGIN, "&Begin", 600, 400, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_BEGIN_CALL()
-    CONTROL SET FONT hDlg3, %BEGIN, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg3,%NEXT, "&Next", 600, 500, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_NEXT_CALL()
-    CONTROL SET FONT hDlg3, %NEXT, NormalFont&
-
-    CONTROL ADD BUTTON, hDlg3,%ALL0, "&All0", 600, 600, 200, 50,%BS_PUSHLIKE , , _
-    CALL BTN_ALL0_CALL()
-    CONTROL SET FONT hDlg3, %ALL0, NormalFont&
-
-    TXT$ = "X Pos: "
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL40, TXT$,    550, 100, 150, 20
-    TXT$ = "Y Pos: "
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL41, TXT$,    550, 150, 150, 20
-    TXT$ = "A Pos: "
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL42, TXT$,    550, 200, 150, 20
-    TXT$ = ""
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_XPOSASCAN, SCANstruc.XPosStr, 850, 100, 80, 20
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_YPOSASCAN, SCANstruc.YPosStr, 850, 150, 80, 20
-    CONTROL ADD LABEL, hDlg3, %IDC_LABEL_APOSASCAN, SCANstruc.APosStr, 850, 200, 80, 20,
-
-END FUNCTION
-
+'=============== Edit Control  call back ==================================
 CALLBACK FUNCTION EditControlCallback()
     LOCAL TXT AS STRING
     LOCAL InkeyVar AS STRING
@@ -724,7 +731,7 @@ CALLBACK FUNCTION EditControlCallback()
  END IF
 
 END FUNCTION
-
+'============= Edit Sub Classing ======================================================
 FUNCTION EditSubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
    SELECT CASE wMsg&
       CASE %WM_KEYUP
@@ -813,6 +820,15 @@ FUNCTION Edit11SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&
       CASE %WM_KEYUP
          keypress = 1
          DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_LABEL_XPOSMJOG  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
+FUNCTION Edit12SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN,%IDC_LABEL_XPOSAUTO  , wParm&
+         USTOP = FALSE
    END SELECT
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)

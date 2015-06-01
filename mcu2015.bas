@@ -39,7 +39,7 @@ FUNCTION PBMAIN () AS LONG
     DIM  YSpd(0 TO 255)
     DIM  StartLPos(3) AS BYTE
     DIM  CalSet AS INTEGER
-    DIM lResult AS LONG
+    DIM  lResult AS LONG
   '****************************************************************************************************
 
     HdrVer = "SCU-1.00"

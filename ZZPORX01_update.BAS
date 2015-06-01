@@ -698,7 +698,8 @@ BaseMenu:
            IF XCode = KeyUP THEN
          CALL PrintChar(3, 11, " ")
          SetLcdPos 2, 11
-           ELSEIF XCode = KeyDN THEN
+
+                   ELSEIF XCode = KeyDN THEN
          CALL PrintChar(3, 11, " ")
          SetLcdPos 4, 11
            ELSEIF XCode = KeyLft THEN
@@ -1547,7 +1548,6 @@ FUNCTION DoX (MPos&)
 
    DO
      IF KeyDown <> 0 THEN 'user pressed KEYPAD
-       FlushKeys
        DoX = TRUE: EXIT FUNCTION
      END IF
      IF (Glo.Stat(Servo1) AND HomeInProg) THEN

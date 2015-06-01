@@ -121,7 +121,8 @@ GLOBAL nComm AS LONG
 GLOBAL A,B,C,D AS INTEGER
 GLOBAL controlbyte AS BYTE
 GLOBAL ExitSub AS INTEGER
-
+GLOBAL USTOP AS BYTE
+GLOBAL KeyDown AS BYTE
 '****************************************************************************************************
 TYPE GloRecord
    NumModules AS INTEGER
@@ -859,17 +860,17 @@ SUB FixSIOerror
   CALL FlushBuffers(PICPort$, 0, ECode%)
 
 END SUB
-DECLARE FUNCTION KeyDown ()
-FUNCTION KeyDown
+'DECLARE FUNCTION KeyDown ()
+'FUNCTION KeyDown
 
 
-   IF GRAPHIC(INSTAT) THEN
-       KEYDOWN = -1
-   ELSE
-       KEYDOWN = 0
-   END IF
+ '  IF GRAPHIC(INSTAT) THEN
+'       KEYDOWN = -1
+'   ELSE
+ '      KEYDOWN = 0
+'   END IF
 
-END FUNCTION
+'END FUNCTION
 
 
 
@@ -932,7 +933,7 @@ SUB GetStatus (Num)
 
    LOCAL MtrNum AS INTEGER
    LOCAL Cmd AS STRING
-   Cmd$ = CHR$(&HD)  'nop
+   Cmd$ = CHR$(&HE)  'nop
 
    IF Num = &H255 THEN  'load status all servos
      FOR MtrNum = 1 TO LastServo
@@ -1606,7 +1607,7 @@ END FUNCTION
 
 SUB XScan
     LOCAL MoveToPos1, MoveToPos2 AS LONG
-    LOCAL UStop AS BYTE
+    'LOCAL UStop AS BYTE
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.YDataStart AND SCANstruc.IndexCt) <= SCANstruc.YDataEnd
       UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
@@ -1628,7 +1629,7 @@ SUB XScan
 END SUB
 
 SUB YScan
-    LOCAL UStop AS BYTE
+    'LOCAL UStop AS BYTE
     LOCAL MoveToPos1, MoveToPos2 AS LONG
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.XDataStart AND SCANstruc.IndexCt) <= SCANstruc.XDataEnd
       UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
@@ -1659,6 +1660,7 @@ FUNCTION DoX (MPos&)
    CALL MoveX(MoveToCts&)
 
    DO
+     DIALOG DOEVENTS 1
      IF KeyDown <> 0 THEN 'user pressed KEYPAD
 
        DoX = TRUE: EXIT FUNCTION
@@ -1686,8 +1688,8 @@ FUNCTION DoY (MPos&)
    CALL MoveY(MoveToCts&)
 
    DO
+     DIALOG DOEVENTS 1
      IF KeyDown <> 0 THEN 'User pressed KEYPAD
-
        DoY = TRUE: EXIT FUNCTION
      END IF
      IF (Glo.Stat(Servo3) AND HomeInProg) THEN

@@ -337,11 +337,20 @@ DECLARE SUB SetModeVel ()
 DECLARE SUB SetPwm (MtrNum AS INTEGER, PVal AS INTEGER)
 DECLARE SUB JogAuto ()
 DECLARE SUB SetXCtrs ()
-
+DECLARE SUB JogMan ()
+DECLARE SUB ManXDN()
+DECLARE SUB ManXUP()
+DECLARE SUB ManYLFT()
+DECLARE SUB ManYRGT()
 DECLARE SUB SetAccel (address AS INTEGER)
 DECLARE SUB SetGain (address AS INTEGER)
 DECLARE SUB EnableAmpl (Value AS INTEGER, address AS INTEGER)
 DECLARE SUB SetTables ()
+'************************************************************************************
+'Motor Calibration File I/O                                                         *
+'************************************************************************************
+DECLARE FUNCTION CalSave(filename AS STRING)
+DECLARE FUNCTION CalLoad(filename AS STRING)
 
 
 SUB DelayX (Millisec) '
@@ -991,7 +1000,6 @@ SUB SetXCtrs
   CALL ResetPosition(Servo2)
 END SUB
 
-DECLARE FUNCTION CalSave(filename AS STRING)
   ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 FUNCTION CalSave(filename AS STRING)
     LOCAL ecode AS INTEGER
@@ -1015,7 +1023,6 @@ FUNCTION CalSave(filename AS STRING)
     END IF
 END FUNCTION
 
-DECLARE FUNCTION CalLoad(filename AS STRING)
   ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 FUNCTION CalLoad(filename AS STRING)
    LOCAL ecode AS INTEGER
@@ -1044,7 +1051,7 @@ ExitCalLoad:
      CalLoad = TRUE
    END IF
 END FUNCTION
-DECLARE SUB JogMan ()
+
 SUB JogMan
   SetModePwm
 END SUB

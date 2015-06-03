@@ -75,7 +75,7 @@ FUNCTION OpenComPorts
     COMM SET #nComm, RXBUFFER = RecvSize   ' 2 Kb receive buffer
     COMM SET #nComm, BAUD   = PICBaud  ' 19200 baud
     COMM SET #nComm, BYTE   = 8     ' 8 bits
-    COMM SET #nComm, PARITY = %FALSE        ' No parity
+    COMM SET #nComm, PARITY = FALSE        ' No parity
     COMM SET #nComm, STOP   = 0     ' 1 stop bit
 
     COMM SET #nComm, XINPFLOW = 0

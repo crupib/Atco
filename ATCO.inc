@@ -303,7 +303,7 @@ DECLARE FUNCTION LongToStr$ (x AS LONG)
 DECLARE FUNCTION IntToStr$ (x AS INTEGER)
 DECLARE FUNCTION CharsToInt (BYVAL A AS INTEGER, B AS INTEGER)  AS INTEGER
 
-DECLARE FUNCTION QStr$ (BYVAL Amount!, BYVAL Places)
+DECLARE FUNCTION QStr$ (BYVAL Amount!, BYVAL Places AS STRING)
 
 DECLARE FUNCTION GoodLNG (Num AS STRING) AS INTEGER
 DECLARE FUNCTION GoodSNG (Num AS STRING) AS INTEGER
@@ -349,11 +349,11 @@ DECLARE SUB SetTables ()
 '************************************************************************************
 'Motor Calibration File I/O                                                         *
 '************************************************************************************
-DECLARE FUNCTION CalSave(filename AS STRING)
-DECLARE FUNCTION CalLoad(filename AS STRING)
+DECLARE FUNCTION CalSave(filename AS STRING) AS INTEGER
+DECLARE FUNCTION CalLoad(filename AS STRING) AS INTEGER
 
 
-SUB DelayX (Millisec) '
+SUB DelayX (Millisec AS INTEGER) '
    SLEEP Millisec
 END SUB
 
@@ -425,7 +425,7 @@ FUNCTION IntToStr$ (x AS INTEGER)
 
 END FUNCTION
 
-FUNCTION CharsToInt (BYVAL A AS INTEGER, B AS INTEGER)
+FUNCTION CharsToInt (BYVAL A AS INTEGER, B AS INTEGER) AS INTEGER
 'converts two bytes, (a=msb) to a signed integer
 
  IF (A > 127) THEN
@@ -630,7 +630,7 @@ SUB GetXyPos
 
 END SUB
 
-FUNCTION QStr$ (BYVAL Amount!, BYVAL Places) STATIC
+FUNCTION QStr$ (BYVAL Amount!, BYVAL Places AS STRING) STATIC
 
     QStr$ = LEFT$(LTRIM$(STR$(Amount!)) + SPACE$(Places), Places)
 
@@ -705,7 +705,7 @@ SUB StopMtrs
 END SUB
 
 
-FUNCTION GoodLNG (Num$)
+FUNCTION GoodLNG (Num$) AS INTEGER
 
   IF VAL(Num$) > 2147483647 THEN
     GoodLNG = FALSE
@@ -720,7 +720,7 @@ FUNCTION GoodLNG (Num$)
 END FUNCTION
 
 
-FUNCTION GoodSNG (Num$)
+FUNCTION GoodSNG (Num$) AS INTEGER
 
   IF VAL(Num$) < -3.402823E+38 THEN
     GoodSNG = FALSE
@@ -790,7 +790,7 @@ SUB StopYMtr
 
 END SUB
 
-SUB MoveXVel (MoveDir)
+SUB MoveXVel (MoveDir AS INTEGER)
    LOCAL ControlByte AS INTEGER
    LOCAL X1, X2 AS LONG
    LOCAL Cmd AS STRING
@@ -817,7 +817,7 @@ SUB MoveXVel (MoveDir)
 END SUB
 
 
-SUB MoveYVel (MoveDir)
+SUB MoveYVel (MoveDir AS INTEGER)
    LOCAL ControlByte AS INTEGER
    LOCAL X1, X2 AS LONG
    LOCAL Cmd AS STRING
@@ -958,7 +958,7 @@ SUB SetModeVel
 END SUB
 
 
-SUB SetPwm (MtrNum, PwmVal)
+SUB SetPwm (MtrNum AS INTEGER, PwmVal AS INTEGER)
     LOCAL x AS INTEGER
     LOCAL Cmd AS STRING
     IF PwmVal > 0 THEN
@@ -1001,7 +1001,7 @@ SUB SetXCtrs
 END SUB
 
   ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-FUNCTION CalSave(filename AS STRING)
+FUNCTION CalSave(filename AS STRING) AS INTEGER
     LOCAL ecode AS INTEGER
     LOCAL BytesRead AS INTEGER
     LOCAL filenumber AS INTEGER
@@ -1024,7 +1024,7 @@ FUNCTION CalSave(filename AS STRING)
 END FUNCTION
 
   ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-FUNCTION CalLoad(filename AS STRING)
+FUNCTION CalLoad(filename AS STRING) AS INTEGER
    LOCAL ecode AS INTEGER
    LOCAL BytesRead AS INTEGER
    LOCAL filenumber AS INTEGER
@@ -1232,7 +1232,7 @@ SUB ReSetMotors
 
 END SUB
 
-FUNCTION ProfileScan
+FUNCTION ProfileScan AS INTEGER
 
    IF GoodLNG(STR$(SCANstruc.XLow * SCANstruc.XCtr + 1)) THEN
      SCANstruc.XStartCts = CLNG(SCANstruc.XLow * SCANstruc.XCtr)

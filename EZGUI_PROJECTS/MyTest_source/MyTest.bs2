@@ -6,7 +6,7 @@
 '
 ' -----------------------------------------------------------------------------------------
 '            WARNING !    Do Not Modify any code WITHIN Protected Sections !
-' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following 
+' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following
 ' CODE TAGS:        '<<SAVE>>      '<<END>>            and the Designer will not remove it.
 ' -----------------------------------------------------------------------------------------
 '
@@ -162,13 +162,8 @@ DECLARE SUB SETUPFORM_ACTIN_Events(MyID&, CMsg&, CVal&, Cancel&)
 '         (Put code in CODE TAGS! to protect from deletion by Code Generator !)
 ' *************************************************************************************
 
-
-'<<SAVE>>
-'EZ_Reg %EZ_CUSTID, %EZ_REGNUM
-'<<END>>
-
 SUB EZ_Main(VerNum&)     ' (PROTECTED)
-     EZ_Reg 1000,9999
+     EZ_Reg %EZ_CUSTID,%EZ_REGNUM
      EZ_DefImageFolder "Graphics"
      EZ_AllowCommandEvents  0
      EZ_AllowKeyEvents 1
@@ -240,6 +235,7 @@ FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
      RV&=1
      FUNCTION=RV&
+     EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
 END FUNCTION
 
 SUB OtherForm_Design(FormName$)
@@ -551,9 +547,10 @@ SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
      LOCAL CText$
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_SubClass 2
-     EZ_Text %SETUPFORM_XSTART, 17, 2, 15, 1, "SCANstruc.XLowStr", "EST"
+     EZ_Text %SETUPFORM_XSTART, 17, 2, 15, 1, "", "EST"
      EZ_SubClass 0
      ' -----------------------------------------------
      EZ_Color 0, 11
@@ -862,6 +859,7 @@ SUB SETUPFORM_XSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
           CASE %EZ_Change
           CASE %EZ_KeyDown
           CASE %EZ_LButtonDown
+          CASE %EZ_Loading
           CASE ELSE
      END SELECT
 END SUB

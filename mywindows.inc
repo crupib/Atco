@@ -87,17 +87,6 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
                CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "LOW - HIGH"
             END IF
          END IF
-         IF CBCTL = %IDC_EB_IDXHL THEN
-            IF CBLPARAM = %VK_RIGHT THEN
-                SCANstruc.IndexLow = TRUE
-                SCANstruc.IndexLowStr = "HIGH - LOW"
-                CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "HIGH - LOW"
-            ELSEIF CBLPARAM = %VK_LEFT THEN
-               SCANstruc.IndexLow = FALSE
-               SCANstruc.IndexLowStr = "LOW - HIGH"
-               CONTROL SET TEXT hDlg1, %IDC_EB_IDXHL, "LOW - HIGH"
-            END IF
-         END IF
          IF CBCTL = %IDC_EB_XONOFF THEN
             IF CBLPARAM = %VK_RIGHT THEN
                 SCANstruc.XEnable = FALSE

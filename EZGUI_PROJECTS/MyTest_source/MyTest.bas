@@ -162,13 +162,8 @@ DECLARE SUB SETUPFORM_ACTIN_Events(MyID&, CMsg&, CVal&, Cancel&)
 '         (Put code in CODE TAGS! to protect from deletion by Code Generator !)
 ' *************************************************************************************
 
-
-'<<SAVE>>
-'EZ_Reg %EZ_CUSTID, %EZ_REGNUM
-'<<END>>
-
 SUB EZ_Main(VerNum&)     ' (PROTECTED)
-     EZ_Reg 1000,9999
+     EZ_Reg %EZ_CUSTID,%EZ_REGNUM
      EZ_DefImageFolder "Graphics"
      EZ_AllowCommandEvents  0
      EZ_AllowKeyEvents 1
@@ -240,7 +235,76 @@ FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
      RV&=1
      FUNCTION=RV&
-     EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
+     'EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
+     'MCU startup code
+     '*******************************************************************************************************
+     'MCU                                                                                                   *
+     '*******************************************************************************************************
+    DIM HdrVer AS STRING * 20
+    DIM ThumbDisk AS STRING * 2
+  'COM PORTS
+    DIM  RecvSize AS LONG
+    DIM  XmitSize AS LONG
+    DIM  MemSize AS LONG
+    DIM  PICPort AS STRING
+    DIM  PICBaud AS LONG
+    DIM KeyTable(20) AS STRING
+  'delay timer
+    DIM  DelayCtr AS LONG
+    DIM  WaitX AS INTEGER
+    DIM  LF(0 TO 255)
+    DIM  LU(0 TO 255)
+    DIM  Corr1(0 TO 255) AS BYTE
+    DIM  Corr2(0 TO 255) AS BYTE
+  'Vel & Accel pot tables
+    DIM  XVel(255) AS LONG
+    DIM  YVel(255) AS LONG
+    DIM  XAcel(255) AS LONG
+    DIM  YAcel(255) AS LONG
+  'Speed Control tables
+    DIM  XSpd(0 TO 255)
+    DIM  YSpd(0 TO 255)
+    DIM  StartLPos(3) AS BYTE
+    DIM  CalSet AS INTEGER
+    DIM  lResult AS LONG
+  '****************************************************************************************************
+
+    HdrVer = "SCU-1.00"
+    ThumbDisk = "C:\UCALS\"
+    PICPort ="COM1"
+    PICBaud = 19200
+    nComm = FREEFILE
+    DelayCtr = DelayFact
+    WaitX = 1
+    'joystick to pwm conversion table
+    CALL SetTables
+
+   '***********************************************
+   'Open & Check Com Buffers, Report & Fix errors
+   '
+   '  - check PIC, power on, etc..
+   '***********************************************
+'    IsSplashActive = 1
+'    ShowSplashDlg(1000, "atcosplash.bmp", 1, "MCU 2015",1)
+    IF NOT OpenComPorts THEN
+     MSGBOX "ERROR, POWER OFF/ON",, "OpenComPorts serial connection failed."
+     DO
+      EXIT FUNCTION
+     LOOP
+    END IF
+    IF NOT InitNetWork THEN
+     lResult& = MSGBOX("SETUP ERROR", %MB_OKCANCEL OR %MB_DEFBUTTON2 OR %MB_TASKMODAL, "InitNetWork Failed.")
+     DO
+       CALL DelayX(200)
+       IF lResult& = %IDCANCEL THEN
+           EXIT FUNCTION
+       END IF
+     LOOP UNTIL InitNetWork
+    END IF
+    CALL SetDefaults
+    Scanstruc.NextFlag = FALSE 'incase cal was saved during scan
+    CALL SetForAuto  'set velocity, etc. & motors on
+    CALL DelayX(200)
 END FUNCTION
 
 SUB OtherForm_Design(FormName$)
@@ -458,7 +522,7 @@ END SUB
 SUB NEWFORM_SETUP_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
-             EZ_SETUPFORM_Display ""
+             EZ_SETUPFORM_Display "NEWFORM"
 
           CASE %EZ_LButtonDown
           CASE ELSE
@@ -545,16 +609,17 @@ END SUB
 
 SUB EZ_SETUPFORM_Display(BYVAL FParent$)     ' (PROTECTED)
      EZ_Color -1, -1
-     EZ_Form "SETUPFORM", FParent$, "MCU Settings", 0, 0, 106, 46, "CMRZ"
+     EZ_Form "SETUPFORM", FParent$, "MCU Settings", 0, 0, 106, 46, "CRZ"
 END SUB
 
 SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
      LOCAL CText$
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_SubClass 2
-     EZ_Text %SETUPFORM_XSTART, 17, 2, 15, 1, "SCANstruc.XLowStr", "EST"
+     EZ_Text %SETUPFORM_XSTART, 17, 2, 15, 1, "", "EST"
      EZ_SubClass 0
      ' -----------------------------------------------
      EZ_Color 0, 11
@@ -850,6 +915,30 @@ SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
                SELECT CASE CMsg&
                     CASE %EZ_Loading
                     CASE %EZ_Loaded
+                    ' add setup data
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSTART,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YEND,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XINDEX,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YINDEX,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XSPEED,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSPEED,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPOS,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPOS,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XCTIN,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YCTIN,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPLUSMIN,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_INDEX,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XONOFF,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YONOFF,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_AUTOHD,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_DUALRAS,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_OVERLAP,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_APOS,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_ACTIN,  SCANstruc.XLowStr
                     CASE %EZ_Started
                     CASE %EZ_Close
                     CASE ELSE
@@ -859,164 +948,338 @@ SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 END SUB
 
 SUB SETUPFORM_XSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
+LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-          CASE %EZ_KeyDown
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                  SCANstruc.XLow = ABS(VAL(TXT$))
+                  SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+                END IF
           CASE %EZ_LButtonDown
+          CASE %EZ_Loading
+            '     V$ = EZ_GetLoadStr("T")
+            '      EZ_SetLoadStr "T", "Hello World!"
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XEND_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                   SCANstruc.XHigh = ABS(VAL(TXT$))
+                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YEND_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YHigh = ABS(VAL(TXT$))
+                       SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                 IF GoodSNG(TXT$) THEN
+                       SCANstruc.XIndex = ABS(VAL(TXT$))
+                       SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YIndex = ABS(VAL(TXT$))
+                       SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XSpeed = ABS(VAL(TXT$))
+                       SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
+    LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+               IF GoodSNG(TXT$) THEN
+                       SCANstruc.YSpeed = ABS(VAL(TXT$))
+                       SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.XPos = ABS(VAL(TXT$))
+                       SCANstruc.XPosStr = QStr$(SCANstruc.XPos, 10)
+                       SCANstruc.XOffset = GetXCord(CLNG(SCANstruc.XPos * SCANstruc.XCtr))
+                       CALL ResetPosition(Servo1)
+                       CALL ResetPosition(Servo2)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YPos = VAL(TXT$)
+                       SCANstruc.YPosStr = QStr$(SCANstruc.YPos, 10)
+                       SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
+                       CALL ResetPosition(Servo3)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodLNG(TXT$) THEN
+                       SCANstruc.XCtr = ABS(VAL(TXT$))
+                       SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodLNG(TXT$) THEN
+                     SCANstruc.YCtr = ABS(VAL(TXT$))
+                     SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XPLUSMIN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+          CASE %EZ_KeyDown
+               IF CVal& = %EZK_RIGHT THEN
+                    SCANstruc.XPlus = TRUE
+                    SCANstruc.XPlusSTR = "POSITIVE  "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_XPLUSMIN, "POSITIVE"
+                ELSEIF CVal& = %EZK_LEFT THEN
+                    SCANstruc.XPlus = FALSE
+                    SCANstruc.XPlusSTR = "NEGATIVE  "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_XPLUSMIN, "NEGATIVE"
+            END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YPLUSMIN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_KeyDown
+               IF CVal& = %EZK_RIGHT THEN
+                    SCANstruc.YPlus = TRUE
+                    SCANstruc.YPlusSTR = "POSITIVE  "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN, "POSITIVE"
+                ELSEIF CVal& = %EZK_LEFT THEN
+                    SCANstruc.YPlus = FALSE
+                    SCANstruc.YPlusSTR = "NEGATIVE  "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN, "NEGATIVE"
+            END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_INDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+          CASE %EZ_KeyDown
+              IF CVal& = %EZK_RIGHT THEN
+                SCANstruc.IndexY = FALSE
+                SCANstruc.IndexYSTR = "X         "
+                EZ_SetText   "SETUPFORM",  %SETUPFORM_INDEX, "X         "
+              ELSEIF CVal& = %EZK_LEFT THEN
+                SCANstruc.IndexY = TRUE
+                SCANstruc.IndexYSTR = "Y         "
+                EZ_SetText   "SETUPFORM",  %SETUPFORM_INDEX,  "Y         "
+            END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_IDXHL_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+          CASE %EZ_KeyDown
+           IF CVal& = %EZK_RIGHT THEN
+                SCANstruc.IndexLow = TRUE
+                SCANstruc.IndexLowStr = "HIGH - LOW"
+                EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL, "HIGH - LOW"
+           ELSEIF CVal& = %EZK_LEFT THEN
+               SCANstruc.IndexLow = FALSE
+               SCANstruc.IndexLowStr = "LOW - HIGH"
+               EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,  "LOW - HIGH"
+         END IF
+'----------------------------
+'----------------------------
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_XONOFF_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+          CASE %EZ_KeyDown
+           IF CVal& = %EZK_RIGHT THEN
+                SCANstruc.IndexLow = TRUE
+                SCANstruc.IndexLowStr = "HIGH - LOW"
+                EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL, "HIGH - LOW"
+           ELSEIF CVal& = %EZK_LEFT THEN
+               SCANstruc.IndexLow = FALSE
+               SCANstruc.IndexLowStr = "LOW - HIGH"
+               EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,  "LOW - HIGH"
+          END IF
+'----------------------------
+'----------------------------
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_YONOFF_Events( MyID&, CMsg&, CVal&, Cancel&)
+    LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_AUTOHD_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_DUALRAS_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                       SCANstruc.YLow = ABS(VAL(TXT$))
+                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_OVERLAP_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                 IF GoodSNG(TXT$) THEN
+                    SCANstruc.OverLap = ABS(VAL(TXT$))
+                    SCANstruc.OverLapStr = QStr$(SCANstruc.OverLap, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_APOS_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                    SCANstruc.APos = ABS(VAL(TXT$))
+                    SCANstruc.APosStr = QStr$(SCANstruc.APos, 10)
+                    SCANstruc.AOffset = GetXCord(CLNG(SCANstruc.APos * SCANstruc.ACtr))
+                    CALL ResetPosition(Servo4)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
 
 SUB SETUPFORM_ACTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodLNG(TXT$) THEN
+                    SCANstruc.ACtr = ABS(VAL(TXT$))
+                    SCANstruc.ACtrStr = QStr$(SCANstruc.ACtr, 10)
+                 END IF
           CASE ELSE
      END SELECT
 END SUB

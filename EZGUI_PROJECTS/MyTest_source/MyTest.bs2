@@ -23,9 +23,9 @@
 #INCLUDE "C:\ezgui50pro\includes\ezgui50.inc"                          ' EZGUI Include file for Declares
 ' --------------------
 #INCLUDE "D:\PBWin10\WinAPI\Win32Api.inc"
-#INCLUDE "D:\EZGUI_PROJECTS\MyTest_source\ATCO.inc"
-#INCLUDE "D:\EZGUI_PROJECTS\MyTest_source\AtcoSer.inc"
-#INCLUDE "D:\EZGUI_PROJECTS\MyTest_source\file.inc"
+#INCLUDE "C:\Users\Bill\Documents\GitHub\Atco\ATCO.inc"
+#INCLUDE "C:\Users\Bill\Documents\GitHub\Atco\AtcoSer.inc"
+#INCLUDE "C:\Users\Bill\Documents\GitHub\Atco\file.inc"
 ' *************************************************************************************
 
 

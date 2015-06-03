@@ -6,7 +6,7 @@
 '
 ' -----------------------------------------------------------------------------------------
 '            WARNING !    Do Not Modify any code WITHIN Protected Sections !
-' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following 
+' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following
 ' CODE TAGS:        '<<SAVE>>      '<<END>>            and the Designer will not remove it.
 ' -----------------------------------------------------------------------------------------
 '
@@ -240,6 +240,7 @@ FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
      RV&=1
      FUNCTION=RV&
+     EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
 END FUNCTION
 
 SUB OtherForm_Design(FormName$)

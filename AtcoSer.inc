@@ -2,12 +2,12 @@
 'AtcoSer.inc
 '********************************************************************************************************
 ' RS232 Port Control
-DECLARE FUNCTION OpenComPorts ()
+DECLARE FUNCTION OpenComPorts () AS INTEGER
 DECLARE SUB CloseCommPort(ComPortNum$,ecode%)
 DECLARE SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
 DECLARE SUB ReadFromComm (ComPortNum$, ReadBuffer$, BytesRead%, ECode%)
 DECLARE SUB WriteToComm (ComPortNum$, WriteBuffer$, BytesWritten%, ECode%)
-DECLARE FUNCTION OpenComPorts ()
+DECLARE FUNCTION OpenComPorts () AS INTEGER
 DECLARE SUB DeleteCommBuffers (ECode%)
 
 'Serial Communication routines
@@ -18,8 +18,8 @@ DECLARE FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER) AS 
 DECLARE SUB FixSIOerror
 DECLARE SUB GetStatus (Num AS INTEGER)
 
-DECLARE SUB GetStatus (Num)
-SUB GetStatus (Num)
+
+SUB GetStatus (Num AS INTEGER)
 
    LOCAL MtrNum AS INTEGER
    LOCAL Cmd AS STRING
@@ -61,7 +61,7 @@ FUNCTION SIOGetByte (Character AS INTEGER, TimeOutPeriod AS INTEGER) AS INTEGER
 
 END FUNCTION
 
-FUNCTION OpenComPorts
+FUNCTION OpenComPorts AS INTEGER
     LOCAL x AS INTEGER
     LOCAL ECode AS INTEGER
     COMM OPEN PicPort AS #nComm
@@ -119,8 +119,8 @@ SUB FlushBuffers (ComPortNum$, WhichBuffer%, ECode%)
       END IF
 END SUB
 '****************************************************************************************************
-DECLARE FUNCTION InitNetWork ()
-FUNCTION InitNetWork
+DECLARE FUNCTION InitNetWork () AS INTEGER
+FUNCTION InitNetWork AS INTEGER
   LOCAL ECode,i  AS INTEGER
   LOCAL Cmd AS STRING
   'Initial Varibles

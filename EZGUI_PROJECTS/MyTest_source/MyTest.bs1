@@ -6,7 +6,7 @@
 '
 ' -----------------------------------------------------------------------------------------
 '            WARNING !    Do Not Modify any code WITHIN Protected Sections !
-' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following 
+' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following
 ' CODE TAGS:        '<<SAVE>>      '<<END>>            and the Designer will not remove it.
 ' -----------------------------------------------------------------------------------------
 '

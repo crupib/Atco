@@ -64,12 +64,30 @@ DECLARE SUB NEWFORM_AUTOSCAN_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_XSPDCTRL_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_MJOG_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_LOAD_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_CALFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_CALFORM_Design()
+DECLARE SUB EZ_CALFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+%CALFORM_CALXBTN            = 100
+%CALFORM_CALYBTN            = 105
+%CALFORM_CALABTN            = 110
+
+DECLARE SUB CALFORM_CALXBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALFORM_CALYBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALFORM_CALABTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB EZ_SETUPFORM_Display(BYVAL FParent$)
 DECLARE SUB EZ_SETUPFORM_Design()
 DECLARE SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 ' ------------------------------------------------
 
+' -------------------------------
+%SETUPFORM_Thread1_ID            =1
+' -------------------------------
+DECLARE SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+' -------------------------------
 %SETUPFORM_XSTART             = 100
 %SETUPFORM_LABELXSTART        = 105
 %SETUPFORM_LABELXEND          = 110
@@ -116,6 +134,7 @@ DECLARE SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 %SETUPFORM_APOS               = 315
 %SETUPFORM_ACTIN              = 320
 %SETUPFORM_LABELINDEX         = 325
+%SETUPFORM_CALBTN             = 330
 
 DECLARE SUB SETUPFORM_XSTART_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_XEND_Events(MyID&, CMsg&, CVal&, Cancel&)
@@ -140,6 +159,15 @@ DECLARE SUB SETUPFORM_DUALRAS_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_OVERLAP_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_APOS_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_ACTIN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB SETUPFORM_CALBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_SPLASHFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_SPLASHFORM_Design()
+DECLARE SUB EZ_SPLASHFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB SPLASHFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+%SPLASHFORM_PICTURE1           = 100
+
 
 
 
@@ -194,8 +222,12 @@ SUB EZ_DesignWindow(FormName$)     ' (PROTECTED)
      SELECT CASE FormName$
           CASE "NEWFORM"
                EZ_NEWFORM_Design
+          CASE "CALFORM"
+               EZ_CALFORM_Design
           CASE "SETUPFORM"
                EZ_SETUPFORM_Design
+          CASE "SPLASHFORM"
+               EZ_SPLASHFORM_Design
           CASE ELSE
                OtherForm_Design FormName$
      END SELECT
@@ -208,8 +240,12 @@ SUB EZ_Events(FormName$, CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
      SELECT CASE FormName$
           CASE "NEWFORM"
                EZ_NEWFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "CALFORM"
+               EZ_CALFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "SETUPFORM"
                EZ_SETUPFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "SPLASHFORM"
+               EZ_SPLASHFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE ELSE
                OtherForm_Events FormName$, CID&, CMsg&, CVal&, Cancel&
      END SELECT
@@ -235,7 +271,7 @@ FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
      RV&=1
      FUNCTION=RV&
-     'EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
+
      'MCU startup code
      '*******************************************************************************************************
      'MCU                                                                                                   *
@@ -600,6 +636,94 @@ END SUB
 
 
 
+'<<BEGINFORM>> "CALFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_CALFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color -1, -1
+     EZ_Form "CALFORM", FParent$, "Calibrate Encoders", 0, 0, 64, 12, "C"
+END SUB
+
+SUB EZ_CALFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Button %CALFORM_CALXBTN, 4, 4, 15, 4, "Calibrate X Encoder", "T"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Button %CALFORM_CALYBTN, 24, 4, 15, 4, "Calibrate Y Encoder", "T"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Button %CALFORM_CALABTN, 44, 4, 15, 4, "Calibrate A Encoder", "T"
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_CALFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               CALFORM_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALFORM_CALXBTN
+               CALFORM_CALXBTN_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALFORM_CALYBTN
+               CALFORM_CALYBTN_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALFORM_CALABTN
+               CALFORM_CALABTN_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               CALFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB CALFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALFORM_CALXBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALFORM_CALYBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALFORM_CALABTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
 '<<BEGINFORM>> "SETUPFORM"
 
 
@@ -609,6 +733,7 @@ END SUB
 
 SUB EZ_SETUPFORM_Display(BYVAL FParent$)     ' (PROTECTED)
      EZ_Color -1, -1
+     EZ_AllowLoadingEvent 2
      EZ_Form "SETUPFORM", FParent$, "MCU Settings", 0, 0, 106, 46, "CRZ"
 END SUB
 
@@ -734,111 +859,133 @@ SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XEND, 17, 4, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YSTART, 17, 6, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YEND, 17, 8, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XINDEX, 17, 9.875, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YINDEX, 17, 11.875, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XSPEED, 17, 13.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YSPEED, 17, 15.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XPOS, 48.375, 1.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YPOS, 48.375, 3.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XCTIN, 48.375, 5.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YCTIN, 48.375, 7.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XPLUSMIN, 48.375, 9.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YPLUSMIN, 48.375, 11.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
-     EZ_Text %SETUPFORM_INDEX, 48.375, 13.9375, 15, 1, "", "EST"
+     EZ_Text %SETUPFORM_INDEX, 48.375, 14, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_IDXHL, 48.375, 15.9375, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_XONOFF, 80.25, 2, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_YONOFF, 80.25, 4, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_AUTOHD, 80.25, 6, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_DUALRAS, 80.25, 8, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_OVERLAP, 80.25, 10, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_APOS, 80.25, 12, 15, 1, "", "EST"
      ' -----------------------------------------------
      EZ_Color-1,-1
      EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
      EZ_UseAutoSize "VH"
      EZ_Text %SETUPFORM_ACTIN, 80.25, 14, 15, 1, "", "EST"
      ' -----------------------------------------------
@@ -847,6 +994,10 @@ SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
      EZ_UseAutoSize "VH"
      EZ_Label %SETUPFORM_LABELINDEX, 34.375, 13.9375, 12, 1, "INDEX", "C"
      ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Button %SETUPFORM_CALBTN, 2, 19, 25, 6, "Calibrate Encoders", "T"
+     ' -----------------------------------------------
 END SUB
 
 
@@ -854,6 +1005,11 @@ SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
      SELECT CASE CID&
           CASE %EZ_Window
                SETUPFORM_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_Started OR CMsg&=%EZ_Close THEN
+                    SETUPFORM_Thread1Events "SETUPFORM", %SETUPFORM_Thread1_ID, CMsg&, CVal&, Cancel&
+               END IF
+          CASE %SETUPFORM_Thread1_ID
+               SETUPFORM_Thread1Events "SETUPFORM", CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XSTART
                SETUPFORM_XSTART_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XEND
@@ -900,6 +1056,8 @@ SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
                SETUPFORM_APOS_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_ACTIN
                SETUPFORM_ACTIN_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %SETUPFORM_CALBTN
+               SETUPFORM_CALBTN_Events CID&, CMsg&, CVal&, Cancel&
           CASE ELSE
                SETUPFORM_Events CID&, CMsg&, CVal&, Cancel&
      END SELECT
@@ -915,34 +1073,52 @@ SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
                SELECT CASE CMsg&
                     CASE %EZ_Loading
                     CASE %EZ_Loaded
-                    ' add setup data
+                         'CALL SetDefaults
                          EZ_SetText   "SETUPFORM",  %SETUPFORM_XSTART,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSTART,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YEND,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XINDEX,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YINDEX,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XSPEED,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSPEED,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPOS,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPOS,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XCTIN,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YCTIN,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPLUSMIN,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_INDEX,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XONOFF,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YONOFF,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_AUTOHD,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_DUALRAS,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_OVERLAP,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_APOS,  SCANstruc.XLowStr
-                         EZ_SetText   "SETUPFORM",  %SETUPFORM_ACTIN,  SCANstruc.XLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSTART,  SCANstruc.YLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YEND,    SCANstruc.YHighStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XINDEX,  SCANstruc.XIndexSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YINDEX,  SCANstruc.YIndexSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XSPEED,  SCANstruc.XSpeedSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YSPEED,  SCANstruc.YSpeedSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPOS,    SCANstruc.XPosStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPOS,    SCANstruc.YPosStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XCTIN,   SCANstruc.XCtrStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YCTIN,   SCANstruc.YCtrStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XPLUSMIN,SCANstruc.XPlusSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN,SCANstruc.YPlusSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_INDEX,   SCANstruc.IndexYSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,   SCANstruc.IndexLowStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_XONOFF,  SCANstruc.XEnableSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_YONOFF,  SCANstruc.YEnableSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_AUTOHD,  SCANstruc.AutoHoldSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_DUALRAS, SCANstruc.DualRasSTR
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_OVERLAP, SCANstruc.OverLapStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_APOS,    SCANstruc.APosStr
+                         EZ_SetText   "SETUPFORM",  %SETUPFORM_ACTIN,   SCANstruc.ACtrStr
+                         '-----------------------------------------------------------------------------
                     CASE %EZ_Started
                     CASE %EZ_Close
                     CASE ELSE
                END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+'  Put other Subs above this one !
+
+SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL STM&
+     SELECT CASE CMsg&
+          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
+               ' Cancel&=0      ' prevents %EZ_Thread event
+          CASE %EZ_Thread         ' GUI Thread Code
+          CASE %EZ_Started        ' Start Thread !
+               STM&=10             ' millisecond delay
+               EZ_StartThread FormName$, CID&, STM&
+          CASE %EZ_Close          ' Terminate Thread when form closes !
+               EZ_CloseThread FormName$, CID&
           CASE ELSE
      END SELECT
 END SUB
@@ -960,6 +1136,8 @@ LOCAL TXT AS STRING
           CASE %EZ_Loading
             '     V$ = EZ_GetLoadStr("T")
             '      EZ_SetLoadStr "T", "Hello World!"
+          CASE %EZ_KeyDown
+          CASE %EZ_Loaded
           CASE ELSE
      END SELECT
 END SUB
@@ -968,11 +1146,13 @@ SUB SETUPFORM_XEND_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                   SCANstruc.XHigh = ABS(VAL(TXT$))
-                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
-                END IF
+          '      TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+          '      IF GoodSNG(TXT$) THEN
+          '         SCANstruc.XHigh = ABS(VAL(TXT$))
+          '         SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+          '      END IF
+          CASE %EZ_Loading
+          CASE %EZ_Loaded
           CASE ELSE
      END SELECT
 END SUB
@@ -1142,6 +1322,7 @@ SUB SETUPFORM_YPLUSMIN_Events( MyID&, CMsg&, CVal&, Cancel&)
                     SCANstruc.YPlusSTR = "NEGATIVE  "
                     EZ_SetText   "SETUPFORM",  %SETUPFORM_YPLUSMIN, "NEGATIVE"
             END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1190,14 +1371,17 @@ SUB SETUPFORM_XONOFF_Events( MyID&, CMsg&, CVal&, Cancel&)
           CASE %EZ_Change
           CASE %EZ_KeyDown
            IF CVal& = %EZK_RIGHT THEN
-                SCANstruc.IndexLow = TRUE
-                SCANstruc.IndexLowStr = "HIGH - LOW"
-                EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL, "HIGH - LOW"
+                SCANstruc.XEnable = FALSE
+                SCANstruc.XEnableSTR = "OFF       "
+                CALL EnableAmpl(SCANstruc.XEnable, Servo1)
+                CALL EnableAmpl(SCANstruc.XEnable, Servo2)
+                EZ_SetText   "SETUPFORM",  %SETUPFORM_XONOFF,  "OFF       "
            ELSEIF CVal& = %EZK_LEFT THEN
-               SCANstruc.IndexLow = FALSE
-               SCANstruc.IndexLowStr = "LOW - HIGH"
-               EZ_SetText   "SETUPFORM",  %SETUPFORM_IDXHL,  "LOW - HIGH"
-          END IF
+               SCANstruc.XEnable = TRUE
+               SCANstruc.XEnableSTR = "ON        "
+               CALL StopXMtrs
+               EZ_SetText   "SETUPFORM",  %SETUPFORM_XONOFF,   "ON        "
+           END IF
 '----------------------------
 '----------------------------
           CASE ELSE
@@ -1208,11 +1392,21 @@ SUB SETUPFORM_YONOFF_Events( MyID&, CMsg&, CVal&, Cancel&)
     LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                       SCANstruc.YLow = ABS(VAL(TXT$))
-                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
-                END IF
+          CASE %EZ_KeyDown
+          IF CVal& = %EZK_RIGHT THEN
+              SCANstruc.YEnable = FALSE
+              SCANstruc.YEnableSTR = "OFF       "
+              CALL EnableAmpl(SCANstruc.YEnable, Servo1)
+              CALL EnableAmpl(SCANstruc.YEnable, Servo2)
+              EZ_SetText   "SETUPFORM",  %SETUPFORM_YONOFF,  "OFF       "
+          ELSEIF CVal& = %EZK_LEFT THEN
+              SCANstruc.YEnable = FALSE
+              SCANstruc.YEnableSTR = "ON        "
+              CALL StopYMtr
+              EZ_SetText   "SETUPFORM",  %SETUPFORM_YONOFF,   "ON        "
+          END IF
+'----------------------------
+'----------------------------
           CASE ELSE
      END SELECT
 END SUB
@@ -1221,11 +1415,18 @@ SUB SETUPFORM_AUTOHD_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                       SCANstruc.YLow = ABS(VAL(TXT$))
-                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
-                END IF
+          CASE %EZ_KeyDown
+              IF CVal& = %EZK_RIGHT THEN
+                    SCANstruc.AutoHold = FALSE
+                    SCANstruc.AutoHoldSTR = "OFF       "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_AUTOHD,   "OFF       "
+              ELSEIF CVal& = %EZK_LEFT THEN
+                    SCANstruc.AutoHold = TRUE
+                    SCANstruc.AutoHoldSTR = "ON        "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_AUTOHD,   "ON        "
+              END IF
+'----------------------------
+'----------------------------
           CASE ELSE
      END SELECT
 END SUB
@@ -1234,11 +1435,17 @@ SUB SETUPFORM_DUALRAS_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                       SCANstruc.YLow = ABS(VAL(TXT$))
-                       SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
-                END IF
+          CASE %EZ_KeyDown
+              IF CVal& = %EZK_RIGHT THEN
+                    SCANstruc.DualRas = FALSE
+                    SCANstruc.DualRasSTR = "OFF       "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_DUALRAS,   "OFF       "
+              ELSEIF CVal& = %EZK_LEFT THEN
+                    SCANstruc.DualRas = TRUE
+                    SCANstruc.DualRasSTR = "ON        "
+                    EZ_SetText   "SETUPFORM",  %SETUPFORM_DUALRAS,   "ON        "
+              END IF
+          CASE %EZ_Loaded
           CASE ELSE
      END SELECT
 END SUB
@@ -1284,8 +1491,84 @@ SUB SETUPFORM_ACTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
      END SELECT
 END SUB
 
+SUB SETUPFORM_CALBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+             EZ_CALFORM_Display "CALFORM"
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
+'<<BEGINFORM>> "SPLASHFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_SPLASHFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color -1, -1
+     EZ_Form "SPLASHFORM", FParent$, "MCU 2015", 0, 0, 209, 54, "CST"
+END SUB
+
+SUB EZ_SPLASHFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     STATIC PN1$
+     IF PN1$ = "" THEN PN1$ = EZ_LoadPicture("atcosplash.bmp")
+     EZ_Picture %SPLASHFORM_PICTURE1, 6, 1, 224.75, 54.9375, PN1$, ""
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_SPLASHFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SPLASHFORM_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               SPLASHFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB SPLASHFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
 
 
 '<<END ALL FORMS>>    UnKnown Routines follow:
 #IF %EZ_NOSKIPCODE
+'  Put other Subs above this one !
+
+SUB SETUPFORM_Thread2Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL STM&
+     SELECT CASE CMsg&
+          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
+               ' Cancel&=0      ' prevents %EZ_Thread event
+          CASE %EZ_Thread         ' GUI Thread Code
+          CASE %EZ_Started        ' Start Thread !
+               STM&=10             ' millisecond delay
+               EZ_StartThread FormName$, CID&, STM&
+          CASE %EZ_Close          ' Terminate Thread when form closes !
+               EZ_CloseThread FormName$, CID&
+          CASE ELSE
+     END SELECT
+END SUB
 #ENDIF 'PARSE END

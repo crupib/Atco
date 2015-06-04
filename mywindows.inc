@@ -117,10 +117,8 @@ CALLBACK FUNCTION DlgProcSetup () AS LONG
          END IF
          IF CBCTL = %IDC_EB_AUTOHD THEN
             IF CBLPARAM = %VK_RIGHT THEN
-                SCANstruc.YEnable = FALSE
-                SCANstruc.YEnableSTR = "OFF       "
-                CALL EnableAmpl(SCANstruc.YEnable, Servo1)
-                CALL EnableAmpl(SCANstruc.YEnable, Servo2)
+                SCANstruc.AutoHold = FALSE
+                SCANstruc.AutoHoldSTR = "OFF       "
                 CONTROL SET TEXT hDlg1, %IDC_EB_AUTOHD, "OFF       "
             ELSEIF CBLPARAM = %VK_LEFT THEN
                 SCANstruc.AutoHold = TRUE

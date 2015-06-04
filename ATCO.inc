@@ -581,7 +581,6 @@ FUNCTION LongToStr$ (x AS LONG)
 END FUNCTION
 
 
-
 SUB SetDefaults
   SCANstruc.YCtr = 14858 'cts per inch travel
   SCANstruc.XCtr = 62047
@@ -608,6 +607,7 @@ SUB SetDefaults
   SCANstruc.IndexY = FALSE: SCANstruc.IndexYSTR = "X         "
   SCANstruc.OverLap = 1: SCANstruc.OverLapStr = "1         "
   SCANstruc.DualRas = FALSE: SCANstruc.DualRasSTR = "OFF       "
+
 END SUB
 
 SUB GetXyPos

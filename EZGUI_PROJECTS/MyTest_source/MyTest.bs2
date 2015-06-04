@@ -6,7 +6,7 @@
 '
 ' -----------------------------------------------------------------------------------------
 '            WARNING !    Do Not Modify any code WITHIN Protected Sections !
-' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following 
+' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following
 ' CODE TAGS:        '<<SAVE>>      '<<END>>            and the Designer will not remove it.
 ' -----------------------------------------------------------------------------------------
 '
@@ -83,6 +83,11 @@ DECLARE SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 ' ------------------------------------------------
 
+' -------------------------------
+%SETUPFORM_Thread1_ID            =1
+' -------------------------------
+DECLARE SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+' -------------------------------
 %SETUPFORM_XSTART             = 100
 %SETUPFORM_LABELXSTART        = 105
 %SETUPFORM_LABELXEND          = 110
@@ -729,7 +734,7 @@ END SUB
 SUB EZ_SETUPFORM_Display(BYVAL FParent$)     ' (PROTECTED)
      EZ_Color -1, -1
      EZ_AllowLoadingEvent 2
-     EZ_Form "SETUPFORM", FParent$, "MCU Settings", 0, 0, 106, 46, "CMRZ"
+     EZ_Form "SETUPFORM", FParent$, "MCU Settings", 0, 0, 106, 46, "CRZ"
 END SUB
 
 SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
@@ -1000,6 +1005,11 @@ SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
      SELECT CASE CID&
           CASE %EZ_Window
                SETUPFORM_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_Started OR CMsg&=%EZ_Close THEN
+                    SETUPFORM_Thread1Events "SETUPFORM", %SETUPFORM_Thread1_ID, CMsg&, CVal&, Cancel&
+               END IF
+          CASE %SETUPFORM_Thread1_ID
+               SETUPFORM_Thread1Events "SETUPFORM", CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XSTART
                SETUPFORM_XSTART_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XEND
@@ -1096,6 +1106,23 @@ SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
      END SELECT
 END SUB
 
+'  Put other Subs above this one !
+
+SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL STM&
+     SELECT CASE CMsg&
+          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
+               ' Cancel&=0      ' prevents %EZ_Thread event
+          CASE %EZ_Thread         ' GUI Thread Code
+          CASE %EZ_Started        ' Start Thread !
+               STM&=10             ' millisecond delay
+               EZ_StartThread FormName$, CID&, STM&
+          CASE %EZ_Close          ' Terminate Thread when form closes !
+               EZ_CloseThread FormName$, CID&
+          CASE ELSE
+     END SELECT
+END SUB
+
 SUB SETUPFORM_XSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
 LOCAL TXT AS STRING
      SELECT CASE CMsg&
@@ -1119,19 +1146,13 @@ SUB SETUPFORM_XEND_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                   SCANstruc.XHigh = ABS(VAL(TXT$))
-                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
-                END IF
+          '      TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+          '      IF GoodSNG(TXT$) THEN
+          '         SCANstruc.XHigh = ABS(VAL(TXT$))
+          '         SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+          '      END IF
           CASE %EZ_Loading
-              MSGBOX "Loading"
-              MSGBOX SCANstruc.XHighStr
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
           CASE %EZ_Loaded
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
-          CASE %EZ_Started
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
           CASE ELSE
      END SELECT
 END SUB
@@ -1534,4 +1555,20 @@ END SUB
 
 '<<END ALL FORMS>>    UnKnown Routines follow:
 #IF %EZ_NOSKIPCODE
+'  Put other Subs above this one !
+
+SUB SETUPFORM_Thread2Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL STM&
+     SELECT CASE CMsg&
+          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
+               ' Cancel&=0      ' prevents %EZ_Thread event
+          CASE %EZ_Thread         ' GUI Thread Code
+          CASE %EZ_Started        ' Start Thread !
+               STM&=10             ' millisecond delay
+               EZ_StartThread FormName$, CID&, STM&
+          CASE %EZ_Close          ' Terminate Thread when form closes !
+               EZ_CloseThread FormName$, CID&
+          CASE ELSE
+     END SELECT
+END SUB
 #ENDIF 'PARSE END

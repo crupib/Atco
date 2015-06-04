@@ -84,9 +84,9 @@ DECLARE SUB SETUPFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 ' ------------------------------------------------
 
 ' -------------------------------
-%SETUPFORM_Thread2_ID            =2
+%SETUPFORM_Thread1_ID            =1
 ' -------------------------------
-DECLARE SUB SETUPFORM_Thread2Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+DECLARE SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
 ' -------------------------------
 %SETUPFORM_XSTART             = 100
 %SETUPFORM_LABELXSTART        = 105
@@ -1006,10 +1006,10 @@ SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
           CASE %EZ_Window
                SETUPFORM_Events CID&, CMsg&, CVal&, Cancel&
                IF CMsg&=%EZ_Started OR CMsg&=%EZ_Close THEN
-                    SETUPFORM_Thread2Events "SETUPFORM", %SETUPFORM_Thread2_ID, CMsg&, CVal&, Cancel&
+                    SETUPFORM_Thread1Events "SETUPFORM", %SETUPFORM_Thread1_ID, CMsg&, CVal&, Cancel&
                END IF
-          CASE %SETUPFORM_Thread2_ID
-               SETUPFORM_Thread2Events "SETUPFORM", CID&, CMsg&, CVal&, Cancel&
+          CASE %SETUPFORM_Thread1_ID
+               SETUPFORM_Thread1Events "SETUPFORM", CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XSTART
                SETUPFORM_XSTART_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_XEND
@@ -1108,7 +1108,7 @@ END SUB
 
 '  Put other Subs above this one !
 
-SUB SETUPFORM_Thread2Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+SUB SETUPFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
      LOCAL STM&
      SELECT CASE CMsg&
           CASE %EZ_ThreadCode     ' Non-GUI Thread Code
@@ -1146,19 +1146,13 @@ SUB SETUPFORM_XEND_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-                IF GoodSNG(TXT$) THEN
-                   SCANstruc.XHigh = ABS(VAL(TXT$))
-                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
-                END IF
+          '      TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+          '      IF GoodSNG(TXT$) THEN
+          '         SCANstruc.XHigh = ABS(VAL(TXT$))
+          '         SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+          '      END IF
           CASE %EZ_Loading
-              MSGBOX "Loading"
-              MSGBOX SCANstruc.XHighStr
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
           CASE %EZ_Loaded
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
-          CASE %EZ_Started
-              EZ_SetText   "SETUPFORM",  %SETUPFORM_XEND,    SCANstruc.XHighStr
           CASE ELSE
      END SELECT
 END SUB
@@ -1561,4 +1555,20 @@ END SUB
 
 '<<END ALL FORMS>>    UnKnown Routines follow:
 #IF %EZ_NOSKIPCODE
+'  Put other Subs above this one !
+
+SUB SETUPFORM_Thread2Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL STM&
+     SELECT CASE CMsg&
+          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
+               ' Cancel&=0      ' prevents %EZ_Thread event
+          CASE %EZ_Thread         ' GUI Thread Code
+          CASE %EZ_Started        ' Start Thread !
+               STM&=10             ' millisecond delay
+               EZ_StartThread FormName$, CID&, STM&
+          CASE %EZ_Close          ' Terminate Thread when form closes !
+               EZ_CloseThread FormName$, CID&
+          CASE ELSE
+     END SELECT
+END SUB
 #ENDIF 'PARSE END

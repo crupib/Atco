@@ -64,6 +64,18 @@ DECLARE SUB NEWFORM_AUTOSCAN_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_XSPDCTRL_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_MJOG_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_LOAD_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_CALAFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_CALAFORM_Design()
+DECLARE SUB EZ_CALAFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALAFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+%CALAFORM_AAXISLAB1          = 100
+%CALAFORM_APOSLAB1           = 105
+%CALAFORM_APOSLAB_1          = 110
+%CALAFORM_ATEXTBOX1          = 115
+
+DECLARE SUB CALAFORM_ATEXTBOX1_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB EZ_CALFORM_Display(BYVAL FParent$)
 DECLARE SUB EZ_CALFORM_Design()
 DECLARE SUB EZ_CALFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
@@ -77,6 +89,30 @@ DECLARE SUB CALFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB CALFORM_CALXBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB CALFORM_CALYBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB CALFORM_CALABTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_CALXFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_CALXFORM_Design()
+DECLARE SUB EZ_CALXFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALXFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+%CALXFORM_XAXISLAB           = 100
+%CALXFORM_XPOSLAB            = 105
+%CALXFORM_XTEXTBOX           = 110
+%CALXFORM_XPOSLAB_2          = 115
+
+DECLARE SUB CALXFORM_XTEXTBOX_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_CALYFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_CALYFORM_Design()
+DECLARE SUB EZ_CALYFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB CALYFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+%CALYFORM_YAXISLAB1          = 100
+%CALYFORM_YPOSLAB1           = 105
+%CALYFORM_YPOSLAB_1          = 110
+%CALYFORM_YTEXTBOX1          = 115
+
+DECLARE SUB CALYFORM_YTEXTBOX1_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB EZ_SETUPFORM_Display(BYVAL FParent$)
 DECLARE SUB EZ_SETUPFORM_Design()
 DECLARE SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
@@ -222,8 +258,14 @@ SUB EZ_DesignWindow(FormName$)     ' (PROTECTED)
      SELECT CASE FormName$
           CASE "NEWFORM"
                EZ_NEWFORM_Design
+          CASE "CALAFORM"
+               EZ_CALAFORM_Design
           CASE "CALFORM"
                EZ_CALFORM_Design
+          CASE "CALXFORM"
+               EZ_CALXFORM_Design
+          CASE "CALYFORM"
+               EZ_CALYFORM_Design
           CASE "SETUPFORM"
                EZ_SETUPFORM_Design
           CASE "SPLASHFORM"
@@ -240,8 +282,14 @@ SUB EZ_Events(FormName$, CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
      SELECT CASE FormName$
           CASE "NEWFORM"
                EZ_NEWFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "CALAFORM"
+               EZ_CALAFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "CALFORM"
                EZ_CALFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "CALXFORM"
+               EZ_CALXFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "CALYFORM"
+               EZ_CALYFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "SETUPFORM"
                EZ_SETUPFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "SPLASHFORM"
@@ -586,9 +634,13 @@ SUB NEWFORM_AJOGBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
 END SUB
 
 SUB NEWFORM_SAVE_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     GLOBAL filename AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Click
-              MSGBOX "SAVE"
+               DISPLAY SAVEFILE  0, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+               IF NOT CalSave(filename) THEN
+                   MSGBOX "Unable to save file!"
+                END IF
           CASE %EZ_LButtonDown
           CASE %EZ_LButtonDown
           CASE ELSE
@@ -626,10 +678,87 @@ SUB NEWFORM_MJOG_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
 END SUB
 
 SUB NEWFORM_LOAD_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     GLOBAL filename AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Click
-              MSGBOX "Setup"
+              DISPLAY OPENFILE  0, , , "Load File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+              IF NOT CalLoad(filename) THEN
+                   MSGBOX "Unable to Load file!"
+              END IF
           CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
+'<<BEGINFORM>> "CALAFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_CALAFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color 0, 11
+     EZ_AllowLoadingEvent 2
+     EZ_Form "CALAFORM", FParent$, "Calibrate A Encoder", 0, 0, 84, 37, "C"
+END SUB
+
+SUB EZ_CALAFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALAFORM_AAXISLAB1, 28, 1.8125, 16, 1, "Move A Axis to Start", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALAFORM_APOSLAB1, 28, 3.8125, 16, 1, "Pos; Press Enter Key", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALAFORM_APOSLAB_1, 28, 5.8125, 16, 1, "A Pos:", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_Text %CALAFORM_ATEXTBOX1, 45, 5.8125, 10, 1, "", "EST"
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_CALAFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               CALAFORM_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALAFORM_ATEXTBOX1
+               CALAFORM_ATEXTBOX1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               CALAFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB CALAFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALAFORM_ATEXTBOX1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -644,26 +773,31 @@ END SUB
 ' ======================================
 
 SUB EZ_CALFORM_Display(BYVAL FParent$)     ' (PROTECTED)
-     EZ_Color -1, -1
+     EZ_Color 0, 11
      EZ_Form "CALFORM", FParent$, "Calibrate Encoders", 0, 0, 64, 12, "C"
 END SUB
 
 SUB EZ_CALFORM_Design()     ' (PROTECTED)
      LOCAL CText$
-     EZ_Color-1,-1
+     EZ_Color 9, 15
      EZ_UseFont 4
-     EZ_UseAutoSize "VH"
-     EZ_Button %CALFORM_CALXBTN, 4, 4, 15, 4, "Calibrate X Encoder", "T"
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH-2"
+     EZ_ODButton %CALFORM_CALXBTN, 4, 4, 15, 4, "Calibrate X Encoder", "T"
+     EZ_SetRegion "CalForm", %CALFORM_CALXBTN,-2,0
      ' -----------------------------------------------
-     EZ_Color-1,-1
+     EZ_Color 12, 15
      EZ_UseFont 4
-     EZ_UseAutoSize "VH"
-     EZ_Button %CALFORM_CALYBTN, 24, 4, 15, 4, "Calibrate Y Encoder", "T"
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH-2"
+     EZ_ODButton %CALFORM_CALYBTN, 24, 4, 15, 4, "Calibrate Y Encoder", "T"
+     EZ_SetRegion "CalForm", %CALFORM_CALYBTN,-2,0
      ' -----------------------------------------------
-     EZ_Color-1,-1
+     EZ_Color 9, 15
      EZ_UseFont 4
-     EZ_UseAutoSize "VH"
-     EZ_Button %CALFORM_CALABTN, 44, 4, 15, 4, "Calibrate A Encoder", "T"
+     EZ_UseAutoSize "VH-2"
+     EZ_ODButton %CALFORM_CALABTN, 44, 4, 15, 4, "Calibrate A Encoder", "T"
+     EZ_SetRegion "CalForm", %CALFORM_CALABTN,-2,0
      ' -----------------------------------------------
 END SUB
 
@@ -674,10 +808,19 @@ SUB EZ_CALFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
                CALFORM_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %CALFORM_CALXBTN
                CALFORM_CALXBTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButtonRR "CalForm", %CALFORM_CALXBTN, CVal&, 15, 9,  4
+               END IF
           CASE  %CALFORM_CALYBTN
                CALFORM_CALYBTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButtonRR "CalForm", %CALFORM_CALYBTN, CVal&, 15, 12,  4
+               END IF
           CASE  %CALFORM_CALABTN
                CALFORM_CALABTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButtonRR "CalForm", %CALFORM_CALABTN, CVal&, 15, 9,  4
+               END IF
           CASE ELSE
                CALFORM_Events CID&, CMsg&, CVal&, Cancel&
      END SELECT
@@ -704,6 +847,7 @@ END SUB
 SUB CALFORM_CALXBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
+             EZ_CALXFORM_Display "CALXFORM"
           CASE ELSE
      END SELECT
 END SUB
@@ -711,6 +855,7 @@ END SUB
 SUB CALFORM_CALYBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
+              EZ_CALYFORM_Display "CALYFORM"
           CASE ELSE
      END SELECT
 END SUB
@@ -718,6 +863,154 @@ END SUB
 SUB CALFORM_CALABTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
+              EZ_CALAFORM_Display "CALAFORM"
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
+'<<BEGINFORM>> "CALXFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_CALXFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color 0, 11
+     EZ_AllowLoadingEvent 2
+     EZ_Form "CALXFORM", FParent$, "Calibrate X Encoder", 0, 0, 83, 30, "C"
+END SUB
+
+SUB EZ_CALXFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALXFORM_XAXISLAB, 30, 2, 16, 1, "Move X Axis to Start", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALXFORM_XPOSLAB, 30, 4, 16, 1, "Pos; Press Enter Key", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_Text %CALXFORM_XTEXTBOX, 50, 6, 10, 1, "", "EST"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALXFORM_XPOSLAB_2, 30, 6, 16, 1, "X Pos:", "C"
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_CALXFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               CALXFORM_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALXFORM_XTEXTBOX
+               CALXFORM_XTEXTBOX_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               CALXFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB CALXFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALXFORM_XTEXTBOX_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Change
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
+'<<BEGINFORM>> "CALYFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_CALYFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color -1, -1
+     EZ_AllowLoadingEvent 2
+     EZ_Form "CALYFORM", FParent$, "CALIBRATE Y Encoder", 0, 0, 78, 32, "C"
+END SUB
+
+SUB EZ_CALYFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_Label %CALYFORM_YAXISLAB1, 25.875, 1.4375, 17, 1, "Move Y Axis to Start", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALYFORM_YPOSLAB1, 26.875, 3.4375, 16, 1, "Pos; Press Enter Key", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_Label %CALYFORM_YPOSLAB_1, 23.875, 5.4375, 14, 1, "Y Pos:", "C"
+     ' -----------------------------------------------
+     EZ_Color-1,-1
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_Text %CALYFORM_YTEXTBOX1, 40.875, 5.4375, 10, 1, "", "EST"
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_CALYFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               CALYFORM_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %CALYFORM_YTEXTBOX1
+               CALYFORM_YTEXTBOX1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               CALYFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB CALYFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB CALYFORM_YTEXTBOX1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -994,9 +1287,10 @@ SUB EZ_SETUPFORM_Design()     ' (PROTECTED)
      EZ_UseAutoSize "VH"
      EZ_Label %SETUPFORM_LABELINDEX, 34.375, 13.9375, 12, 1, "INDEX", "C"
      ' -----------------------------------------------
-     EZ_Color-1,-1
+     EZ_Color 12, 15
      EZ_UseFont 4
-     EZ_Button %SETUPFORM_CALBTN, 2, 19, 25, 6, "Calibrate Encoders", "T"
+     EZ_ODButton %SETUPFORM_CALBTN, 2, 19, 25, 6, "Calibrate Encoders", "T"
+     EZ_SetRegion "SetupForm", %SETUPFORM_CALBTN,-2,0
      ' -----------------------------------------------
 END SUB
 
@@ -1058,6 +1352,9 @@ SUB EZ_SETUPFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
                SETUPFORM_ACTIN_Events CID&, CMsg&, CVal&, Cancel&
           CASE  %SETUPFORM_CALBTN
                SETUPFORM_CALBTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButtonRR "SetupForm", %SETUPFORM_CALBTN, CVal&, 15, 12,  4
+               END IF
           CASE ELSE
                SETUPFORM_Events CID&, CMsg&, CVal&, Cancel&
      END SELECT
@@ -1166,6 +1463,7 @@ SUB SETUPFORM_YSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.YLow = ABS(VAL(TXT$))
                        SCANstruc.YLowStr = QStr$(SCANstruc.YLow, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1178,6 +1476,7 @@ SUB SETUPFORM_YEND_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.YHigh = ABS(VAL(TXT$))
                        SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1191,6 +1490,7 @@ SUB SETUPFORM_XINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.XIndex = ABS(VAL(TXT$))
                        SCANstruc.XIndexSTR = QStr$(SCANstruc.XIndex, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1204,6 +1504,7 @@ SUB SETUPFORM_YINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.YIndex = ABS(VAL(TXT$))
                        SCANstruc.YIndexSTR = QStr$(SCANstruc.YIndex, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1217,6 +1518,7 @@ SUB SETUPFORM_XSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.XSpeed = ABS(VAL(TXT$))
                        SCANstruc.XSpeedSTR = QStr$(SCANstruc.XSpeed, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1230,6 +1532,7 @@ SUB SETUPFORM_YSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.YSpeed = ABS(VAL(TXT$))
                        SCANstruc.YSpeedSTR = QStr$(SCANstruc.YSpeed, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1246,6 +1549,7 @@ SUB SETUPFORM_XPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
                        CALL ResetPosition(Servo1)
                        CALL ResetPosition(Servo2)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1261,6 +1565,7 @@ SUB SETUPFORM_YPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.YOffset = GetYCord(CLNG(SCANstruc.YPos * SCANstruc.YCtr))
                        CALL ResetPosition(Servo3)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1274,6 +1579,7 @@ SUB SETUPFORM_XCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
                        SCANstruc.XCtr = ABS(VAL(TXT$))
                        SCANstruc.XCtrStr = QStr$(SCANstruc.XCtr, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB
@@ -1287,6 +1593,7 @@ SUB SETUPFORM_YCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
                      SCANstruc.YCtr = ABS(VAL(TXT$))
                      SCANstruc.YCtrStr = QStr$(SCANstruc.YCtr, 10)
                 END IF
+          CASE %EZ_Change
           CASE ELSE
      END SELECT
 END SUB

@@ -1146,13 +1146,13 @@ SUB SETUPFORM_XEND_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
           CASE %EZ_Change
-          '      TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
-          '      IF GoodSNG(TXT$) THEN
-          '         SCANstruc.XHigh = ABS(VAL(TXT$))
-          '         SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
-          '      END IF
-          CASE %EZ_Loading
-          CASE %EZ_Loaded
+
+          CASE %EZ_NoFocus
+                TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
+                IF GoodSNG(TXT$) THEN
+                   SCANstruc.XHigh = ABS(VAL(TXT$))
+                   SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+                END IF
           CASE ELSE
      END SELECT
 END SUB
@@ -1160,7 +1160,7 @@ END SUB
 SUB SETUPFORM_YSTART_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.YLow = ABS(VAL(TXT$))
@@ -1173,7 +1173,7 @@ END SUB
 SUB SETUPFORM_YEND_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.YHigh = ABS(VAL(TXT$))
                        SCANstruc.YHighStr = QStr$(SCANstruc.YHigh, 10)
@@ -1185,7 +1185,7 @@ END SUB
 SUB SETUPFORM_XINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                  IF GoodSNG(TXT$) THEN
                        SCANstruc.XIndex = ABS(VAL(TXT$))
@@ -1198,7 +1198,7 @@ END SUB
 SUB SETUPFORM_YINDEX_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.YIndex = ABS(VAL(TXT$))
@@ -1211,7 +1211,7 @@ END SUB
 SUB SETUPFORM_XSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.XSpeed = ABS(VAL(TXT$))
@@ -1224,7 +1224,7 @@ END SUB
 SUB SETUPFORM_YSPEED_Events( MyID&, CMsg&, CVal&, Cancel&)
     LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                IF GoodSNG(TXT$) THEN
                        SCANstruc.YSpeed = ABS(VAL(TXT$))
@@ -1237,7 +1237,7 @@ END SUB
 SUB SETUPFORM_XPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.XPos = ABS(VAL(TXT$))
@@ -1253,7 +1253,7 @@ END SUB
 SUB SETUPFORM_YPOS_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodSNG(TXT$) THEN
                        SCANstruc.YPos = VAL(TXT$)
@@ -1268,7 +1268,7 @@ END SUB
 SUB SETUPFORM_XCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodLNG(TXT$) THEN
                        SCANstruc.XCtr = ABS(VAL(TXT$))
@@ -1281,7 +1281,7 @@ END SUB
 SUB SETUPFORM_YCTIN_Events( MyID&, CMsg&, CVal&, Cancel&)
      LOCAL TXT AS STRING
      SELECT CASE CMsg&
-          CASE %EZ_Change
+          CASE %EZ_NoFocus
                 TXT$ = EZ_GetText( "SETUPFORM",  MyID& )
                 IF GoodLNG(TXT$) THEN
                      SCANstruc.YCtr = ABS(VAL(TXT$))

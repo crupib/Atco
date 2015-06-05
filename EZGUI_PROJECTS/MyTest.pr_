@@ -87,7 +87,10 @@
 [GENSELCASE]=1 - Yes
 [DIRECTIVE]=1 - Yes
 [BEGINFORMS]
+"CALAFORM"C:\Users\Bill\Documents\GitHub\Atco\CALAFORM.fmz
 "CALFORM"D:\PBWin10\WinAPI\calibrate.fmz
+"CALXFORM"C:\Users\Bill\Documents\GitHub\Atco\CALXFORM.fmz
+"CALYFORM"C:\Users\Bill\Documents\GitHub\Atco\CALYFORM.fmz
 "NEWFORM"D:\EZGUI_PROJECTS\newform.fmz
 "SETUPFORM"D:\EZGUI_PROJECTS\SetupForm.fmz
 "SPLASHFORM"C:\Users\Bill\Documents\GitHub\Atco\Splash.fmz

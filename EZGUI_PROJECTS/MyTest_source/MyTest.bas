@@ -83,6 +83,38 @@ DECLARE SUB AJOGFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 
 DECLARE SUB AJOGFORM_STOPBTN1_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB AJOGFORM_TEXT1_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB EZ_AUTOSFORM_Display(BYVAL FParent$)
+DECLARE SUB EZ_AUTOSFORM_Design()
+DECLARE SUB EZ_AUTOSFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+' ------------------------------------------------
+
+' -------------------------------
+%AUTOSFORM_Timer_ID         = 3
+' -------------------------------
+DECLARE SUB AUTOSFORM_TimerEvents(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+
+%AUTOSFORM_NEXTBTN            = 100
+%AUTOSFORM_BEGBTN             = 105
+%AUTOSFORM_XPOSLAB1           = 110
+%AUTOSFORM_YPOSLAB1           = 115
+%AUTOSFORM_APOSLAB1           = 120
+%AUTOSFORM_ZPOSLAB1           = 125
+%AUTOSFORM_YPOSUPD1           = 130
+%AUTOSFORM_XPOSUPD1           = 135
+%AUTOSFORM_APOSUPD1           = 140
+%AUTOSFORM_ZPOSUPD1           = 145
+%AUTOSFORM_ALL0BTN            = 150
+%AUTOSFORM_TEXT1              = 155
+
+DECLARE SUB AUTOSFORM_NEXTBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_BEGBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_YPOSUPD1_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_XPOSUPD1_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_APOSUPD1_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_ZPOSUPD1_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_ALL0BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+DECLARE SUB AUTOSFORM_TEXT1_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB EZ_CALFORM_Display(BYVAL FParent$)
 DECLARE SUB EZ_CALFORM_Design()
 DECLARE SUB EZ_CALFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
@@ -296,6 +328,8 @@ SUB EZ_DesignWindow(FormName$)     ' (PROTECTED)
                EZ_NEWFORM_Design
           CASE "AJOGFORM"
                EZ_AJOGFORM_Design
+          CASE "AUTOSFORM"
+               EZ_AUTOSFORM_Design
           CASE "CALFORM"
                EZ_CALFORM_Design
           CASE "CALXFORM"
@@ -322,6 +356,8 @@ SUB EZ_Events(FormName$, CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
                EZ_NEWFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "AJOGFORM"
                EZ_AJOGFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
+          CASE "AUTOSFORM"
+               EZ_AUTOSFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "CALFORM"
                EZ_CALFORM_ParseEvents CID&, CMsg&, CVal&, Cancel&
           CASE "CALXFORM"
@@ -723,7 +759,7 @@ END SUB
 SUB NEWFORM_AUTOSCAN_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
-              MSGBOX "AUTOSCAN"
+              EZ_AUTOSFORM_Display  "AUTOFORM"
           CASE %EZ_LButtonDown
           CASE %EZ_LButtonDown
           CASE ELSE
@@ -912,6 +948,265 @@ SUB AJOGFORM_TEXT1_Events( MyID&, CMsg&, CVal&, Cancel&)
                      EZ_SetText   "AJOGFORM",  %AJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
                      EZ_SetText   "AJOGFORM",  %AJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
               END IF
+     END SELECT
+END SUB
+
+
+
+'<<BEGINFORM>> "AUTOSFORM"
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+SUB EZ_AUTOSFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     EZ_Color -1, -1
+     EZ_AllowLoadingEvent 2
+     EZ_Form "AUTOSFORM", FParent$, "Auto Scan", 0, 0, 79, 32, "CZ"
+END SUB
+
+SUB EZ_AUTOSFORM_Design()     ' (PROTECTED)
+     LOCAL CText$
+     EZ_Color 9, 15
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_SubClass 2
+     EZ_ODButton %AUTOSFORM_NEXTBTN, 22, 15, 33, 2, "Next", ""
+     EZ_SubClass 0
+     ' -----------------------------------------------
+     EZ_Color 9, 15
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_SubClass 2
+     EZ_ODButton %AUTOSFORM_BEGBTN, 22, 11, 33, 2, "Begin", ""
+     EZ_SubClass 0
+     ' -----------------------------------------------
+     EZ_Color 0, 14
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_XPOSLAB1, 21, 2, 18, 1, "X POS", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 14
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_YPOSLAB1, 21, 4, 18, 1, "Y POS", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 14
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_APOSLAB1, 21, 6, 18, 1, "A POS", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 14
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_ZPOSLAB1, 21, 8, 18, 1, "Z POS", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 11
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_YPOSUPD1, 41, 4, 13, 1, "", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 11
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_XPOSUPD1, 41, 2, 13, 1, "", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 11
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_APOSUPD1, 41, 6, 13, 1, "", "C"
+     ' -----------------------------------------------
+     EZ_Color 0, 11
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_Label %AUTOSFORM_ZPOSUPD1, 41, 8, 13, 1, "", "C"
+     ' -----------------------------------------------
+     EZ_Color 9, 15
+     EZ_UseFont 4
+     EZ_UseAutoSize "VH"
+     EZ_SubClass 2
+     EZ_ODButton %AUTOSFORM_ALL0BTN, 22, 19, 33, 2, "ALL0", ""
+     EZ_SubClass 0
+     ' -----------------------------------------------
+     EZ_Color 0, 34
+     EZ_UseFont 4
+     EZ_AllowLoadingEvent 2
+     EZ_Text %AUTOSFORM_TEXT1, 1, 33, 1.125, .5625, "", "ET"
+     ' -----------------------------------------------
+END SUB
+
+
+SUB EZ_AUTOSFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               AUTOSFORM_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_Started OR CMsg&=%EZ_Close THEN
+                    AUTOSFORM_TimerEvents "AUTOSFORM", %AUTOSFORM_Timer_ID, CMsg&, CVal&, Cancel&
+               END IF
+          CASE %AUTOSFORM_Timer_ID
+               AUTOSFORM_TimerEvents "AUTOSFORM", CID&, CMsg&, CVal&, Cancel&
+          CASE  %AUTOSFORM_NEXTBTN
+               AUTOSFORM_NEXTBTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButton "AUTOSFORM", %AUTOSFORM_NEXTBTN, CVal&, 15, 9,  4
+               END IF
+          CASE  %AUTOSFORM_BEGBTN
+               AUTOSFORM_BEGBTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButton "AUTOSFORM", %AUTOSFORM_BEGBTN, CVal&, 15, 9,  4
+               END IF
+          CASE  %AUTOSFORM_YPOSUPD1
+               AUTOSFORM_YPOSUPD1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %AUTOSFORM_XPOSUPD1
+               AUTOSFORM_XPOSUPD1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %AUTOSFORM_APOSUPD1
+               AUTOSFORM_APOSUPD1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %AUTOSFORM_ZPOSUPD1
+               AUTOSFORM_ZPOSUPD1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE  %AUTOSFORM_ALL0BTN
+               AUTOSFORM_ALL0BTN_Events CID&, CMsg&, CVal&, Cancel&
+               IF CMsg&=%EZ_OwnerDraw THEN
+                    EZ_Draw3DButton "AUTOSFORM", %AUTOSFORM_ALL0BTN, CVal&, 15, 9,  4
+               END IF
+          CASE  %AUTOSFORM_TEXT1
+               AUTOSFORM_TEXT1_Events CID&, CMsg&, CVal&, Cancel&
+          CASE ELSE
+               AUTOSFORM_Events CID&, CMsg&, CVal&, Cancel&
+     END SELECT
+END SUB
+
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB AUTOSFORM_Events(CID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CID&
+          CASE %EZ_Window
+               SELECT CASE CMsg&
+                    CASE %EZ_Loading
+                    CASE %EZ_Loaded
+                    CASE %EZ_Started
+                    CASE %EZ_Close
+                    CASE ELSE
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+'  Put other Subs above this one !
+
+SUB AUTOSFORM_TimerEvents(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
+     LOCAL TM!
+     SELECT CASE CMsg&
+          CASE %EZ_Timer          ' Timer Event !
+                CALL GetXyPos
+                EZ_SetText   "AUTOSFORM",  %AUTOSFORM_XPOSUPD1, SCANstruc.XPosStr
+                EZ_SetText   "AUTOSFORM",  %AUTOSFORM_YPOSUPD1, SCANstruc.YPosStr
+                EZ_SetText   "AUTOSFORM",  %AUTOSFORM_APOSUPD1, SCANstruc.APosStr
+
+                IF SCANstruc.IndexY THEN  'X Scan, Y Index
+                   CALL XScan
+                ELSE : CALL YScan   'Y Scan, X Index
+                END IF
+
+          CASE %EZ_Started        ' Start Timer !
+               TM!=1           ' Timer delay in seconds
+               EZ_StartTimer FormName$, CID&, TM!
+          CASE %EZ_Close          ' Terminate Timer when form closes !
+               EZ_StopTimer FormName$, CID&
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_NEXTBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+              ScanLength! = ABS(SCANstruc.XHigh - SCANstruc.XLow)
+              IF SCANstruc.IndexLow THEN
+                IF SCANstruc.XLow - ScanLength! >= 0 THEN
+                  SCANstruc.XLow = SCANstruc.XLow - ScanLength!
+                  SCANstruc.XHigh = SCANstruc.XHigh - ScanLength!
+                END IF
+              ELSE
+               SCANstruc.XLow = SCANstruc.XLow + ScanLength!
+               SCANstruc.XHigh = SCANstruc.XHigh + ScanLength!
+              END IF
+              SCANstruc.XLowStr = QStr$(SCANstruc.XLow, 10)
+              SCANstruc.XHighStr = QStr$(SCANstruc.XHigh, 10)
+              SCANstruc.NextFlag = TRUE
+          CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_BEGBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+              CALL Profiler  'make sure scan ok before next scan add or subtract
+              CALL SetForAuto
+              CALL ReSetMotors
+              CALL SetXCtrs  'set x encoder cts to match
+              CALL GetXyPos
+              EZ_SetFocus  "AUTOSFORM",  %AUTOSFORM_TEXT1
+          CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_YPOSUPD1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_XPOSUPD1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_APOSUPD1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_ZPOSUPD1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_ALL0BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+          CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB AUTOSFORM_TEXT1_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Change
+          CASE %EZ_KeyDown
+               IF CVal& = %EZK_ESC THEN
+                   USTOP=FALSE
+                   CALL StopMtrs
+                   CALL SetModeVel
+               ELSEIF CVal& = %EZK_DOWN THEN
+                   keydown = TRUE
+              END IF
+          CASE ELSE
      END SELECT
 END SUB
 

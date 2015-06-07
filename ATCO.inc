@@ -1292,45 +1292,47 @@ END FUNCTION
 
 SUB XScan
     LOCAL MoveToPos1, MoveToPos2 AS LONG
-    'LOCAL UStop AS BYTE
+    EZ_DoEvents  5
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.YDataStart AND SCANstruc.IndexCt) <= SCANstruc.YDataEnd
+      EZ_DoEvents  5
       UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.XCts > SCANstruc.XStartCts + (SCANstruc.XEndCts - SCANstruc.XStartCts) / 2 THEN
-     MoveToPos1& = SCANstruc.XStartCts
-     MoveToPos2& = SCANstruc.XEndCts
+        MoveToPos1& = SCANstruc.XStartCts
+        MoveToPos2& = SCANstruc.XEndCts
       ELSE
-     MoveToPos1& = SCANstruc.XEndCts
-     MoveToPos2& = SCANstruc.XStartCts
+        MoveToPos1& = SCANstruc.XEndCts
+        MoveToPos2& = SCANstruc.XStartCts
       END IF
       UStop = DoX(MoveToPos1&) 'put x axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.DualRas THEN
-    UStop = DoX(MoveToPos2&)'put x axis into position
-    IF UStop THEN EXIT DO 'check if user hit stop
+        UStop = DoX(MoveToPos2&)'put x axis into position
+        IF UStop THEN EXIT DO 'check if user hit stop
       END IF
       SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
     LOOP
 END SUB
 
 SUB YScan
-    'LOCAL UStop AS BYTE
     LOCAL MoveToPos1, MoveToPos2 AS LONG
+    EZ_DoEvents  5
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.XDataStart AND SCANstruc.IndexCt) <= SCANstruc.XDataEnd
+      EZ_DoEvents  5
       UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.YCts > SCANstruc.YStartCts + (SCANstruc.YEndCts - SCANstruc.YStartCts) / 2 THEN
-    MoveToPos1& = SCANstruc.YStartCts
-    MoveToPos2& = SCANstruc.YEndCts
+         MoveToPos1& = SCANstruc.YStartCts
+         MoveToPos2& = SCANstruc.YEndCts
       ELSE
-    MoveToPos1& = SCANstruc.YEndCts
-    MoveToPos2& = SCANstruc.YStartCts
+         MoveToPos1& = SCANstruc.YEndCts
+         MoveToPos2& = SCANstruc.YStartCts
       END IF
       UStop = DoY(MoveToPos1&)'put y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.DualRas THEN
-    UStop = DoY(MoveToPos2&)'put y axis into position
-    IF UStop THEN EXIT DO 'check if user hit stop
+        UStop = DoY(MoveToPos2&)'put y axis into position
+        IF UStop THEN EXIT DO 'check if user hit stop
       END IF
       SCANstruc.IndexCt = SCANstruc.IndexCt + SCANstruc.IndexInc
     LOOP
@@ -1341,23 +1343,19 @@ DECLARE FUNCTION DoX (AbsPos AS LONG) AS INTEGER
 FUNCTION DoX (MPos AS LONG) AS INTEGER
    LOCAL MoveToCts AS LONG
    MoveToCts& = GetXCord(MPos&)
-
    CALL MoveX(MoveToCts&)
-
+   EZ_DoEvents  5
    DO
-     DIALOG DOEVENTS 1
-     IF KeyDown <> 0 THEN 'user pressed KEYPAD
-
+     'DIALOG DOEVENTS 1
+      EZ_DoEvents  5
+      IF KeyDown <> 0 THEN 'user pressed KEYPAD
+       DoX = TRUE: EXIT FUNCTION
+      END IF
+      IF (Glo.Stat(Servo1) AND HomeInProg) THEN
+    'OK
+      ELSE  'user pressed ABORT switch
        DoX = TRUE: EXIT FUNCTION
      END IF
-     IF (Glo.Stat(Servo1) AND HomeInProg) THEN
-    'OK
-     ELSE  'user pressed ABORT switch
-    DoX = TRUE: EXIT FUNCTION
-     END IF
-     'PrintYPos
-     'PrintAPos
-     'PrintXPos
    LOOP UNTIL ABS(SCANstruc.XCts - ABS(MoveToCts&)) < (SCANstruc.XCtr / 8) 'REM
 
    DoX = FALSE: EXIT FUNCTION
@@ -1369,11 +1367,11 @@ DECLARE FUNCTION DoY (AbsPosY AS LONG) AS INTEGER
 FUNCTION DoY (MPos AS LONG) AS INTEGER
    LOCAL MoveToCts AS LONG
    MoveToCts& = GetYCord(MPos&)
-
    CALL MoveY(MoveToCts&)
-
+   EZ_DoEvents  5
    DO
-     DIALOG DOEVENTS 1
+     'DIALOG DOEVENTS 1
+     EZ_DoEvents  5
      IF KeyDown <> 0 THEN 'User pressed KEYPAD
        DoY = TRUE: EXIT FUNCTION
      END IF
@@ -1382,9 +1380,6 @@ FUNCTION DoY (MPos AS LONG) AS INTEGER
      ELSE  'user pressed ABORT switch
     DoY = TRUE: EXIT FUNCTION
      END IF
-   '  PrintAPos
-   '  PrintXPos
-   '  PrintYPos
    LOOP UNTIL (ABS(SCANstruc.YCts - ABS(MoveToCts&)) < (SCANstruc.YCtr / 8))
 
    DoY = FALSE: EXIT FUNCTION
@@ -1437,9 +1432,6 @@ SUB MoveY (PosCts&)
   Cmd$ = Cmd$ + LongToStr(Glo.CmdVelocity(Servo3)) + LongToStr(Glo.CmdAccel(Servo3))
 
   SendCmd Servo3, Cmd$
-
-  'REMED
-  'CALL GoYMtr
 
   CALL GoMtrs
 

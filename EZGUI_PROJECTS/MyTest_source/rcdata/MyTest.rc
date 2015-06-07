@@ -19,3 +19,4 @@ BEGIN
   END
 END
 1 24 "MyTest.exe.manifest"
+ATCO ICON DISCARDABLE "atco.ico"

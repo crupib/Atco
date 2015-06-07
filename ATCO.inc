@@ -877,13 +877,13 @@ SUB JogJoyStk
   SetModePwm
 
   StopOn = FALSE
-
+  COUNT = 5
   DO
-      DIALOG DOEVENTS 1
+      ' DIALOG DOEVENTS 20 TO COUNT
+
+      EZ_DoEvents  5
       IF ExitSub THEN EXIT DO
-
       'calculated PWM output based on A/D 1 & 2
-
       IF Glo.Ad2 <= 127 THEN 'left
         Glo.CmdPwm(2) = CINT((LU(Corr1(Glo.Ad1)) / 100) * 255)
         Glo.CmdPwm(1) = CINT((LF(Corr2(Glo.Ad2)) / 100) * Glo.CmdPwm(2))
@@ -909,7 +909,7 @@ SUB JogJoyStk
   LOOP
 
   'FlushKeys
-
+  ExitSub = 0
   IF SCANstruc.AutoHold THEN
     CALL StopMtrs 'put into velocity mode and set velocity to 0
     SetModeVel 'sets vel to 0

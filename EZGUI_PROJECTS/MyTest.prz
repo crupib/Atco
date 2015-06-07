@@ -87,10 +87,11 @@
 [GENSELCASE]=1 - Yes
 [DIRECTIVE]=1 - Yes
 [BEGINFORMS]
-"CALAFORM"C:\Users\Bill\Documents\GitHub\Atco\CALAFORM.fmz
+"AJOGFORM"C:\Users\Bill\Documents\GitHub\Atco\AJOGFORM.fmz
 "CALFORM"D:\PBWin10\WinAPI\calibrate.fmz
 "CALXFORM"C:\Users\Bill\Documents\GitHub\Atco\CALXFORM.fmz
-"CALYFORM"C:\Users\Bill\Documents\GitHub\Atco\CALYFORM.fmz
+"JOYFORM"C:\Users\Bill\Documents\GitHub\Atco\MJOYFORM.fmz
+"MJOGFORM"C:\Users\Bill\Documents\GitHub\Atco\mjogform.fmz
 "NEWFORM"D:\EZGUI_PROJECTS\newform.fmz
 "SETUPFORM"D:\EZGUI_PROJECTS\SetupForm.fmz
 "SPLASHFORM"C:\Users\Bill\Documents\GitHub\Atco\Splash.fmz
@@ -102,5 +103,5 @@
 "FILE"C:\Users\Bill\Documents\GitHub\Atco\file.inc
 [ENDCODEFILES]
 [BEGINRESOURCES]
-"ATCO"C:\Users\Bill\Documents\GitHub\Atco\atco.ico
+"$ATCO"C:\Users\Bill\Documents\GitHub\Atco\atco.ico
 [ENDRESOURCES]

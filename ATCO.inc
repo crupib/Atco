@@ -160,7 +160,7 @@ GLOBAL controlbyte AS BYTE
 GLOBAL ExitSub AS INTEGER
 GLOBAL USTOP AS BYTE
 GLOBAL KeyDown AS BYTE
-
+GLOBAL filename AS STRING
 '****************************************************************************************************
 TYPE GloRecord
    NumModules AS INTEGER

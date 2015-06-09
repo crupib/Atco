@@ -42,24 +42,27 @@ DECLARE SUB EZ_NEWFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 ' ------------------------------------------------
 
-' -------------------------------
-%NEWFORM_Thread1_ID            =1
-' -------------------------------
-DECLARE SUB NEWFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
-' -------------------------------
-%NEWFORM_SETUP_BTN          = 100
-%NEWFORM_JOYSTK_BTN         = 105
-%NEWFORM_AJOGBTN            = 110
-%NEWFORM_SAVE_BTN           = 115
-%NEWFORM_AUTOSCAN_BTN       = 120
-%NEWFORM_XSPDCTRL           = 125
-%NEWFORM_MJOG_BTN           = 130
-%NEWFORM_LOAD_BTN           = 135
 
-DECLARE SUB NEWFORM_SETUP_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
-DECLARE SUB NEWFORM_JOYSTK_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
-DECLARE SUB NEWFORM_AJOGBTN_Events(MyID&, CMsg&, CVal&, Cancel&)
-DECLARE SUB NEWFORM_SAVE_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
+' ----------------------------------------------------------
+%NEWFORM_FILEITEM                               = 9000
+' ----------------------------------------------------------
+%NEWFORM_LOADITEM                               = 9005
+%NEWFORM_OPENITEM                               = 9010
+
+' ----------------------------------------------------------
+%NEWFORM_SCANNERITEM                            = 9100
+' ----------------------------------------------------------
+%NEWFORM_SETUPITEM                              = 9105
+%NEWFORM_AUTOSITEM                              = 9110
+%NEWFORM_AJOGITEM                               = 9115
+%NEWFORM_MJOGITEM                               = 9120
+%NEWFORM_JOYITEM                                = 9125
+%NEWFORM_XSPDCITEM                              = 9130
+%NEWFORM_AUTOSCAN_BTN       = 100
+%NEWFORM_XSPDCTRL           = 105
+%NEWFORM_MJOG_BTN           = 110
+%NEWFORM_LOAD_BTN           = 115
+
 DECLARE SUB NEWFORM_AUTOSCAN_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_XSPDCTRL_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB NEWFORM_MJOG_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
@@ -531,48 +534,33 @@ END FUNCTION
 ' ======================================
 
 SUB EZ_NEWFORM_Display(BYVAL FParent$)     ' (PROTECTED)
+     LOCAL hMainMenu&
+     ' Main Menu handle automatically stored by EZGUI
+     hMainMenu&=EZ_DefMainMenu( %NEWFORM_FILEITEM, "&File", "")
      EZ_Color 0, 11
-     EZ_Form "NEWFORM", FParent$, "MCU 2015", 0, 0, 72, 42, "CMZ"
+     EZ_AllowLoadingEvent 2
+     EZ_Form "NEWFORM", FParent$, "ATCO NDT 2015", 0, 0, 75, 44, "^_CMZ"
 END SUB
 
 SUB EZ_NEWFORM_Design()     ' (PROTECTED)
      LOCAL CText$
-     EZ_Color 9, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_SETUP_BTN, 8, 6, 24, 5, "Setup", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_SETUP_BTN,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_SETUP_BTN
-     ' -----------------------------------------------
-     EZ_Color 12, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_JOYSTK_BTN, 8, 13, 24, 5, "Joy Stick", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_JOYSTK_BTN,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_JOYSTK_BTN
-     ' -----------------------------------------------
-     EZ_Color 9, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_AJOGBTN, 8, 20, 24, 5, "A-JOG", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_AJOGBTN,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_AJOGBTN
-     ' -----------------------------------------------
-     EZ_Color 12, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_SAVE_BTN, 8, 27, 24, 5, "Save", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_SAVE_BTN,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_SAVE_BTN
-     ' -----------------------------------------------
+     LOCAL hMainMenu&, hDropMenu&, hSubMenu&
+     hMainMenu&=EZ_GetMenu("NEWFORM", 0)
+     EZ_AddMenuItem hMainMenu&, %NEWFORM_SCANNERITEM, 0, "&Scanner", ""
+     hDropMenu&=EZ_DefSubMenu( %NEWFORM_LOADITEM, "&Load", "")
+     EZ_SaveMenu "NEWFORM", 1, hDropMenu&
+     EZ_SetSubMenu hMainMenu& , %NEWFORM_FILEITEM, hDropMenu&
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_OPENITEM, 0, "Open", ""
+     hDropMenu&=EZ_DefSubMenu( %NEWFORM_SETUPITEM, "&Setup", "")
+     EZ_SaveMenu "NEWFORM", 2, hDropMenu&
+     EZ_SetSubMenu hMainMenu& , %NEWFORM_SCANNERITEM, hDropMenu&
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_AUTOSITEM, 0, "A&uto Scan", ""
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_AJOGITEM, 0, "A-&Jog", ""
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_MJOGITEM, 0, "&M-Jog", ""
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_JOYITEM, 0, "Joy Stic&k", ""
+     EZ_AddMenuItem hDropMenu&, %NEWFORM_XSPDCITEM, 0, "&XSPD Ctrl", ""
+     ' ------------------------------------------------
+
      EZ_Color 12, 15
      EZ_UseIFont "Courier New", 14,"BF"
      EZ_UseAutoSize "VH-2"
@@ -612,39 +600,117 @@ SUB EZ_NEWFORM_Design()     ' (PROTECTED)
 END SUB
 
 
+' ======================================
+' [USER ACCESSABLE CODE]  You may Edit !
+' ======================================
+
+SUB NEWFORM_MenuEvents(BYVAL MyID&, CMsg&, CVal&, Cancel&, BYVAL hMenu&, BYVAL MenuText$)
+     SELECT CASE MyID&
+          CASE %NEWFORM_FILEITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_OPENITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                           DISPLAY SAVEFILE  0, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+                           IF NOT CalSave(filename) THEN
+                               MSGBOX "Unable to save file!"
+                            END IF
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_SETUPITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                        EZ_SETUPFORM_Display "SETUPFORM"
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_SCANNERITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_LOADITEM
+               SELECT CASE CMsg&
+                    GLOBAL filename AS STRING
+                    CASE %EZ_Click
+                          DISPLAY OPENFILE  0, , , "Load File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
+                          IF NOT CalLoad(filename) THEN
+                            MSGBOX "Unable to Load file!"
+                          END IF
+               CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_AUTOSITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                        EZ_AUTOSFORM_Display  "AUTOFORM"
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_AJOGITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                         EZ_AJOGFORM_Display  "AJOGFORM"
+                         CALL SetForAuto
+                         CALL JogAuto
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_MJOGITEM
+               SELECT CASE CMsg&
+                  CASE %EZ_Click
+                    EZ_MJOGFORM_Display  "MJOGFORM"
+                    CALL SetForAuto
+                    CALL JogMan
+                  CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_JOYITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                        EZ_JOYFORM_Display  "JOYFORM"
+                        CALL SetForAuto
+                        CALL JogJoyStk
+                    CASE %EZ_Selected
+               END SELECT
+          CASE %NEWFORM_XSPDCITEM
+               SELECT CASE CMsg&
+                    CASE %EZ_Click
+                        MSGBOX "XSPD Ctrl not implemented"
+                    CASE %EZ_Selected
+               END SELECT
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+' ======================================
+' [PROTECTED CODE]         Do NOT Edit !
+' ======================================
+
+
 SUB EZ_NEWFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
      SELECT CASE CID&
           CASE %EZ_Window
                NEWFORM_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_Started OR CMsg&=%EZ_Close THEN
-                    NEWFORM_Thread1Events "NEWFORM", %NEWFORM_Thread1_ID, CMsg&, CVal&, Cancel&
-               END IF
-          CASE %NEWFORM_Thread1_ID
-               NEWFORM_Thread1Events "NEWFORM", CID&, CMsg&, CVal&, Cancel&
-          CASE  %NEWFORM_SETUP_BTN
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "Configure MCU Settings"
-               NEWFORM_SETUP_BTN_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_SETUP_BTN, CVal&, 15, 9,  EZ_ODIFont
-               END IF
-          CASE  %NEWFORM_JOYSTK_BTN
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "Use Joy Stick"
-               NEWFORM_JOYSTK_BTN_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_JOYSTK_BTN, CVal&, 15, 12,  EZ_ODIFont
-               END IF
-          CASE  %NEWFORM_AJOGBTN
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "A Jog"
-               NEWFORM_AJOGBTN_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_AJOGBTN, CVal&, 15, 9,  EZ_ODIFont
-               END IF
-          CASE  %NEWFORM_SAVE_BTN
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "Test Button"
-               NEWFORM_SAVE_BTN_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_SAVE_BTN, CVal&, 15, 12,  EZ_ODIFont
-               END IF
+          CASE %NEWFORM_FILEITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 0), "&File"
+          CASE %NEWFORM_LOADITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 1), "&Load"
+          CASE %NEWFORM_OPENITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 1), "Open"
+          CASE %NEWFORM_SCANNERITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 0), "&Scanner"
+          CASE %NEWFORM_SETUPITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "&Setup"
+          CASE %NEWFORM_AUTOSITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "A&uto Scan"
+          CASE %NEWFORM_AJOGITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "A-&Jog"
+          CASE %NEWFORM_MJOGITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "&M-Jog"
+          CASE %NEWFORM_JOYITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "Joy Stic&k"
+          CASE %NEWFORM_XSPDCITEM
+               NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 2), "&XSPD Ctrl"
           CASE  %NEWFORM_AUTOSCAN_BTN
                IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "Auto Scan"
                NEWFORM_AUTOSCAN_BTN_Events CID&, CMsg&, CVal&, Cancel&
@@ -692,70 +758,6 @@ SUB NEWFORM_Events(CID&, CMsg&, CVal&, Cancel&)
      END SELECT
 END SUB
 
-'  Put other Subs above this one !
-
-SUB NEWFORM_Thread1Events(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cancel&)
-     LOCAL STM&
-     SELECT CASE CMsg&
-          CASE %EZ_ThreadCode     ' Non-GUI Thread Code
-               ' Cancel&=0      ' prevents %EZ_Thread event
-          CASE %EZ_Thread         ' GUI Thread Code
-          CASE %EZ_Started        ' Start Thread !
-               STM&=10             ' millisecond delay
-               EZ_StartThread FormName$, CID&, STM&
-          CASE %EZ_Close          ' Terminate Thread when form closes !
-               EZ_CloseThread FormName$, CID&
-          CASE ELSE
-     END SELECT
-END SUB
-SUB NEWFORM_SETUP_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-             EZ_SETUPFORM_Display "NEWFORM"
-
-          CASE %EZ_LButtonDown
-          CASE ELSE
-     END SELECT
-END SUB
-
-SUB NEWFORM_JOYSTK_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-               EZ_JOYFORM_Display  "JOYFORM"
-               CALL SetForAuto
-               CALL JogJoyStk
-          CASE %EZ_LButtonDown
-
-          CASE ELSE
-     END SELECT
-END SUB
-
-SUB NEWFORM_AJOGBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-               EZ_AJOGFORM_Display  "AJOGFORM"
-               CALL SetForAuto
-               CALL JogAuto
-          CASE %EZ_LButtonDown
-          CASE %EZ_LButtonDown
-          CASE ELSE
-     END SELECT
-END SUB
-
-SUB NEWFORM_SAVE_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
-     GLOBAL filename AS STRING
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-               DISPLAY SAVEFILE  0, , , "Save File", "", "Cal" + CHR$(0) + "*.cal"+ CHR$(0) ,"","cal",%OFN_OVERWRITEPROMPT TO filename
-               IF NOT CalSave(filename) THEN
-                   MSGBOX "Unable to save file!"
-                END IF
-          CASE %EZ_LButtonDown
-          CASE %EZ_LButtonDown
-          CASE ELSE
-     END SELECT
-END SUB
-
 SUB NEWFORM_AUTOSCAN_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
@@ -769,7 +771,7 @@ END SUB
 SUB NEWFORM_XSPDCTRL_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
-              MSGBOX "Setup"
+              MSGBOX "XSPDCTRL to be implemented"
           CASE %EZ_LButtonDown
           CASE %EZ_LButtonDown
           CASE ELSE
@@ -779,7 +781,7 @@ END SUB
 SUB NEWFORM_MJOG_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
-            EZ_AJOGFORM_Display  "MJOGFORM"
+            EZ_MJOGFORM_Display  "MJOGFORM"
             CALL SetForAuto
             CALL JogMan
           CASE %EZ_LButtonDown
@@ -963,7 +965,7 @@ END SUB
 SUB EZ_AUTOSFORM_Display(BYVAL FParent$)     ' (PROTECTED)
      EZ_Color -1, -1
      EZ_AllowLoadingEvent 2
-     EZ_Form "AUTOSFORM", FParent$, "Auto Scan", 0, 0, 79, 32, "CZ"
+     EZ_Form "AUTOSFORM", FParent$, "Auto Scan", 0, 0, 74, 36, "CZ"
 END SUB
 
 SUB EZ_AUTOSFORM_Design()     ' (PROTECTED)
@@ -1037,7 +1039,8 @@ SUB EZ_AUTOSFORM_Design()     ' (PROTECTED)
      EZ_Color 0, 34
      EZ_UseFont 4
      EZ_AllowLoadingEvent 2
-     EZ_Text %AUTOSFORM_TEXT1, 1, 33, 1.125, .5625, "", "ET"
+     EZ_UseAutoSize "VH"
+     EZ_Text %AUTOSFORM_TEXT1, 3.375, 34.625, 1.125, .5625, "", "ET"
      ' -----------------------------------------------
 END SUB
 
@@ -1105,15 +1108,18 @@ SUB AUTOSFORM_TimerEvents(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cance
      LOCAL TM!
      SELECT CASE CMsg&
           CASE %EZ_Timer          ' Timer Event !
+              '  CALL SetForAuto
+              '  ReSetMotors
+              '  SetXCtrs  'set x enco
                 CALL GetXyPos
                 EZ_SetText   "AUTOSFORM",  %AUTOSFORM_XPOSUPD1, SCANstruc.XPosStr
                 EZ_SetText   "AUTOSFORM",  %AUTOSFORM_YPOSUPD1, SCANstruc.YPosStr
                 EZ_SetText   "AUTOSFORM",  %AUTOSFORM_APOSUPD1, SCANstruc.APosStr
 
-                IF SCANstruc.IndexY THEN  'X Scan, Y Index
-                   CALL XScan
-                ELSE : CALL YScan   'Y Scan, X Index
-                END IF
+            '    IF SCANstruc.IndexY THEN  'X Scan, Y Index
+            '       CALL XScan
+            '    ELSE : CALL YScan   'Y Scan, X Index
+             '   END IF
 
           CASE %EZ_Started        ' Start Timer !
                TM!=1           ' Timer delay in seconds
@@ -1125,6 +1131,7 @@ SUB AUTOSFORM_TimerEvents(BYVAL FormName$, BYVAL CID&, BYVAL CMsg&, CVal&, Cance
 END SUB
 
 SUB AUTOSFORM_NEXTBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     LOCAL ScanLength AS SINGLE
      SELECT CASE CMsg&
           CASE %EZ_Click
               ScanLength! = ABS(SCANstruc.XHigh - SCANstruc.XLow)
@@ -1148,12 +1155,21 @@ END SUB
 SUB AUTOSFORM_BEGBTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
-              CALL Profiler  'make sure scan ok before next scan add or subtract
-              CALL SetForAuto
-              CALL ReSetMotors
-              CALL SetXCtrs  'set x encoder cts to match
-              CALL GetXyPos
               EZ_SetFocus  "AUTOSFORM",  %AUTOSFORM_TEXT1
+              CALL Profiler  'make sure scan ok before next scan add or subtract
+              IF SCANstruc.ScanFlag = -1 THEN
+                  CALL SetForAuto
+                  CALL ReSetMotors
+                  CALL SetXCtrs  'set x encoder cts to match
+                  CALL GetXyPos
+                  IF SCANstruc.IndexY THEN  'X Scan, Y Index
+                     CALL XScan
+                  ELSE : CALL YScan   'Y Scan, X Index
+              END IF
+              CALL GetXyPos
+              ELSE
+                MSGBOX "CAL ERROR-PRESS KEY"
+              END IF
           CASE %EZ_LButtonDown
           CASE ELSE
      END SELECT
@@ -1785,6 +1801,12 @@ END SUB
 SUB MJOGFORM_STOPBTN1_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click
+              CALL StopMtrs
+              CALL SetModeVel
+              CALL GetXyPos
+              EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
+              EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
+             EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
           CASE %EZ_LButtonDown
           CASE ELSE
      END SELECT
@@ -1794,7 +1816,6 @@ SUB MJOGFORM_TEXT1_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Change
           CASE %EZ_KeyDown
-                CASE %WM_KEYDOWN
                     IF CVal& = %EZK_LEFT THEN
                        CALL ManYLFT
                        SetModePwm
@@ -1802,34 +1823,35 @@ SUB MJOGFORM_TEXT1_Events( MyID&, CMsg&, CVal&, Cancel&)
                        EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
                        EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
                        EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
-                ELSEIF CVal& = %EZK_RIGHT THEN
-                     CALL ManYRGT
-                    CALL SetModePwm
-                    CALL GetXyPos
-                    EZ_SetText  "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
-                ELSEIF CVal& = %EZK_UP THEN
-                    CALL ManXUP
-                    CALL SetModePwm
-                    CALL GetXyPos
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
-                ELSEIF CVal& = %EZK_DOWN THEN
-                    CALL ManXDN
-                    CALL SetModePwm
-                    CALL GetXyPos
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
-                ELSEIF CVal& = %EZK_ESC   THEN
-                    CALL StopMtrs
-                    CALL SetModeVel
-                    CALL GetXyPos
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
-                    EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
+                    ELSEIF CVal& = %EZK_RIGHT THEN
+                       CALL ManYRGT
+                       CALL SetModePwm
+                       CALL GetXyPos
+                       EZ_SetText  "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
+                    ELSEIF CVal& = %EZK_UP THEN
+                       CALL ManXUP
+                       CALL SetModePwm
+                       CALL GetXyPos
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
+                    ELSEIF CVal& = %EZK_DOWN THEN
+                       CALL ManXDN
+                       CALL SetModePwm
+                       CALL GetXyPos
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
+                    ELSEIF CVal& = %EZK_ESC   THEN
+                       CALL StopMtrs
+                       CALL SetModeVel
+                       CALL GetXyPos
+                       MSGBOX "ESCAPE MJOG"
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_APOSUPD1,  SCANstruc.APosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_XPOSUPD1,  SCANstruc.XPosStr
+                       EZ_SetText   "MJOGFORM",  %MJOGFORM_YPOSUPD1,  SCANstruc.YPosStr
               END IF
      END SELECT
 END SUB

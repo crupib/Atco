@@ -3,7 +3,7 @@
 [USETHEMES]=1 - Yes
 [AUTOCOMPRES]=1 - Yes
 [COPYRUN]=2 - EZGUI + Controls
-[SUSPEND]=1 - Yes
+[SUSPEND]=0 - No
 [CAT4]=
 [FONT6]=(Use Designer Default)
 [FONT7]=(Use Designer Default)
@@ -106,3 +106,4 @@
 [BEGINRESOURCES]
 "$ATCO"C:\Users\Bill\Documents\GitHub\Atco\atco.ico
 [ENDRESOURCES]
+

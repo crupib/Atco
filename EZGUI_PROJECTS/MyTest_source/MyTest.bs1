@@ -6,7 +6,7 @@
 '
 ' -----------------------------------------------------------------------------------------
 '            WARNING !    Do Not Modify any code WITHIN Protected Sections !
-' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following
+' You can add code (Sub,Function,etc.) BEFORE any Protected Routine by using the following 
 ' CODE TAGS:        '<<SAVE>>      '<<END>>            and the Designer will not remove it.
 ' -----------------------------------------------------------------------------------------
 '
@@ -69,11 +69,7 @@ DECLARE SUB NEWFORM_Events(CID&, CMsg&, CVal&, Cancel&)
 ' ----------------------------------------------------------
 %NEWFORM_3DVIEWITEM                             = 9300
 ' ----------------------------------------------------------
-%NEWFORM_AUTOSCAN_BTN       = 100
-%NEWFORM_XSPDCTRL           = 105
 
-DECLARE SUB NEWFORM_AUTOSCAN_BTN_Events(MyID&, CMsg&, CVal&, Cancel&)
-DECLARE SUB NEWFORM_XSPDCTRL_Events(MyID&, CMsg&, CVal&, Cancel&)
 DECLARE SUB EZ_AJOGFORM_Display(BYVAL FParent$)
 DECLARE SUB EZ_AJOGFORM_Design()
 DECLARE SUB EZ_AJOGFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
@@ -546,7 +542,7 @@ SUB EZ_NEWFORM_Display(BYVAL FParent$)     ' (PROTECTED)
      hMainMenu&=EZ_DefMainMenu( %NEWFORM_FILEITEM, "&File", "")
      EZ_Color 0, 11
      EZ_AllowLoadingEvent 2
-     EZ_Form "NEWFORM", FParent$, "ATCO NDT 2015", 0, 0, 75, 44, "^_CMZ"
+     EZ_Form "NEWFORM", FParent$, "ATCO NDT 2015", 0, 0, 79, 44, "^_CMZ"
 END SUB
 
 SUB EZ_NEWFORM_Design()     ' (PROTECTED)
@@ -575,24 +571,6 @@ SUB EZ_NEWFORM_Design()     ' (PROTECTED)
      EZ_AddMenuItem hDropMenu&, %NEWFORM_ASCANITEM, 0, "&A-SCAN", ""
      ' ------------------------------------------------
 
-     EZ_Color 12, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_AUTOSCAN_BTN, 38, 6, 24, 5, "AUTO Scan", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_AUTOSCAN_BTN,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_AUTOSCAN_BTN
-     ' -----------------------------------------------
-     EZ_Color 9, 15
-     EZ_UseIFont "Courier New", 14,"BF"
-     EZ_UseAutoSize "VH-2"
-     EZ_SubClass 2
-     EZ_ODButton %NEWFORM_XSPDCTRL, 38, 13, 24, 5, "XSPD CTRL", "T"
-     EZ_SetRegion "NewFOrm", %NEWFORM_XSPDCTRL,-2,0
-     EZ_SubClass 0
-     EZ_AddToolTip "NewFOrm", %NEWFORM_XSPDCTRL
-     ' -----------------------------------------------
 END SUB
 
 
@@ -742,18 +720,6 @@ SUB EZ_NEWFORM_ParseEvents(CID&, CMsg&, CVal&, Cancel&)     ' (PROTECTED)
                NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 3), "&A-SCAN"
           CASE %NEWFORM_3DVIEWITEM
                NEWFORM_MenuEvents CID&, CMsg&, CVal&, Cancel&, EZ_GetMenu("NEWFORM", 0), "3D &View"
-          CASE  %NEWFORM_AUTOSCAN_BTN
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "Auto Scan"
-               NEWFORM_AUTOSCAN_BTN_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_AUTOSCAN_BTN, CVal&, 15, 12,  EZ_ODIFont
-               END IF
-          CASE  %NEWFORM_XSPDCTRL
-               IF CMsg& = %EZ_ToolTip THEN EZ_SetToolTip "XSPD CTRL"
-               NEWFORM_XSPDCTRL_Events CID&, CMsg&, CVal&, Cancel&
-               IF CMsg&=%EZ_OwnerDraw THEN
-                    EZ_Draw3DButtonRR "NewFOrm", %NEWFORM_XSPDCTRL, CVal&, 15, 9,  EZ_ODIFont
-               END IF
           CASE ELSE
                NEWFORM_Events CID&, CMsg&, CVal&, Cancel&
      END SELECT
@@ -773,26 +739,6 @@ SUB NEWFORM_Events(CID&, CMsg&, CVal&, Cancel&)
                     CASE %EZ_Close
                     CASE ELSE
                END SELECT
-          CASE ELSE
-     END SELECT
-END SUB
-
-SUB NEWFORM_AUTOSCAN_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-              EZ_AUTOSFORM_Display  "AUTOFORM"
-          CASE %EZ_LButtonDown
-          CASE %EZ_LButtonDown
-          CASE ELSE
-     END SELECT
-END SUB
-
-SUB NEWFORM_XSPDCTRL_Events( MyID&, CMsg&, CVal&, Cancel&)
-     SELECT CASE CMsg&
-          CASE %EZ_Click
-            CALL SetForAuto
-            CALL JogXSpd
-          CASE %EZ_LButtonDown
           CASE ELSE
      END SELECT
 END SUB
@@ -2712,6 +2658,28 @@ END SUB
 
 '<<END ALL FORMS>>    UnKnown Routines follow:
 #IF %EZ_NOSKIPCODE
+SUB NEWFORM_AUTOSCAN_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+              EZ_AUTOSFORM_Display  "AUTOFORM"
+          CASE %EZ_LButtonDown
+          CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+SUB NEWFORM_XSPDCTRL_Events( MyID&, CMsg&, CVal&, Cancel&)
+     SELECT CASE CMsg&
+          CASE %EZ_Click
+            CALL SetForAuto
+            CALL JogXSpd
+          CASE %EZ_LButtonDown
+          CASE ELSE
+     END SELECT
+END SUB
+
+
+
 SUB NEWFORM_MJOG_BTN_Events( MyID&, CMsg&, CVal&, Cancel&)
      SELECT CASE CMsg&
           CASE %EZ_Click

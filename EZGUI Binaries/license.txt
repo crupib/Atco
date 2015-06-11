@@ -1,0 +1,6 @@
+' Enter your User number and
+' Registration number below:
+' -------------------------------
+%EZ_CUSTID      =   6071
+%EZ_REGNUM      =   570416930
+' -------------------------------

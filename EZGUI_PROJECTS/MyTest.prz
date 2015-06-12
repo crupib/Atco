@@ -58,7 +58,7 @@
 [GRAPHICFNAME]=Graphics
 [ALLOWCOMMAND]=0 - Off
 [ALLOWCURSOR]=0 - Off
-[ALLOWKEY]=0 - Off
+[ALLOWKEY]=1 - On (Standard)
 [ALLOWMOUSE]=0 - Off
 [ALLOWNOTIFY]=0 - Off
 [PATLIBSYS]=0 - No
@@ -98,7 +98,7 @@
 "SPLASHFORM"C:\Users\Bill\Documents\GitHub\Atco\Splash.fmz
 [ENDFORMS]
 [BEGINCODEFILES]
-"(PRIMARY)"D:\PBWin10\WinAPI\Win32Api.inc
+"(PRIMARY)"D:\PBCC60\WinAPI\Win32Api.inc
 "ATCO"C:\Users\Bill\Documents\GitHub\Atco\ATCO.inc
 "ATCOSER"C:\Users\Bill\Documents\GitHub\Atco\AtcoSer.inc
 "FILE"C:\Users\Bill\Documents\GitHub\Atco\file.inc

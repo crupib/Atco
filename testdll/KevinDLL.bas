@@ -1,10 +1,6 @@
 '==============================================================================
 '
-'  Address.bas for PowerBASIC for Windows
-'  Copyright (c) 1999-2011 PowerBASIC, Inc.
-'  All Rights Reserved.
-'
-'  A simple application to test MyDLL.DLL
+'                   Atco Source code testing program.
 '
 '==============================================================================
 
@@ -144,13 +140,8 @@ FUNCTION PBMAIN () AS LONG
              Q=ASC(RIGHT$(keynum,1))
              IF Q =  KeyRgt  THEN
                  IF COL < 14 THEN
-                    COL = COL+1
-                    IF COL = 2 THEN
-                        COL = 1
-                        CON.CELL = ROW,COL
-                        PRINT " "
-                        COL = 2
-                    END IF
+                    PRINT " "
+                    COL = 14
                  END IF
                  IF COL = 14 THEN
                         CON.CELL = ROW,COL
@@ -160,7 +151,8 @@ FUNCTION PBMAIN () AS LONG
              END IF
              IF Q =  KeyLft  THEN
                  IF COL > 1 THEN
-                    COL = COL-1
+                    PRINT " "
+                    COL = 1
                     IF COL = 1 THEN
                         CON.CELL = ROW,COL
                         PRINT ">"

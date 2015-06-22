@@ -96,6 +96,7 @@ CONST KeyDN = 80
 CONST KeyLft = 75
 CONST KeyRgt = 77
 CONST KeyEsc = 27
+CONST KeyEnter = 13
 GLOBAL SCANstruc AS scanparms
 
 '--------------------------------------------------------------------
@@ -114,56 +115,174 @@ FUNCTION PBMAIN () AS LONG
     LOCAL setupcall AS STRING
     LOCAL lRes AS LONG
     LOCAL hwnd AS LONG
-    LOCAL ROW, COL AS LONG
+    LOCAL ROW, COL, tmprow, tmpcol AS LONG
     LOCAL keynum AS STRING
     LOCAL Q AS LONG
   '  lRes = MyFunction1(lRes)
   '  filename =  LOAD_FILE()
   '  PRINT filename
   '  WAITKEY$
-     ROW = 25
-     COL = 80
+    ROW = 25
+    COL = 80
 
-     CON.SCREEN = ROW, COL
+    CON.SCREEN = ROW, COL
 
-        CON.PRINT   " Setup        AutoScan"
-        CON.PRINT   " JoyStk       XSPD CTRL"
-        CON.PRINT   " A-JOG        M-JOG"
-        CON.PRINT   " SAVE         LOAD"
-        ROW = 1
-        COL = 1
-        CON.CELL = ROW,COL
-        CON.PRINT ">"
-        ROW = 1
-        COL = 1
-        CON.CELL = ROW,COL
-     DO
+    CON.PRINT   " Setup        AutoScan"
+    CON.PRINT   " JoyStk       XSPD CTRL"
+    CON.PRINT   " A-JOG        M-JOG"
+    CON.PRINT   " SAVE         LOAD"
+    ROW = 1
+    COL = 1
+    CON.CELL = ROW,COL
+    CON.PRINT ">"
+    ROW = 1
+    COL = 1
+    CON.CELL = ROW,COL
+    DO
         CON.INKEY$ TO keynum
         IF LEN(keynum) > 1 THEN
              Q=ASC(RIGHT$(keynum,1))
              IF Q =  KeyRgt  THEN
-                 IF COL = 1 THEN
-                    PRINT " "
-                 END IF
                  IF COL < 14 THEN
                     COL = COL+1
+                    IF COL = 2 THEN
+                        COL = 1
+                        CON.CELL = ROW,COL
+                        PRINT " "
+                        COL = 2
+                    END IF
                  END IF
                  IF COL = 14 THEN
-                     PRINT ">"
+                        CON.CELL = ROW,COL
+                        PRINT ">"
                  END IF
                  CON.CELL = ROW,COL
              END IF
              IF Q =  KeyLft  THEN
-                 IF COL > 0 THEN
+                 IF COL > 1 THEN
                     COL = COL-1
-                 END IF
-                 IF COL = 1 THEN
-                    PRINT ">"
+                    IF COL = 1 THEN
+                        CON.CELL = ROW,COL
+                        PRINT ">"
+                        COL = 1
+                    END IF
+                    IF COL = 13 THEN
+                        PRINT " "
+                    END IF
                  END IF
                  CON.CELL = ROW,COL
              END IF
-         END IF
-     LOOP
+             IF Q =  Keydn  THEN
+                 IF ROW < 4 THEN
+                    ROW = ROW + 1
+                 END IF
+                 IF COL = 1 THEN
+                     ROW = ROW - 1
+                     CON.CELL = ROW,COL
+                     PRINT " "
+                     ROW = ROW + 1
+                     PRINT ">"
+                 END IF
+                 IF COL = 14 THEN
+                     CON.CELL = ROW,COL
+                     PRINT ">"
+                     ROW = ROW - 1
+                     CON.CELL = ROW,COL
+                     PRINT " "
+                     ROW = ROW + 1
+                 END IF
+                 CON.CELL = ROW,COL
+             END IF
+             IF Q =  Keyup  THEN
+                 IF ROW > 1 THEN
+                    ROW = ROW - 1
+                 END IF
+                 IF COL = 1 THEN
+                     CON.CELL = ROW,COL
+                     PRINT ">"
+                     ROW = ROW + 1
+                     CON.CELL = ROW,COL
+                     PRINT " "
+                     ROW = ROW - 1
+                 END IF
+                 IF COL = 14 THEN
+                     CON.CELL = ROW,COL
+                     PRINT ">"
+                     ROW = ROW + 1
+                     CON.CELL = ROW,COL
+                     PRINT " "
+                     ROW = ROW - 1
+                 END IF
+                 CON.CELL = ROW,COL
+             END IF
+        ELSE
+            Q=ASC(keynum)
+            IF Q=KeyEsc THEN
+              EXIT DO
+            END IF
+            IF Q=KeyEnter THEN
+              IF ROW = 1 AND COL = 1 THEN
+                setupcall = SETUP_CALL(SCANstruc)
+              END IF
+              IF ROW = 2 AND COL = 1 THEN
+                tmprow = 15
+                tmpcol = 20
+                CON.CELL = tmprow,tmpcol
+                PRINT "Joystk not implemenetd"
+                SLEEP 3600
+                CON.CELL = tmprow,tmpcol
+                PRINT "                      "
+                CON.CELL = ROW,COL
+              END IF
+              IF ROW = 3 AND COL = 1 THEN
+                tmprow = 15
+                tmpcol = 20
+                CON.CELL = tmprow,tmpcol
+                PRINT "A-Jog not implemenetd"
+                SLEEP 3600
+                CON.CELL = tmprow,tmpcol
+                PRINT "                      "
+                CON.CELL = ROW,COL
+              END IF
+              IF ROW = 4 AND COL = 1 THEN
+                filename = SAVE_FILE()
+              END IF
+              IF ROW = 4 AND COL = 14 THEN
+                filename =  LOAD_FILE()
+              END IF
+              IF ROW = 1 AND COL = 14 THEN
+                tmprow = 15
+                tmpcol = 20
+                CON.CELL = tmprow,tmpcol
+                PRINT "AutoScan not implemented"
+                SLEEP 3600
+                CON.CELL = tmprow,tmpcol
+                PRINT "                        "
+                CON.CELL = ROW,COL
+              END IF
+              IF ROW = 2 AND COL = 14 THEN
+                tmprow = 15
+                tmpcol = 20
+                CON.CELL = tmprow,tmpcol
+                PRINT "XSPD CTRL not implemented"
+                SLEEP 3600
+                CON.CELL = tmprow,tmpcol
+                PRINT "                         "
+                CON.CELL = ROW,COL
+              END IF
+              IF ROW = 3 AND COL = 14 THEN
+                tmprow = 15
+                tmpcol = 20
+                CON.CELL = tmprow,tmpcol
+                PRINT "M-JOG     not implemented"
+                SLEEP 3600
+                CON.CELL = tmprow,tmpcol
+                PRINT "                         "
+                CON.CELL = ROW,COL
+              END IF
+            END IF
+        END IF
+    LOOP
 
   '  ScanStruc.XPlusSTR = "Test"
   '  setupcall = SETUP_CALL(SCANstruc)

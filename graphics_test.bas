@@ -1,7 +1,14 @@
 #COMPILE EXE
 #DIM ALL
 #CONSOLE OFF
-#INCLUDE "C:\PBCC60\WinAPI\WIN32API.INC"
+#INCLUDE "D:\PBCC60\WinAPI\WIN32API.INC"
+MACRO CONST = MACRO
+CONST KeyUP = 72
+CONST KeyDN = 80
+CONST KeyLft = 75
+CONST KeyRgt = 77
+CONST KeyEsc = 27
+CONST KeyEnter = 13
 FUNCTION PBMAIN () AS LONG
   LOCAL underline&, NormalFont&
   LOCAL mystrings() AS STRING
@@ -13,7 +20,7 @@ FUNCTION PBMAIN () AS LONG
   LOCAL NumericVar AS LONG
   LOCAL myclick AS LONG
   LOCAL myint AS INTEGER
-  LOCAL cp, Q, rp, colpt,rowpt AS LONG
+  LOCAL cp, Q, P, rp, colpt,rowpt AS LONG
   LOCAL temppt AS LONG
   DIM mystrings$(3)
   LOCAL numrows AS LONG
@@ -61,7 +68,7 @@ FUNCTION PBMAIN () AS LONG
         GRAPHIC INKEY$ TO inkeyVar$
         IF LEN(inkeyVar$)>1 THEN
             Q=ASC(RIGHT$(inkeyVar$,1))
-            IF Q = 77 THEN
+            IF Q = KeyRgt THEN
                colpt = colpt + 1
                cp = cp+GRAPHIC(CHR.SIZE.X)
                IF colpt > LEN(mystrings$(rowpt)) THEN
@@ -78,7 +85,7 @@ FUNCTION PBMAIN () AS LONG
                GRAPHIC PRINT s$ POS(cp)
 
             END IF
-            IF Q = 75 THEN
+            IF Q = KeyLft THEN
                colpt = colpt - 1
                cp = cp-GRAPHIC(CHR.SIZE.X)
                IF colpt < 1 THEN
@@ -94,7 +101,7 @@ FUNCTION PBMAIN () AS LONG
                s$  = MID$(mystrings$(rowpt), colpt+1, 1)
                GRAPHIC PRINT s$ POS(cp)
             END IF
-            IF Q=80 THEN
+            IF Q=KeyDN THEN
                rowpt = rowpt + 1
                rp = rp+GRAPHIC(CHR.SIZE.Y)
                IF rowpt > numrows THEN
@@ -110,7 +117,7 @@ FUNCTION PBMAIN () AS LONG
                s$  = MID$(mystrings$(rowpt-1), colpt, 1)
                GRAPHIC PRINT s$ POS(cp)
             END IF
-            IF Q=72 THEN
+            IF Q=KeyUP THEN
                rowpt = rowpt - 1
                rp = rp-GRAPHIC(CHR.SIZE.Y)
                IF rowpt < 1 THEN
@@ -126,7 +133,19 @@ FUNCTION PBMAIN () AS LONG
                s$  = MID$(mystrings$(rowpt+1), colpt, 1)
                GRAPHIC PRINT s$ POS(cp)
             END IF
+            IF P=KeyEnter THEN
+                EXIT FUNCTION
+            END IF
+        ELSE
+            Q=ASC(inkeyVar$)
+            IF Q=KeyEsc THEN
+              EXIT DO
+            END IF
+            IF Q=KeyEnter THEN
+              EXIT DO
+            END IF
         END IF
+
     END IF
   LOOP
 

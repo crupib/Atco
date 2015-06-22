@@ -1,9 +1,9 @@
 [CAT8]=
-[STARTFORM]=NEWFORM
-[USETHEMES]=1 - Yes
+[STARTFORM]=MAINFORM
+[USETHEMES]=0 - No
 [AUTOCOMPRES]=1 - Yes
 [COPYRUN]=2 - EZGUI + Controls
-[SUSPEND]=0 - No
+[SUSPEND]=1 - Yes
 [CAT4]=
 [FONT6]=(Use Designer Default)
 [FONT7]=(Use Designer Default)
@@ -58,7 +58,7 @@
 [GRAPHICFNAME]=Graphics
 [ALLOWCOMMAND]=0 - Off
 [ALLOWCURSOR]=0 - Off
-[ALLOWKEY]=1 - On (Standard)
+[ALLOWKEY]=0 - Off
 [ALLOWMOUSE]=0 - Off
 [ALLOWNOTIFY]=0 - Off
 [PATLIBSYS]=0 - No
@@ -87,19 +87,9 @@
 [GENSELCASE]=1 - Yes
 [DIRECTIVE]=1 - Yes
 [BEGINFORMS]
-"AJOGFORM"C:\Users\Bill\Documents\GitHub\Atco\AJOGFORM.fmz
-"AUTOSFORM"C:\Users\Bill\Documents\GitHub\Atco\AUTOSFORM.fmz
-"CALFORM"D:\PBWin10\WinAPI\calibrate.fmz
-"CALXFORM"C:\Users\Bill\Documents\GitHub\Atco\CALXFORM.fmz
-"JOYFORM"C:\Users\Bill\Documents\GitHub\Atco\MJOYFORM.fmz
-"MJOGFORM"C:\Users\Bill\Documents\GitHub\Atco\mjogform.fmz
-"NEWFORM"D:\EZGUI_PROJECTS\newform.fmz
-"SETUPFORM"D:\EZGUI_PROJECTS\SetupForm.fmz
-"SPLASHFORM"C:\Users\Bill\Documents\GitHub\Atco\Splash.fmz
+"MAINFORM"C:\Users\Bill\Documents\GitHub\Atco\ATCO_ NDT\mainform.fmz
 [ENDFORMS]
 [BEGINCODEFILES]
 [ENDCODEFILES]
 [BEGINRESOURCES]
-"$ATCO"C:\Users\Bill\Documents\GitHub\Atco\atco.ico
 [ENDRESOURCES]
-

@@ -94,7 +94,8 @@ CONST KeyRgt = 77
 CONST KeyEsc = 27
 CONST KeyEnter = 13
 GLOBAL SCANstruc AS scanparms
-
+GLOBAL keynum AS STRING
+GLOBAL Q AS LONG
 '--------------------------------------------------------------------
 DECLARE FUNCTION LOAD_FILE LIB "MYDLL.DLL" _
           ALIAS "Load_File" () AS STRING
@@ -106,23 +107,36 @@ DECLARE FUNCTION MyFunction1 LIB "MYDLL.DLL" _
           ALIAS "MyFunction1" (BYVAL Param1 AS LONG) AS LONG
 '--------------------------------------------------------------------
 
+GLOBAL ROW, COL, tmprow, tmpcol AS LONG
+GLOBAL filename AS STRING
+GLOBAL setupcall AS STRING
+GLOBAL lRes AS LONG
+GLOBAL hwnd AS LONG
+GLOBAL ROW, COL, tmprow, tmpcol AS LONG
+GLOBAL keynum AS STRING
+GLOBAL Q AS LONG
 FUNCTION PBMAIN () AS LONG
-    LOCAL filename AS STRING
-    LOCAL setupcall AS STRING
-    LOCAL lRes AS LONG
-    LOCAL hwnd AS LONG
-    LOCAL ROW, COL, tmprow, tmpcol AS LONG
-    LOCAL keynum AS STRING
-    LOCAL Q AS LONG
   '  lRes = MyFunction1(lRes)
   '  filename =  LOAD_FILE()
   '  PRINT filename
   '  WAITKEY$
     ROW = 25
     COL = 80
-
     CON.SCREEN = ROW, COL
+    CALL PrintMainMenu
 
+  '  ScanStruc.XPlusSTR = "Test"
+  '  setupcall = SETUP_CALL(SCANstruc)
+  '  PRINT SCANstruc.XPlusSTR
+  '  IF SCANstruc.xplusstr <> "NEGITIVE" THEN
+   '    scanstruc.xplusstr = "NOT VALID"
+  '     setupcall = SETUP_CALL(SCANstruc)
+   ' END IF
+'   filename = SAVE_FILE()
+'    PRINT filename
+END FUNCTION
+SUB PrintMainMenu
+    CON.CAPTION$ = "Atco 2015 Main Menu"
     CON.PRINT   " Setup        AutoScan"
     CON.PRINT   " JoyStk       XSPD CTRL"
     CON.PRINT   " A-JOG        M-JOG"
@@ -217,14 +231,7 @@ FUNCTION PBMAIN () AS LONG
                 setupcall = SETUP_CALL(SCANstruc)
               END IF
               IF ROW = 2 AND COL = 1 THEN
-                tmprow = 15
-                tmpcol = 20
-                CON.CELL = tmprow,tmpcol
-                PRINT "Joystk not implemenetd"
-                SLEEP 3600
-                CON.CELL = tmprow,tmpcol
-                PRINT "                      "
-                CON.CELL = ROW,COL
+                CALL JOYSTK
               END IF
               IF ROW = 3 AND COL = 1 THEN
                 tmprow = 15
@@ -275,14 +282,41 @@ FUNCTION PBMAIN () AS LONG
             END IF
         END IF
     LOOP
-
-  '  ScanStruc.XPlusSTR = "Test"
-  '  setupcall = SETUP_CALL(SCANstruc)
-  '  PRINT SCANstruc.XPlusSTR
-  '  IF SCANstruc.xplusstr <> "NEGITIVE" THEN
-   '    scanstruc.xplusstr = "NOT VALID"
-  '     setupcall = SETUP_CALL(SCANstruc)
-   ' END IF
-'   filename = SAVE_FILE()
-'    PRINT filename
-END FUNCTION
+END SUB
+SUB JoyStk
+     CON.CAPTION$ = "Atco 2015 JoyStk"
+     CON.CLS
+     PRINT "Joy Stick Control"
+     PRINT "X   "
+     PRINT "Y   "
+     PRINT "A   "
+     CON.CELL = ROW,COL
+     DO
+        CON.INKEY$ TO keynum
+        Q=ASC(keynum)
+        IF Q=KeyEsc THEN
+          EXIT DO
+        END IF
+        ROW = 2
+        COL = 4
+        CON.CELL = ROW,COL
+        PRINT "        "
+        CON.CELL = ROW,COL
+        PRINT RND(0,256)
+        ROW = 3
+        COL = 4
+        CON.CELL = ROW,COL
+        PRINT "        "
+        CON.CELL = ROW,COL
+        PRINT RND(0,256)
+        ROW = 4
+        COL = 4
+        CON.CELL = ROW,COL
+        PRINT "        "
+        CON.CELL = ROW,COL
+        PRINT RND(0,256)
+        SLEEP 300
+    LOOP
+    CON.CLS
+    CALL PrintMainMenu
+END SUB

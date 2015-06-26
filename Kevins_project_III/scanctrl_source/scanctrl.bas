@@ -171,7 +171,7 @@ SUB EZ_Events(FormName$, CID&, CMsg&, CVal&, Cancel&)     ' All calls must be fo
 END SUB
 
 ' -------------------------------------------------------------------------------------
-
+' --------------Kevin ------ Setup code -----------------------------------------------
 FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
      LOCAL Par1 AS MyData, Par2 AS MyData, Par3 AS MyData, Par4 AS MyData, SPar AS STRING, ErrFlag AS LONG
@@ -445,7 +445,7 @@ END SUB
 SUB EZ_MAIN_Design()
      ' separate each menu item with the | character
      ' FILE menu Items
-     DATA "File Item 1|File Item 2|File Item 3|File Item 4|File Item 5|File Item 6"
+     DATA "Open|Save|File Item 3|File Item 4|File Item 5|File Item 6"
      ' SETUP menu items
      DATA "SETUP Item 1|SETUP Item 2|SETUP Item 3|SETUP Item 4|SETUP Item 5|SETUP Item 6"
      ' WINDOW menu items
@@ -782,6 +782,8 @@ END SUB
 
 SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
      LOCAL MenuN&, EText$, RV$
+     LOCAL Par1 AS MyData, Par2 AS MyData, Par3 AS MyData, Par4 AS MyData, SPar AS STRING, ErrFlag AS LONG
+     ErrFlag&=0
      SELECT CASE CID&
           ' -------------
           ' Form events
@@ -806,6 +808,24 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                SELECT CASE CMsg&
                     CASE %EZ_Click
                          MainMsg "File"+STR$(MenuN&)
+                         IF MenuN& = 1 THEN
+                             ErrFlag& = 0
+                             ProcessInput %OPEN_FILE_NAME, Par1, Par2, Par3, Par4, SPar, ErrFlag&
+                             IF ErrFlag&=0 THEN
+                               MainMsg "File Open worked!"+Par1.S
+                             ELSE
+                               MainMsg "File not allowed to be open!"
+                             END IF
+                         END IF
+                         IF MenuN& = 2 THEN
+                             ErrFlag& = 0
+                             ProcessInput %SAVE_FILE_NAME, Par1, Par2, Par3, Par4, SPar, ErrFlag&
+                             IF ErrFlag&=0 THEN
+                               MainMsg "File Save worked! "+Par1.OF
+                             ELSE
+                               MainMsg "File not allowed to be saved!"
+                             END IF
+                         END IF
                END SELECT
           CASE %MAIN_EXITAPP
                SELECT CASE CMsg&
@@ -835,11 +855,12 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
           CASE  %MAIN_BUTTONXPOS
                SELECT CASE CMsg&
                     CASE %EZ_Click, %EZ_DClick
-                         EText$=EZ_GetText("MAIN", %MAIN_TEXTXPOS)
-                         RV$=ShowInputBox("Set X Position", "Enter New X Position",EText$, 1)
-                         IF RV$<>EText$ THEN
+                         'EText$=EZ_GetText("MAIN", %MAIN_TEXTXPOS)
+                         'RV$=ShowInputBox("Set CRUX Position", "Enter New X Position",EText$, 1)
+                         'IF RV$<>EText$ THEN
                               EZ_SetText "MAIN", %MAIN_TEXTXPOS, RV$
-                         END IF
+                         'END IF
+                         ProcessInput %SET_XPOS_SET, Par1, Par2, Par3, Par4, SPar, ErrFlag&
                     CASE %EZ_OwnerDraw
                          EZ_Draw3DButtonRR "Main", %MAIN_BUTTONXPOS, CVal&, 36, 0,  6
                END SELECT

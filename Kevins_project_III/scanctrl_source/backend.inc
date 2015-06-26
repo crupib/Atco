@@ -41,10 +41,12 @@ END SUB
 %OPEN_FILE_NAME                    = 3
 %SAVE_FILE_NAME                    = 4
 %SET_XPOS_SET                      = 5
+%GO_AUTO_SCAN                      = 6
 ' ----------------------------------
 SUB ProcessInput(BYVAL TaskID AS LONG, Par1 AS MyData, Par2 AS MyData, Par3 AS MyData, Par4 AS MyData, SPar AS STRING, ErrFlag AS LONG)
      LOCAL F AS STRING
      LOCAL EText$, RV$
+     LOCAL X&
      ' TaskID are ID numbers for any Tasks the GUI needs to pass on to backend
      ' ie. of using parameter which is MyData (UNION)
      '    Par1.Q is a Quad Integer value
@@ -80,6 +82,8 @@ SUB ProcessInput(BYVAL TaskID AS LONG, Par1 AS MyData, Par2 AS MyData, Par3 AS M
               IF RV$<>EText$ THEN
                    EZ_SetText "MAIN", %MAIN_TEXTXPOS, RV$
               END IF
+          CASE %GO_AUTO_SCAN
+               MainMsg "GO-AutoScan"
           CASE ELSE
      END SELECT
 END SUB

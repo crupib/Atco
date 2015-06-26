@@ -858,8 +858,9 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                          'EText$=EZ_GetText("MAIN", %MAIN_TEXTXPOS)
                          'RV$=ShowInputBox("Set CRUX Position", "Enter New X Position",EText$, 1)
                          'IF RV$<>EText$ THEN
-                              EZ_SetText "MAIN", %MAIN_TEXTXPOS, RV$
+                         '     EZ_SetText "MAIN", %MAIN_TEXTXPOS, RV$
                          'END IF
+                         'on click processInput
                          ProcessInput %SET_XPOS_SET, Par1, Par2, Par3, Par4, SPar, ErrFlag&
                     CASE %EZ_OwnerDraw
                          EZ_Draw3DButtonRR "Main", %MAIN_BUTTONXPOS, CVal&, 36, 0,  6
@@ -965,8 +966,9 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
           CASE  %MAIN_BUTTONGOSCAN
                SELECT CASE CMsg&
                     CASE %EZ_Click, %EZ_DClick
+                      ProcessInput %GO_AUTO_SCAN, Par1, Par2, Par3, Par4, SPar, ErrFlag&
                     CASE %EZ_OwnerDraw
-                         EZ_Draw3DButtonRR "Main", %MAIN_BUTTONGOSCAN, CVal&, 42, 0,  7
+                          EZ_Draw3DButtonRR "Main", %MAIN_BUTTONGOSCAN, CVal&, 42, 0,  7
                END SELECT
           CASE  %MAIN_BUTTONEXTRASCAN
                SELECT CASE CMsg&

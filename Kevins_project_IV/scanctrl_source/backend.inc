@@ -1,3 +1,4 @@
+#INCLUDE "scanctrl.inc"
 ' Extra Buttons have IDs 1 to 18
 ' File menu has IDs from 50 to 56
 ' Setup menu has IDs from 60 to 66
@@ -11,7 +12,9 @@
 ' GUISetXMotor State&                             (sets X Motor ON/OFF button state. 1 = ON, 0 = OFF)
 ' GUISetYMotor State&                             (sets Y Motor ON/OFF button state. 1 = ON, 0 = OFF)
 ' GUISetRMotor State&                             (sets R Motor ON/OFF button state. 1 = ON, 0 = OFF)
-' GUISetXPos validXPOS&                           (sets X POS)
+' GUISetXPos validXPOS&                       'bc (sets X POS) 'Calls SetXPOSValue (places value in text box, converts from numeral to string. STR$)
+GLOBAL bc_string AS STRING
+'%MAIN_BUTTONXPOS         = 105                'bc Brought over from scanctrl.bas - maybe we can put these in an include file   ; I added the include file, but not in the main scanctrl.bas
 GLOBAL bc_string AS STRING
 
 FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
@@ -32,12 +35,12 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                               GUISetClose
                               EXIT LOOP
                          END IF
-                    CASE 105
-                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
-                          GUISetXPOS 20
+                    CASE %MAIN_BUTTONXPOS
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GUISetXPOS 25  '*** bc - Kevin this only updates the Value in the XPOS Box - it does not ask user for input. That would be a higher level call - see what Chris thinks'
                     CASE ELSE
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
-                         GUISetXMotor 0
+                         GUISetXMotor 0    'bc I did this as a test
                END SELECT
           END IF                                       'Kevins MAIN
      LOOP

@@ -729,7 +729,9 @@ BuildDropMenu:
 RETURN
 
 END SUB
-
+SUB SetXPOSValue (BYVAL GXPOS AS LONG)
+    EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
+END SUB
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      LOCAL T$
      T$=EZ_GetText(FormName$, CID&)
@@ -897,7 +899,7 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                          CASE 7    ' set R Motor ON
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 1
                          CASE 8    ' set X POS
-                              EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
+                              SetXPOSValue GXPOS
                          CASE ELSE
                     END SELECT
                END IF

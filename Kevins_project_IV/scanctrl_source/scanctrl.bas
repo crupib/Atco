@@ -729,9 +729,17 @@ BuildDropMenu:
 RETURN
 
 END SUB
+'bc added 06/27/2015
 SUB SetXPOSValue (BYVAL GXPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
 END SUB
+SUB SetYPOSValue (BYVAL GYPOS AS LONG)
+    EZ_SetText "MAIN", %MAIN_TEXTYPOS, STR$(GYPOS)
+END SUB
+SUB SetRPOSValue (BYVAL GRPOS AS LONG)
+    EZ_SetText "MAIN", %MAIN_TEXTRPOS, STR$(GRPOS)
+END SUB
+
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      LOCAL T$
      T$=EZ_GetText(FormName$, CID&)
@@ -813,7 +821,7 @@ END SUB
 
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
-GLOBAL GXPOS AS LONG
+GLOBAL GXPOS, GYPOS, GRPOS AS LONG
 
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
@@ -848,6 +856,18 @@ SUB GUISetXPos(BYVAL XPOS&)
     GXPOS = XPOS&
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 8
 END SUB
+
+SUB GUISetYPos(BYVAL YPOS&)
+    GYPOS = YPOS&
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 9
+END SUB
+
+SUB GUISetRPos(BYVAL RPOS&)
+    GRPOS = RPOS&
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 10
+END SUB
+
+
 
 
 
@@ -900,6 +920,10 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 1
                          CASE 8    ' set X POS
                               SetXPOSValue GXPOS
+                         CASE 9    ' set Y POS
+                              SetYPOSValue GYPOS
+                         CASE 10    ' set R POS
+                              SetRPOSValue GRPOS
                          CASE ELSE
                     END SELECT
                END IF

@@ -811,7 +811,7 @@ END SUB
 
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
-
+GLOBAL GXPOS AS LONG
 
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
@@ -840,6 +840,11 @@ SUB GUISetRMotor(BYVAL State&)
      ELSE
           EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 7
      END IF
+END SUB
+
+SUB GUISetXPos(BYVAL XPOS&)
+    GXPOS = XPOS&
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 8
 END SUB
 
 
@@ -891,6 +896,8 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 0
                          CASE 7    ' set R Motor ON
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 1
+                         CASE 8    ' set X POS
+                              EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
                          CASE ELSE
                     END SELECT
                END IF

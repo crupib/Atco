@@ -11,6 +11,7 @@
 ' GUISetXMotor State&                             (sets X Motor ON/OFF button state. 1 = ON, 0 = OFF)
 ' GUISetYMotor State&                             (sets Y Motor ON/OFF button state. 1 = ON, 0 = OFF)
 ' GUISetRMotor State&                             (sets R Motor ON/OFF button state. 1 = ON, 0 = OFF)
+' GUISetXPos validXPOS&                           (sets X POS)
 GLOBAL bc_string AS STRING
 
 FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
@@ -31,7 +32,9 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                               GUISetClose
                               EXIT LOOP
                          END IF
-
+                    CASE 105
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
+                          GUISetXPOS 20
                     CASE ELSE
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
                          GUISetXMotor 0

@@ -1,0 +1,18 @@
+
+SetPolar_GUI (On/Off, Color)
+SetCartesian_GUI ( On/Off,  Color) 
+SetXMotor_GUI ( On/Off, Color)
+SetYMotor_GUI ( On/Off , Color)
+SetRMotor _GUI( On/Off, Color)
+SetContinuous_GUI (On/Off,Color)
+SetStep_GUI (On/Off,Color)
+SetJogRate_GUI (String)
+SetXValue_GUI(String)
+SetYValue_GUI( String)
+SetRValue _GUI( String)
+ 
+ 
+Messaging:
+GetInput_GUI(PromptString$,  ReturnString$)
+SendMessage_GUI(Message$)  =  message box with “OK” to click or press enter key
+

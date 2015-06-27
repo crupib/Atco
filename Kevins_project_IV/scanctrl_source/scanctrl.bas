@@ -421,7 +421,7 @@ END FUNCTION
 SUB EZ_MAIN_Design()
      ' separate each menu item with the | character
      ' FILE menu Items
-     DATA "File Item 1|File Item 2|File Item 3|File Item 4|File Item 5|File Item 6"
+     DATA "Open File|File Item 2|File Item 3|File Item 4|File Item 5|File Item 6"
      ' SETUP menu items
      DATA "SETUP Item 1|SETUP Item 2|SETUP Item 3|SETUP Item 4|SETUP Item 5|SETUP Item 6"
      ' WINDOW menu items
@@ -821,7 +821,7 @@ END SUB
 
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
-GLOBAL GXPOS, GYPOS, GRPOS AS LONG
+GLOBAL GXPOS, GYPOS, GRPOS, GONOFF AS LONG
 
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
@@ -867,7 +867,10 @@ SUB GUISetRPos(BYVAL RPOS&)
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 10
 END SUB
 
-
+SUB GUIGoAutoScan(ONOFF AS LONG)
+    GONOFF = ONOFF
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 11
+END SUB
 
 
 
@@ -924,6 +927,12 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetYPOSValue GYPOS
                          CASE 10    ' set R POS
                               SetRPOSValue GRPOS
+                         CASE 11    ' Go Button hit!
+                             IF GONOFF THEN
+                                EZ_EnableC "MAIN", %MAIN_BUTTONGOSCAN
+                             ELSE
+                                EZ_DisableC "MAIN", %MAIN_BUTTONGOSCAN
+                             END IF
                          CASE ELSE
                     END SELECT
                END IF

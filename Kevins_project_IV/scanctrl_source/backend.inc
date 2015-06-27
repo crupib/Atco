@@ -14,6 +14,7 @@
 ' GUISetRMotor State&                             (sets R Motor ON/OFF button state. 1 = ON, 0 = OFF)
 ' GUISetXPos validXPOS&                       'bc (sets X POS) 'Calls SetXPOSValue (places value in text box, converts from numeral to string. STR$)
 ' GUISetYPos validYPOS&                       'bc (sets Y POS) 'Calls SetXPOSValue (places value in text box, converts from numeral to string. STR$)
+' GUISetRPos validRPOS&                       'bc (sets R POS) 'Calls SetRPOSValue (places value in text box, converts from numeral to string. STR$)
 GLOBAL bc_string AS STRING
 '%MAIN_BUTTONXPOS         = 105                'bc Brought over from scanctrl.bas - maybe we can put these in an include file   ; I added the include file, but not in the main scanctrl.bas
 GLOBAL bc_string AS STRING
@@ -45,6 +46,9 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                     CASE %MAIN_BUTTONRPOS
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
                           GUISetRPOS 35  '*** bc - Kevin this only updates the Value in the RPOS Box - it does not ask user for input. That would be a higher level call - see what Chris thinks'
+                    CASE %MAIN_BUTTONGOSCAN
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GuiGoAutoscan 0
                     CASE ELSE
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
                          GUISetXMotor 0    'bc I did this as a test

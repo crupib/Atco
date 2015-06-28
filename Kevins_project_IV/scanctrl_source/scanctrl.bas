@@ -733,6 +733,7 @@ RETURN
 END SUB
 
 'bc added 06/27/2015 functions to update main form
+'bc step one for adding button code
 SUB SetXPOSValue (BYVAL GXPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
 END SUB
@@ -741,6 +742,20 @@ SUB SetYPOSValue (BYVAL GYPOS AS LONG)
 END SUB
 SUB SetRPOSValue (BYVAL GRPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTRPOS, STR$(GRPOS)
+END SUB
+SUB SetAllOn (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONALLON
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONALLON
+    END IF
+END SUB
+SUB SetAllOff (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONALLOFF
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONALLOFF
+    END IF
 END SUB
 'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
@@ -826,7 +841,7 @@ END SUB
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
 GLOBAL GXPOS, GYPOS, GRPOS, GENDIS AS LONG
-
+'bc - step 2 add a FakeID
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
      EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 1
@@ -879,7 +894,15 @@ SUB GUISTOPScan(ENDIS AS LONG)          ' stop scan
     GENDIS = ENDIS
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 12
 END SUB
+SUB GUIAllOn(ENDIS AS LONG)          ' All motors on
+    GENDIS = ENDIS
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 13
+END SUB
 
+SUB GUIAllOff(ENDIS AS LONG)          ' All motors off
+    GENDIS = ENDIS
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 14
+END SUB
 
 
 
@@ -914,6 +937,7 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
 
                     END SELECT
                END IF
+'bc - add Step 3 add button
           CASE %MAIN_FakeID
                IF CMsg&=%EZ_Thread THEN
                     SELECT CASE CVal&
@@ -950,6 +974,10 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                              ELSE
                                 EZ_DisableC "MAIN", %MAIN_BUTTONSTOPSCAN
                              END IF
+                         CASE 13    'All on Button hit! this can be modified to anything    'bc
+                              SetAllOn GENDIS
+                         CASE 14   'All off Button hit! this can be modified to anything    'bc
+                              SetAllOff GENDIS
                          CASE ELSE
                     END SELECT
                END IF

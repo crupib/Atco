@@ -162,6 +162,7 @@ GLOBAL SCN AS ScanVars
 ' GUISetRPos validRPOS&                       'bc (sets R POS) 'Calls SetRPOSValue (places value in text box, converts from numeral to string. STR$)
 ' GUIGoAutoScan enable disable button         GENDIS = ENDIS - example; GuiGoAutoscan 0 '(DISABLE)    GuiGoAutoscan 1 '(ENABLE)
 ' GUIStopScan enable disable button           GENDIS = ENDIS - example; GuiStopscan 0 '(DISABLE)    GuiStopscan 1 '(ENABLE)
+' GUIAllOff (disable/enable) button           GENDIS = ENDIS - example; GUIAllOff 0 '(DISABLE)    GUIAllOff 1 '(ENABLE)
 
 DECLARE FUNCTION mystring(BYVAL bc_string$) AS STRING
 
@@ -178,6 +179,7 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
      GUISetRMotor 1
      bc_string = "Bill"
      bc_string = mystring(bc_string)
+     'bc - step 4 to add button
      DO                                                  'Kevins MAIN start
           GUIGetUserInput CID&, CMsg&, CVal&             'Main routine to recieve button clicks and keyboard presses
           IF CID&<>%GUINoInput THEN
@@ -208,6 +210,14 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                           bc_string = "StopSCAN button hit!"
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
                           GuiStopscan DISABLE
+                    CASE %MAIN_BUTTONALLON
+                          bc_string = "AllOn button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GuiAllOn DISABLE
+                    CASE %MAIN_BUTTONALLOFF
+                          bc_string = "AllOff button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GuiAllOff DISABLE
                     CASE ELSE
                          bc_string = "Default string"
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string

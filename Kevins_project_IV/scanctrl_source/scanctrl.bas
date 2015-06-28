@@ -757,6 +757,20 @@ SUB SetAllOff (GENDIS AS LONG)
        EZ_DisableC "MAIN",%MAIN_BUTTONALLOFF
     END IF
 END SUB
+SUB SetAllPOS (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONALLPOS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONALLPOS
+    END IF
+END SUB
+SUB SetJOGXPlus (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGXPLUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGXPLUS
+    END IF
+END SUB
 'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      LOCAL T$
@@ -870,6 +884,7 @@ SUB GUISetRMotor(BYVAL State&)
           EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 7
      END IF
 END SUB
+
 'bc - added by me
 SUB GUISetXPos(BYVAL XPOS&)
     GXPOS = XPOS&
@@ -902,6 +917,14 @@ END SUB
 SUB GUIAllOff(ENDIS AS LONG)          ' All motors off
     GENDIS = ENDIS
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 14
+END SUB
+SUB GUISetAllPOS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 15
+END SUB
+SUB GUISetXPLUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 16
 END SUB
 
 
@@ -978,6 +1001,10 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetAllOn GENDIS
                          CASE 14   'All off Button hit! this can be modified to anything    'bc
                               SetAllOff GENDIS
+                         CASE 15   'Set AllPos  Button hit! this can be modified to anything    'bc
+                              SetAllPos GENDIS
+                         CASE 16   'Set SetXPLUS  Button hit! this can be modified to anything    'bc
+                              SetJOGXPlus GENDIS
                          CASE ELSE
                     END SELECT
                END IF

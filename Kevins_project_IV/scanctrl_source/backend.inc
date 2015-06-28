@@ -218,6 +218,14 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                           bc_string = "AllOff button hit!"
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
                           GuiAllOff DISABLE
+                     CASE %MAIN_BUTTONALLPOS
+                          bc_string = "Set All Position  button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GUISetAllPOS DISABLE
+                     CASE %MAIN_BUTTONJOGXPLUS
+                          bc_string = "Set XPLUS  button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GUISetXPLUS DISABLE
                     CASE ELSE
                          bc_string = "Default string"
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string

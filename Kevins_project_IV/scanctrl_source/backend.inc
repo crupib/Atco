@@ -15,6 +15,11 @@
 ' GUISetXPos validXPOS&                       'bc (sets X POS) 'Calls SetXPOSValue (places value in text box, converts from numeral to string. STR$)
 ' GUISetYPos validYPOS&                       'bc (sets Y POS) 'Calls SetXPOSValue (places value in text box, converts from numeral to string. STR$)
 ' GUISetRPos validRPOS&                       'bc (sets R POS) 'Calls SetRPOSValue (places value in text box, converts from numeral to string. STR$)
+' GUIGoAutoScan enable disable button         GENDIS = ENDIS - example; GuiGoAutoscan 0 '(DISABLE)    GuiGoAutoscan 1 '(ENABLE)
+' GUIStopScan enable disable button           GENDIS = ENDIS - example; GuiStopscan 0 '(DISABLE)    GuiStopscan 1 '(ENABLE)
+
+DECLARE FUNCTION mystring(BYVAL bc_string$) AS STRING
+
 GLOBAL bc_string AS STRING
 '%MAIN_BUTTONXPOS         = 105                'bc Brought over from scanctrl.bas - maybe we can put these in an include file   ; I added the include file, but not in the main scanctrl.bas
 GLOBAL bc_string AS STRING
@@ -28,8 +33,8 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
      GUISetRMotor 1
      bc_string = "Bill"
      bc_string = mystring(bc_string)
-     DO                                                  'Kevins MAIN
-          GUIGetUserInput CID&, CMsg&, CVal&
+     DO                                                  'Kevins MAIN start
+          GUIGetUserInput CID&, CMsg&, CVal&             'Main routine to recieve button clicks and keyboard presses
           IF CID&<>%GUINoInput THEN
                SELECT CASE CID&
                     CASE 0
@@ -47,13 +52,18 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
                           GUISetRPOS 35  '*** bc - Kevin this only updates the Value in the RPOS Box - it does not ask user for input. That would be a higher level call - see what Chris thinks'
                     CASE %MAIN_BUTTONGOSCAN
+                          bc_string = "GoAutoSCAN button hit!"
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
-                          GuiGoAutoscan 0
+                          GuiGoAutoscan DISABLE
+                    CASE %MAIN_BUTTONSTOPSCAN
+                          bc_string = "StopSCAN button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GuiStopscan DISABLE
                     CASE ELSE
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string
                          GUISetXMotor 0    'bc I did this as a test
                END SELECT
-          END IF                                       'Kevins MAIN
+          END IF                                       'Kevins MAIN atop
      LOOP
      FUNCTION=0
 END FUNCTION

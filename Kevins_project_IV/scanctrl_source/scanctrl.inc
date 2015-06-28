@@ -31,3 +31,7 @@
 %MAIN_BUTTONJOGSTEP      = 235
 %MAIN_BUTTONEXTRA        = 240     ' first extra button ID (18 buttons total)
 %MAIN_MAINCANVAS         = 330
+MACRO CONST = MACRO
+'misc const values
+CONST ENABLE = -1
+CONST DISABLE = 0

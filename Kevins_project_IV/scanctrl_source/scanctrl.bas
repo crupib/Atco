@@ -177,6 +177,7 @@ END SUB
 
 FUNCTION Main_Initialize(BYVAL VerNum&) AS LONG
      LOCAL RV&
+     'bc - any initialize code you want to include
      App_XMotorState&=0
      App_YMotorState&=0
      App_RMotorState&=0
@@ -421,6 +422,7 @@ END FUNCTION
 SUB EZ_MAIN_Design()
      ' separate each menu item with the | character
      ' FILE menu Items
+     'bc see above discription
      DATA "Open File|File Item 2|File Item 3|File Item 4|File Item 5|File Item 6"
      ' SETUP menu items
      DATA "SETUP Item 1|SETUP Item 2|SETUP Item 3|SETUP Item 4|SETUP Item 5|SETUP Item 6"
@@ -729,7 +731,8 @@ BuildDropMenu:
 RETURN
 
 END SUB
-'bc added 06/27/2015
+
+'bc added 06/27/2015 functions to update main form
 SUB SetXPOSValue (BYVAL GXPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
 END SUB
@@ -739,7 +742,7 @@ END SUB
 SUB SetRPOSValue (BYVAL GRPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTRPOS, STR$(GRPOS)
 END SUB
-
+'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      LOCAL T$
      T$=EZ_GetText(FormName$, CID&)
@@ -747,6 +750,7 @@ SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      T$=MakeButtonRedGreen(T$, BState&)
      EZ_SetText FormName$, CID&, T$
 END SUB
+
 
 GLOBAL App_Stack() AS LONG
 GLOBAL App_StackTop&
@@ -821,7 +825,7 @@ END SUB
 
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
-GLOBAL GXPOS, GYPOS, GRPOS, GONOFF AS LONG
+GLOBAL GXPOS, GYPOS, GRPOS, GENDIS AS LONG
 
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
@@ -851,10 +855,10 @@ SUB GUISetRMotor(BYVAL State&)
           EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 7
      END IF
 END SUB
-
+'bc - added by me
 SUB GUISetXPos(BYVAL XPOS&)
     GXPOS = XPOS&
-    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 8
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 8            'this is handled by the appstack, a number needs to be added.
 END SUB
 
 SUB GUISetYPos(BYVAL YPOS&)
@@ -867,10 +871,16 @@ SUB GUISetRPos(BYVAL RPOS&)
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 10
 END SUB
 
-SUB GUIGoAutoScan(ONOFF AS LONG)
-    GONOFF = ONOFF
+SUB GUIGoAutoScan(ENDIS AS LONG)
+    GENDIS = ENDIS
     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 11
 END SUB
+SUB GUISTOPScan(ENDIS AS LONG)          ' stop scan
+    GENDIS = ENDIS
+    EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 12
+END SUB
+
+
 
 
 
@@ -921,17 +931,24 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 0
                          CASE 7    ' set R Motor ON
                               SetRedGreenState "MAIN", %MAIN_BUTTONRONOFF, 1
+                              'bc added for each FakeID
                          CASE 8    ' set X POS
                               SetXPOSValue GXPOS
                          CASE 9    ' set Y POS
                               SetYPOSValue GYPOS
                          CASE 10    ' set R POS
                               SetRPOSValue GRPOS
-                         CASE 11    ' Go Button hit!
-                             IF GONOFF THEN
+                         CASE 11    ' Go Button hit! this can be modified to anything    'bc
+                             IF GENDIS THEN
                                 EZ_EnableC "MAIN", %MAIN_BUTTONGOSCAN
                              ELSE
                                 EZ_DisableC "MAIN", %MAIN_BUTTONGOSCAN
+                             END IF
+                         CASE 12    'Stop Button hit! this can be modified to anything    'bc
+                             IF GENDIS THEN
+                                EZ_EnableC "MAIN", %MAIN_BUTTONSTOPSCAN
+                             ELSE
+                                EZ_DisableC "MAIN", %MAIN_BUTTONSTOPSCAN
                              END IF
                          CASE ELSE
                     END SELECT

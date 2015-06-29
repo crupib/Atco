@@ -96,6 +96,7 @@ GLOBAL App_RMotorState&
 %MAIN_BUTTONJOGCONT      = 230
 %MAIN_BUTTONJOGSTEP      = 235
 %MAIN_BUTTONEXTRA        = 240     ' first extra button ID (18 buttons total)
+
 %MAIN_MAINCANVAS         = 330
 %MAIN_LABELSTATUS        = 335
 %MAIN_LABELXPOS          = 340
@@ -423,7 +424,7 @@ SUB EZ_MAIN_Design()
      ' separate each menu item with the | character
      ' FILE menu Items
      'bc see above discription
-     DATA "Open File|File Item 2|File Item 3|File Item 4|File Item 5|File Item 6"
+     DATA "Open File|Save File|File Item 3|File Item 4|File Item 5|File Item 6"
      ' SETUP menu items
      DATA "SETUP Item 1|SETUP Item 2|SETUP Item 3|SETUP Item 4|SETUP Item 5|SETUP Item 6"
      ' WINDOW menu items
@@ -806,6 +807,54 @@ SUB SetJOGRMINUS (GENDIS AS LONG)
        EZ_DisableC "MAIN",%MAIN_BUTTONJOGRMINUS
     END IF
 END SUB
+'%MAIN_BUTTONPOLAR
+SUB SetPolar (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONPOLAR
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONPOLAR
+    END IF
+END SUB
+'%MAIN_BUTTONCARTESIAN
+SUB SetCARTESIAN  (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONCARTESIAN
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONCARTESIAN
+    END IF
+END SUB
+'%MAIN_BUTTONJOGCONT
+SUB SetJogCont  (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGCONT
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGCONT
+    END IF
+END SUB
+'%MAIN_BUTTONJOGSTEP
+SUB SetJOGSTEP   (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGSTEP
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGSTEP
+    END IF
+END SUB
+'%MAIN_BUTTONEXTRASCAN
+SUB SetEXTRAScan     (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONEXTRASCAN
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONEXTRASCAN
+    END IF
+END SUB
+'%MAIN_BUTTONEXTRA
+SUB SetExtraButtons(GENDIS AS LONG, BYVAL G_ID AS LONG)
+     IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONEXTRA+G_ID
+    ELSE
+       EZ_DisableC "MAIN", %MAIN_BUTTONEXTRA+G_ID
+    END IF
+END SUB
 
 'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
@@ -890,7 +939,7 @@ END SUB
 
 GLOBAL App_MainHandle&
 GLOBAL App_StatusText$
-GLOBAL GXPOS, GYPOS, GRPOS, GENDIS AS LONG
+GLOBAL GXPOS, GYPOS, GRPOS, GENDIS, G_ID AS LONG
 'bc - step 2 add a FakeID
 SUB GUIPrintStatus(BYVAL SText$)
      App_StatusText$=SText$
@@ -982,6 +1031,31 @@ SUB GUISetRMINUS(ENDIS AS LONG)
      GENDIS = ENDIS
      EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 21
 END SUB
+SUB GUISetPolar(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 22
+END SUB
+SUB GUISetCartesian(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 23
+END SUB
+SUB GUISetJOGCont(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 24
+END SUB
+SUB GUISetJOGStep(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 25
+END SUB
+SUB GUISetExtraScan(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 26
+END SUB
+SUB GUISetExtra(ENDIS AS LONG, BYVAL ID&)
+     GENDIS = ENDIS
+     G_ID = ID&
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 27
+END SUB
 'bc  end of roustine
 
 
@@ -1069,6 +1143,18 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetJOGRPlus GENDIS
                          CASE 21  'Set SetRMINUS  Button hit! this can be modified to anything    'bc
                               SetJOGRMINUS GENDIS
+                         CASE 22  'Set SetPolar  Button hit! this can be modified to anything    'bc
+                              SetPolar GENDIS
+                         CASE 23  'Set SetCartesian  Button hit! this can be modified to anything    'bc
+                              SetCartesian GENDIS
+                         CASE 24  'Set SetJogCont  Button hit! this can be modified to anything    'bc
+                              SetJogCont GENDIS
+                         CASE 25  'Set SetJogStep  Button hit! this can be modified to anything    'bc
+                              SetJogStep GENDIS
+                         CASE 26  'Set SetExtraScan  Button hit! this can be modified to anything    'bc
+                              SetExtraScan GENDIS
+                         CASE 27  'Set SetExtra  Button hit! this can be modified to anything    'bc
+                              SetExtraButtons GENDIS, G_ID
                          CASE ELSE
                     END SELECT
                END IF

@@ -168,6 +168,10 @@ GLOBAL SCN AS ScanVars
 'GUISetAllPOS  (disable/enable) button           GENDIS = ENDIS - example - See above
 'GuiAllOff     (disable/enable) button           GENDIS = ENDIS - example - See above
 'GuiAllOn      (disable/enable) button           GENDIS = ENDIS - example - See above
+'GUISetYPLUS   (disable/enable) button           GENDIS = ENDIS - example - See above
+'GUISetYMINUS  (disable/enable) button           GENDIS = ENDIS - example - See above
+'GUISetRPLUS   (disable/enable) button           GENDIS = ENDIS - example - See above
+'GUISetRMINUS  (disable/enable) button           GENDIS = ENDIS - example - See above
 DECLARE FUNCTION mystring(BYVAL bc_string$) AS STRING
 
 GLOBAL bc_string AS STRING
@@ -242,6 +246,14 @@ FUNCTION BackEndThreadFunc(BYVAL IFlag&) AS LONG
                           bc_string = "Set Y MINUS   button hit!"
                           GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
                           GUISetYMINUS  DISABLE
+                    CASE %MAIN_BUTTONJOGRPLUS
+                          bc_string = "Set RPLUS  button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GUISetRPLUS DISABLE
+                     CASE %MAIN_BUTTONJOGRMINUS
+                          bc_string = "Set R MINUS   button hit!"
+                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string       'I added bc_string whoo hoo!
+                          GUISetRMINUS  DISABLE
                     CASE ELSE
                          bc_string = "Default string"
                          GUIPrintStatus "Control ID: "+STR$(CID&)+"  Control Message: "+STR$(CMsg&)+"  Value: "+STR$(CVal&)+" " + bc_string

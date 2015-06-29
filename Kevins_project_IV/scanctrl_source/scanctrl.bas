@@ -792,6 +792,20 @@ SUB SetJOGYMINUS (GENDIS AS LONG)
        EZ_DisableC "MAIN",%MAIN_BUTTONJOGYMINUS
     END IF
 END SUB
+SUB SetJOGRPlus (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGRPLUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGRPLUS
+    END IF
+END SUB
+SUB SetJOGRMINUS (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGRMINUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGRMINUS
+    END IF
+END SUB
 
 'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
@@ -960,6 +974,14 @@ SUB GUISetYMINUS(ENDIS AS LONG)
      GENDIS = ENDIS
      EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 19
 END SUB
+SUB GUISetRPLUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 20
+END SUB
+SUB GUISetRMINUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 21
+END SUB
 'bc  end of roustine
 
 
@@ -1043,6 +1065,10 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetJOGYPlus GENDIS
                          CASE 19  'Set SetYMINUS  Button hit! this can be modified to anything    'bc
                               SetJOGYMINUS GENDIS
+                         CASE 20   'Set SetRPLUS  Button hit! this can be modified to anything    'bc
+                              SetJOGRPlus GENDIS
+                         CASE 21  'Set SetRMINUS  Button hit! this can be modified to anything    'bc
+                              SetJOGRMINUS GENDIS
                          CASE ELSE
                     END SELECT
                END IF

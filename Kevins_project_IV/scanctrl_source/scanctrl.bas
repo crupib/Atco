@@ -733,7 +733,7 @@ RETURN
 END SUB
 
 'bc added 06/27/2015 functions to update main form
-'bc step one for adding button code
+'bc step 1 one for adding button code
 SUB SetXPOSValue (BYVAL GXPOS AS LONG)
     EZ_SetText "MAIN", %MAIN_TEXTXPOS, STR$(GXPOS)
 END SUB
@@ -771,6 +771,28 @@ SUB SetJOGXPlus (GENDIS AS LONG)
        EZ_DisableC "MAIN",%MAIN_BUTTONJOGXPLUS
     END IF
 END SUB
+SUB SetJOGXMINUS (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGXMINUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGXMINUS
+    END IF
+END SUB
+SUB SetJOGYPlus (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGYPLUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGYPLUS
+    END IF
+END SUB
+SUB SetJOGYMINUS (GENDIS AS LONG)
+    IF GENDIS THEN
+       EZ_EnableC "MAIN", %MAIN_BUTTONJOGYMINUS
+    ELSE
+       EZ_DisableC "MAIN",%MAIN_BUTTONJOGYMINUS
+    END IF
+END SUB
+
 'bc end
 SUB SetRedGreenState(BYVAL FormName$, BYVAL CID&, BYVAL BState&)
      LOCAL T$
@@ -926,9 +948,19 @@ SUB GUISetXPLUS(ENDIS AS LONG)
      GENDIS = ENDIS
      EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 16
 END SUB
-
-
-
+SUB GUISetXMINUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 17
+END SUB
+SUB GUISetYPLUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 18
+END SUB
+SUB GUISetYMINUS(ENDIS AS LONG)
+     GENDIS = ENDIS
+     EZ_SendThreadEvent App_MainHandle&, %MAIN_FakeID, 19
+END SUB
+'bc  end of roustine
 
 
 %MAIN_Thread1  =    10
@@ -1005,6 +1037,12 @@ SUB EZ_MAIN_ParseEvents(CID&, CMsg&, CVal&, Cancel&)
                               SetAllPos GENDIS
                          CASE 16   'Set SetXPLUS  Button hit! this can be modified to anything    'bc
                               SetJOGXPlus GENDIS
+                         CASE 17   'Set SetXMINUS  Button hit! this can be modified to anything    'bc
+                              SetJOGXMINUS GENDIS
+                         CASE 18   'Set SetYPLUS  Button hit! this can be modified to anything    'bc
+                              SetJOGYPlus GENDIS
+                         CASE 19  'Set SetYMINUS  Button hit! this can be modified to anything    'bc
+                              SetJOGYMINUS GENDIS
                          CASE ELSE
                     END SELECT
                END IF

@@ -11,7 +11,8 @@ DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEG
 FUNCTION PBMAIN () AS LONG
    LOCAL I,J AS INTEGER
    LOCAL filename AS STRING
-   LOCAL myheader, header AS LONG
+   LOCAL myheader AS LONG
+   LOCAL HEADER AS LONG
    LOCAL filenumber AS INTEGER
    LOCAL offset AS INTEGER
    DIM myarray1(5) AS DOUBLE
@@ -21,7 +22,7 @@ FUNCTION PBMAIN () AS LONG
    DIM myarray5(5) AS DOUBLE
    DIM arrayreadin (5) AS DOUBLE
    filename = "Test.cal"
-   header = 5
+   HEADER = 5
    myheader = 9999
    FOR I%=0 TO 5
       MyArray1(I%) = 1.0
@@ -31,8 +32,8 @@ FUNCTION PBMAIN () AS LONG
       MyArray4(I%) = 5.0
    NEXT I%
    FCreate (filenumber, 0, filename)
-   CALL DFWriteLong(filenumber, BYVAL VARPTR(header), 0)
-   offset = LEN(header)
+   CALL DFWriteLong(filenumber, BYVAL VARPTR(HEADER), 0)
+   offset = LEN(HEADER)
    CALL DFWriteArray( filenumber,BYVAL VARPTR(myarray1()) ,offset)
    offset = offset+50
    CALL DFWriteArray( filenumber,BYVAL VARPTR(myarray2()) ,offset)
@@ -45,7 +46,7 @@ FUNCTION PBMAIN () AS LONG
    offset = offset+50
 
    CALL DFReadLong (filenumber, BYVAL VARPTR(myheader), 0)
-   offset = LEN(header)
+   offset = LEN(HEADER)
    CALL DFReadArray (filenumber,BYVAL VARPTR(arrayreadin()) , offset)
    PRINT myheader
    FOR I%=0 TO 5

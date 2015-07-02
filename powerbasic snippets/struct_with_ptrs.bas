@@ -17,16 +17,18 @@ GLOBAL mystruc AS udt1
 FUNCTION PBMAIN () AS LONG
 DIM myarray(10) AS DOUBLE
 DIM xPtr AS DOUBLE POINTER
-myarray(0) = 2.335
-myarray(1) = 2.9
-mystruc.R(0) = 1.0
-mystruc.R(1) = 2.2
-mystruc.S(1,2) = 2.33001
-xPtr = VARPTR(myarray(0))
-mystruc.xPtr = VARPTR(myarray(0))
-PRINT @xPtr[0]
-PRINT mystruc.@xPtr[0]
-PRINT mystruc.R(0)
-PRINT mystruc.S(1,2)
-WAITKEY$
+    myarray(0) = 4.335
+    myarray(1) = 5.9
+    mystruc.R(0) = 6.0
+    mystruc.R(1) = 7.2
+    mystruc.S(1,2) = 8.33001
+    mystruc.S(0,0) = 9.33001
+    xPtr = VARPTR(myarray(0))
+    mystruc.xPtr = VARPTR(myarray(0))
+    PRINT "xPtr " @xPtr[0]
+    PRINT "mystruc.xPtr " mystruc.@xPtr[1]
+    PRINT "R " mystruc.R(0)
+    PRINT "S " mystruc.S(1,2)
+    PRINT "S " mystruc.S(0,0)
+    WAITKEY$
 END FUNCTION

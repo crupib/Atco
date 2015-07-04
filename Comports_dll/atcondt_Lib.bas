@@ -392,10 +392,13 @@ FUNCTION comportlist ALIAS "comportlist" (BYREF comlist() AS STRING)  EXPORT AS 
        IF LEN(InfoArray(%Friendly, Looper)) THEN
        END IF
        IF LEN(InfoArray(%Manufacturer, Looper)) THEN
+
        END IF
        IF LEN(InfoArray(%PortName, Looper)) THEN
-          comlist(comlistidx) = InfoArray(%PortName, Looper)
-          comlistidx = comlistidx+1
+          IF InfoArray(%Manufacturer, Looper) = "FTDI" THEN
+            comlist(comlistidx) = InfoArray(%PortName, Looper)
+            comlistidx = comlistidx+1
+          END IF
        END IF
      NEXT
 

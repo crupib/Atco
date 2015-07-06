@@ -881,7 +881,7 @@ SUB JogJoyStk
   DO
       ' DIALOG DOEVENTS 20 TO COUNT
 
-      EZ_DoEvents  5
+      'EZ_DoEvents  5
       IF ExitSub THEN EXIT DO
       'calculated PWM output based on A/D 1 & 2
       IF Glo.Ad2 <= 127 THEN 'left
@@ -1292,9 +1292,9 @@ END FUNCTION
 
 SUB XScan
     LOCAL MoveToPos1, MoveToPos2 AS LONG
-    EZ_DoEvents  5
+    'EZ_DoEvents  5
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.YDataStart AND SCANstruc.IndexCt) <= SCANstruc.YDataEnd
-      EZ_DoEvents  5
+      'EZ_DoEvents  5
       UStop = DoY(SCANstruc.YIndexCts * SCANstruc.IndexCt)'index Y axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.XCts > SCANstruc.XStartCts + (SCANstruc.XEndCts - SCANstruc.XStartCts) / 2 THEN
@@ -1316,9 +1316,9 @@ END SUB
 
 SUB YScan
     LOCAL MoveToPos1, MoveToPos2 AS LONG
-    EZ_DoEvents  5
+    'EZ_DoEvents  5
     DO WHILE SCANstruc.IndexCt >= (SCANstruc.XDataStart AND SCANstruc.IndexCt) <= SCANstruc.XDataEnd
-      EZ_DoEvents  5
+     ' EZ_DoEvents  5
       UStop = DoX(SCANstruc.XIndexCts * SCANstruc.IndexCt)'index X axis into position
       IF UStop THEN EXIT DO 'check if user hit stop
       IF SCANstruc.YCts > SCANstruc.YStartCts + (SCANstruc.YEndCts - SCANstruc.YStartCts) / 2 THEN
@@ -1344,10 +1344,10 @@ FUNCTION DoX (MPos AS LONG) AS INTEGER
    LOCAL MoveToCts AS LONG
    MoveToCts& = GetXCord(MPos&)
    CALL MoveX(MoveToCts&)
-   EZ_DoEvents  5
+  ' EZ_DoEvents  5
    DO
      'DIALOG DOEVENTS 1
-      EZ_DoEvents  5
+      'EZ_DoEvents  5
       IF KeyDown <> 0 THEN 'user pressed KEYPAD
        DoX = TRUE: EXIT FUNCTION
       END IF
@@ -1368,10 +1368,10 @@ FUNCTION DoY (MPos AS LONG) AS INTEGER
    LOCAL MoveToCts AS LONG
    MoveToCts& = GetYCord(MPos&)
    CALL MoveY(MoveToCts&)
-   EZ_DoEvents  5
+   'EZ_DoEvents  5
    DO
      'DIALOG DOEVENTS 1
-     EZ_DoEvents  5
+     'EZ_DoEvents  5
      IF KeyDown <> 0 THEN 'User pressed KEYPAD
        DoY = TRUE: EXIT FUNCTION
      END IF

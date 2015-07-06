@@ -824,6 +824,15 @@ FUNCTION Edit11SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&
    ' Pass the message on to the original window procedure... the DDT engine!
    FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
 END FUNCTION
+
+FUNCTION hformsubclass(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
+   SELECT CASE wMsg&
+      CASE %WM_KEYUP
+         DIALOG SEND GetParent(hWnd&), %WM_KEYDOWN, hDlg  , wParm&
+   END SELECT
+   ' Pass the message on to the original window procedure... the DDT engine!
+   FUNCTION = CallWindowProc(gOldEditClassProc, hWnd&, wMsg&, wParm&, lParm&)
+END FUNCTION
 FUNCTION Edit12SubClassProc(BYVAL hWnd&, BYVAL wMsg&, BYVAL wParm&, BYVAL lParm&) AS LONG
    SELECT CASE wMsg&
       CASE %WM_KEYUP

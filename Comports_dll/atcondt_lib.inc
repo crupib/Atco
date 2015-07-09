@@ -1,20 +1,6 @@
-
-'
-'    If LibMain is called with %DLL_PROCESS_ATTACH, your LibMain function
-'    should return a zero (0) if any part of your initialization process
-'    fails or a one (1) if no errors were encountered.  If a zero is
-'    returned, Windows will abort and unload the DLL from memory. When
-'    LibMain is called with any other value than %DLL_PROCESS_ATTACH, the
-'    return value is ignored.
-'
-'===============================================================================
-
-#COMPILER PBWIN 10
-#COMPILE DLL
-'=========================================================================================
-#REGISTER NONE
 #INCLUDE "Win32Api.Inc"
 'USB4
+%USB4_SUCCESS    =            0
 DECLARE FUNCTION USB4_Initialize LIB "usb4.dll" ALIAS "USB4_Initialize" (BYREF pDeviceCount AS DWORD) AS INTEGER
 DECLARE FUNCTION USB4_DeviceCount LIB "usb4.dll" ALIAS "USB4_DeviceCount" () AS INTEGER
 DECLARE FUNCTION USB4_GetCount LIB "usb4.dll" ALIAS "USB4_GetCount" (BYVAL iDeviceNo AS DWORD, BYVAL iEncoder AS DWORD, BYREF pulVal AS LONG) AS INTEGER
@@ -23,7 +9,6 @@ DECLARE FUNCTION USB4_SetMultiplier LIB "usb4.dll" ALIAS "USB4_SetMultiplier" (B
 DECLARE FUNCTION USB4_SetCounterMode LIB "usb4.dll" ALIAS "USB4_SetMultiplier" (BYVAL iDeviceNo AS DWORD, BYVAL iEncoder AS DWORD, BYVAL iVal AS LONG) AS INTEGER
 DECLARE FUNCTION USB4_SetCounterEnabled LIB "usb4.dll" ALIAS "USB4_SetCounterEnabled" (BYVAL iDeviceNo AS DWORD, BYVAL iEncoder AS DWORD, BYVAL bVal AS BYTE) AS INTEGER
 DECLARE SUB USB4_Shutdown LIB "usb4.dll" ALIAS "USB4_Shutdown" ()
-'QSB include file
 %QSB_MAX_COMM_PORTS = 255
 
 %QSB_DEFAULT_BAUD_RATE =  230400
@@ -514,8 +499,8 @@ END ENUM
 DECLARE FUNCTION QSB_InitComm LIB "QSBUser.dll" ALIAS "QSB_InitComm" (BYVAL comPort AS DWORD) AS INTEGER
 DECLARE FUNCTION QSB_InitCommScan LIB "QSBUser.dll" ALIAS "QSB_InitCommScan" (BYREF comPort AS DWORD) AS INTEGER
 DECLARE FUNCTION QSB_CloseComm LIB "QSBUser.dll" ALIAS "QSB_CloseComm" (BYVAL comPort AS DWORD) AS INTEGER
-DECLARE FUNCTION QSB_GetDeviceInfo LIB "QSBUser.dll" ALIAS "QSB_GetDeviceInfo" (BYVAL comPort AS DWORD, BYREF product AS STRING, _
-                            BYREF version AS STRING, BYREF serialNo AS STRING ) AS INTEGER
+DECLARE FUNCTION QSB_GetDeviceInfo LIB "QSBUser.dll" ALIAS "QSB_GetDeviceInfo" (BYVAL comPort AS DWORD, BYREF product AS STRING * 10, _
+                            BYREF version AS STRING * 10, BYREF serialNo AS STRING * 10 ) AS INTEGER
 DECLARE FUNCTION QSB_GetResponseFormat LIB "QSBUser.dll" ALIAS "QSB_GetResponseFormat" (BYVAL comPort AS DWORD, BYREF linefeed AS BYTE, _
                             BYREF carriageReturn AS BYTE, BYREF timeStamp AS BYTE, BYREF spaces AS BYTE ) AS INTEGER
 DECLARE FUNCTION QSB_SetResponseFormat LIB "QSBUser.dll" ALIAS "QSB_SetResponseFormat" (BYVAL comPort AS DWORD, BYREF elinefeed AS BYTE, _
@@ -555,7 +540,6 @@ DECLARE FUNCTION QSB_SetDirection LIB "QSBUser.dll" ALIAS "QSB_SetDirection" (BY
 DECLARE FUNCTION QSB_SendReceive LIB "QSBUser.dll" ALIAS "QSB_SendReceive" (BYVAL comPort AS DWORD, _
                             BYVAL ulSendSize AS LONG, BYREF pucSendBuff AS BYTE, BYREF pulRecvSize AS LONG, _
                             BYREF pucRecvBuff AS BYTE) AS INTEGER
-
 %ClassName                         = 001
 %GuidTxt                           = 002
 %Friendly                          = 003
@@ -630,8 +614,6 @@ TYPE SP_DEVICE_INTERFACE_DETAIL_DATA
   cbSize              AS DWORD
   DevicePath          AS ASCIIZ * 512
 END TYPE
-
-
 DECLARE FUNCTION SetupDiLoadClassIcon LIB "SetupApi.DLL" ALIAS "SetupDiLoadClassIcon"( _
   BYREF ClassGuid                     AS GUIDAPI, _
   BYREF hIconBig                      AS DWORD  , _
@@ -727,224 +709,6 @@ DECLARE FUNCTION SetupDiOpenDeviceInterfaceRegKey LIB "SetupApi.DLL" ALIAS "Setu
   BYREF DeviceInterfaceData           AS SP_DEVICE_INTERFACE_DATA, _
   BYVAL Reserved                      AS DWORD                   , _
   BYVAL samDesired                    AS DWORD) AS LONG
-'______________________________________________________________________________
-FUNCTION GetDeviceInfo(Device AS STRING, InfoArray() AS STRING) AS LONG
- LOCAL zClassName                AS ASCIIZ * %MAX_CLASS_NAME_LEN
- LOCAL zBuffer                   AS ASCIIZ * %MAX_CLASS_NAME_LEN
- LOCAL DeviceInterfaceData       AS SP_DEVICE_INTERFACE_DATA
- LOCAL DeviceInfoData            AS SP_DEVINFO_DATA
- LOCAL hDeviceInfoSet            AS DWORD
- LOCAL RequiredSize              AS DWORD
- LOCAL hKeyDevice                AS DWORD
- LOCAL HwProfile                 AS DWORD
- LOCAL PropertyRegDataType       AS DWORD
- LOCAL DevCount                  AS LONG
- LOCAL Retval                    AS LONG
- LOCAL DeviceCount               AS LONG
- LOCAL Looper                   AS LONG
- FOR Looper = 1 TO PARSECOUNT(Device, "/")
-   zClassName = PARSE$(Device, "/", Looper)
-   DevCount = 0
-
-   Retval = SetupDiClassGuidsFromName(zClassName, BYVAL 0, BYVAL 0, RequiredSize)
-   IF RequiredSize THEN
-     REDIM GuidArray(1 TO RequiredSize) AS GUIDAPI
-     Retval = SetupDiClassGuidsFromName(zClassName, GuidArray(1), _
-                                        SIZEOF(GUIDAPI) * RequiredSize, RequiredSize)
-   ELSE
-     ITERATE
-   END IF
-
-   'Get info by ClassGUID, like GUID$("{4D36E978E325-11CE-BFC1-08002BE10318})" for "Ports"
-   hDeviceInfoSet = SetupDiGetClassDevs(GuidArray(1), BYVAL %NULL, BYVAL %NULL, %DIGCF_PRESENT)
-   'Get info by registry keyname like "FLOP" in "HKEY_LOCAL_MACHINE\Enum\FLOP"
-   'zBuffer = "Flop" 'For floppy
-   'hDeviceInfoSet = SetupDiGetClassDevs(byval %NULL, zBuffer, BYVAL %NULL, %DIGCF_PRESENT OR %DIGCF_ALLCLASSES)
-   'List all devices
-   'hDeviceInfoSet = SetupDiGetClassDevs(byval %NULL, BYVAL %NULL, BYVAL %NULL, %DIGCF_PRESENT OR %DIGCF_ALLCLASSES)
-   IF hDeviceInfoSet = %INVALID_HANDLE_VALUE THEN ITERATE
-   DeviceInfoData.cbSize      = SIZEOF(DeviceInfoData)
-   DeviceInterfaceData.CbSize = SIZEOF(DeviceInterfaceData)
-   DO 'Loop to get all devices of a class
-     'Get a device based on DevCount, exit if no more
-     Retval = SetupDiEnumDeviceInfo(hDeviceInfoSet, DevCount, DeviceInfoData)
-     IF Retval = 0 THEN EXIT DO 'Last device
-     INCR DeviceCount
-     REDIM PRESERVE InfoArray(1 TO 7, 1 TO DeviceCount)
-     InfoArray(%ClassName, DeviceCount) = zClassName
-     InfoArray(%GuidTxt, DeviceCount) =  GUIDTXT$(GuidArray(DeviceCount))
-     'Get friendly name
-     zBuffer = ""
-     Retval = SetupDiGetDeviceRegistryProperty( _
-                hDeviceInfoSet      , _
-                DeviceInfoData      , _
-                %SPDRP_FRIENDLYNAME , _ 'Get friendly name
-                PropertyRegDataType , _
-                zBuffer             , _ 'Like "Communication port (COM1)"
-                SIZEOF(zBuffer)     , _
-                RequiredSize)
-     InfoArray(%Friendly, DeviceCount) = zBuffer
-     'Get device description
-     zBuffer = "None"
-     Retval = SetupDiGetDeviceRegistryProperty( _
-                hDeviceInfoSet      , _
-                DeviceInfoData      , _
-                %SPDRP_DEVICEDESC   , _
-                PropertyRegDataType , _
-                zBuffer             , _
-                SIZEOF(zBuffer)     , _
-                RequiredSize)
-     InfoArray(%DevDesc, DeviceCount) = zBuffer
-     'Get Device driver
-     zBuffer = "None"
-     Retval = SetupDiGetDeviceRegistryProperty( _
-                hDeviceInfoSet      , _
-                DeviceInfoData      , _
-                %SPDRP_DRIVER       , _
-                PropertyRegDataType , _
-                zBuffer             , _
-                SIZEOF(zBuffer)     , _
-                RequiredSize)
-     InfoArray(%DevDriver, DeviceCount) = zBuffer
-     'Get device manufacturer
-     zBuffer = ""
-     Retval = SetupDiGetDeviceRegistryProperty( _
-                hDeviceInfoSet      , _
-                DeviceInfoData      , _
-                %SPDRP_MFG          , _
-                PropertyRegDataType , _
-                zBuffer             , _
-                SIZEOF(zBuffer)     , _
-                RequiredSize)
-     InfoArray(%Manufacturer, DeviceCount) = zBuffer
-     'Get a handle to the current registry, where device was found
-     hKeyDevice = SetupDiOpenDevRegKey( _
-                    hDeviceInfoSet    , _
-                    DeviceInfoData    , _
-                    %DICS_FLAG_GLOBAL , _
-                    HwProfile         , _
-                    %DIREG_DEV        , _
-                    %KEY_QUERY_VALUE)
-     'Get PortName
-     zBuffer = ""
-     Retval = RegQueryValueEx( _
-                hKeyDevice        , _  'Handle of key to query
-                BYCOPY "portname" , _  'Address of name of value to query
-                BYVAL %NULL       , _  'Reserved
-                BYVAL %NULL       , _  'Address of buffer for value type
-                zBuffer           , _  'Address of data buffer
-                SIZEOF(zBuffer))       'Address of data buffer size
-     RegCloseKey hKeyDevice
-     InfoArray(%PortName,  DeviceCount) = zBuffer
-     INCR DevCount
-   LOOP
-   IF hDeviceInfoSet THEN
-     SetupDiDestroyDeviceInfoList hDeviceInfoSet
-     hDeviceInfoSet = 0
-   END IF
- NEXT
- FUNCTION = DeviceCount
-END FUNCTION
-'______________________________________________________________________________
-
-'=========================================================================================
-#INCLUDE ONCE "Win32api.inc"
-GLOBAL ghInstance AS DWORD
-FUNCTION LIBMAIN (BYVAL hInstance   AS LONG, _
-                  BYVAL fwdReason   AS LONG, _
-                  BYVAL lpvReserved AS LONG) AS LONG
-    SELECT CASE fwdReason
-    CASE %DLL_PROCESS_ATTACH
-        'Indicates that the DLL is being loaded by another process (a DLL
-        'or EXE is loading the DLL).  DLLs can use this opportunity to
-        'initialize any instance or global data, such as arrays.
-        ghInstance = hInstance
-        FUNCTION = 1   'success!
-        'FUNCTION = 0   'failure!  This will prevent the EXE from running.
-    CASE %DLL_PROCESS_DETACH
-        'Indicates that the DLL is being unloaded or detached from the
-        'calling application.  DLLs can take this opportunity to clean
-        'up all resources for all threads attached and known to the DLL.
-        FUNCTION = 1   'success!
-        'FUNCTION = 0   'failure!
-    CASE %DLL_THREAD_ATTACH
-        'Indicates that the DLL is being loaded by a new thread in the
-        'calling application.  DLLs can use this opportunity to
-        'initialize any thread local storage (TLS).
-        FUNCTION = 1   'success!
-        'FUNCTION = 0   'failure!
-    CASE %DLL_THREAD_DETACH
-        'Indicates that the thread is exiting cleanly.  If the DLL has
-        'allocated any thread local storage, it should be released.
-        FUNCTION = 1   'success!
-        'FUNCTION = 0   'failure!
-    END SELECT
-END FUNCTION
-
-FUNCTION comportlist ALIAS "comportlist" (BYREF comlist() AS STRING)  EXPORT AS LONG
-    STATIC ClassImageListData        AS SP_CLASSIMAGELIST_DATA
-    LOCAL  lpdis                     AS DRAWITEMSTRUCT PTR
-    LOCAL  zClassName                AS ASCIIZ * %MAX_CLASS_NAME_LEN
-    LOCAL  zTxt                      AS ASCIIZ * 300
-    LOCAL  zBuf                      AS ASCIIZ * 300
-    LOCAL  GuidInfo                  AS GUIDAPI
-    LOCAL  rc                        AS RECT
-    LOCAL  Looper                    AS LONG
-    LOCAL  DeviceCount               AS LONG
-    LOCAL  itd                       AS LONG
-    LOCAL  Retval                    AS LONG
-    STATIC hList                     AS DWORD
-    STATIC hImageList                AS DWORD
-    LOCAL  hIcon                     AS DWORD
-    LOCAL  ImageIndex                AS DWORD
-    LOCAL  RequiredSize              AS DWORD
-    LOCAL  IconPos                   AS DWORD
-    LOCAL  Device                    AS STRING
-    DIM    InfoArray(1 TO 7, 1 TO 1) AS STRING
-    'DIM    comlist(10) AS STRING
-    LOCAL  comlistidx AS INTEGER
-    LOCAL  I AS INTEGER
-
-    ClassImageListData.cbSize = SIZEOF(ClassImageListData)
-    SetupDiGetClassImageList ClassImageListData
-    hImageList = ClassImageListData.hImageList
-
-'The complete list
-'     Device = "1394/1394debug/61883/adapter/apmsupport/avc/battery/biometric/" & _
-'              "bluetooth/cdrom/computer/decoder/diskdrive/display/"            & _
-'              "dot4print/enum1394/fdc/floppydisk/gps/hdc/hidclass/image/"      & _
-'              "infrared/keyboard/legacydriver/media/mediumchanger/mtd/modem/"  & _
-'              "monitor/mouse/multifunction/multiportserial/net/netclient/"     & _
-'              "netservice/nettrans/nodriver/pcmcia/ports/printer/"             & _
-'              "printer upgrade/pnpprinters/processor/sbp2/scsiadapter/"        & _
-'              "security accelerator/smartcardreader/sound/system/tapedrive/"   & _
-'              "unknown/usb/volume/volumesnapshot/wceusbs"
-     'Device = "Ports/Modem/Printer"     'Try this
-     'Device = "Modem"                   'or this
-     Device = "Ports"                   'or this...
-     'Device = "Infrared"                'or this...
-     'Device = "Image"                   'or this...
-     'The next function will return an hardware description array based on the device string
-     DeviceCount = GetDeviceInfo(Device, InfoArray())
-     comlistidx = 0
-     'msgbox  str$(DeviceCount)
-     FOR Looper = 1 TO DeviceCount
-       zClassName = InfoArray(%ClassName, Looper)
-       Retval = SetupDiClassGuidsFromName(zClassName, GuidInfo, SIZEOF(GuidInfo) , RequiredSize)
-       Retval = SetupDiLoadClassIcon(GuidInfo, hIcon, ImageIndex )
-       IF LEN(InfoArray(%Friendly, Looper)) THEN
-       END IF
-       IF LEN(InfoArray(%Manufacturer, Looper)) THEN
-
-       END IF
-       IF LEN(InfoArray(%PortName, Looper)) THEN
-          IF InfoArray(%Manufacturer, Looper) = "FTDI" THEN
-            comlist(comlistidx) = InfoArray(%PortName, Looper)
-            comlistidx = comlistidx+1
-          END IF
-       END IF
-     NEXT
-
-     comportlist = comlistidx
-
-END FUNCTION
+'____________
+ DECLARE FUNCTION comportlist LIB "atcondt_lib.dll" _
+         ALIAS "comportlist" (BYREF parm1() AS STRING) AS LONG

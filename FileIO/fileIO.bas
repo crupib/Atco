@@ -15,6 +15,7 @@ DECLARE SUB FCreate (filenumber AS INTEGER, myattr AS INTEGER, filename AS STRIN
 DECLARE SUB FOpen (FileNumber AS INTEGER, ReadWrite AS INTEGER, Sharing AS INTEGER, filename AS STRING)
 
 FUNCTION PBMAIN () AS LONG
+   DIM Stand_alone_array(1000) AS EXT
    LOCAL I,J AS INTEGER
    LOCAL filename AS STRING
    filename = "Test.cal"
@@ -29,6 +30,10 @@ FUNCTION PBMAIN () AS LONG
    TestStruc.header = "Atco Cal file"
    TestStruc.NumModules = 3
    TestStruc.StatusDef = 10
+   FOR I%=0 TO 999
+      Stand_alone_array(I%) = I%*2
+   NEXT I%
+
    CalSave(filename)
    CalLoad(filename)
    PRINT TestStruc.MyMulti(5,5)
@@ -38,7 +43,8 @@ END FUNCTION
 FUNCTION CalSave(filename AS STRING) AS INTEGER
     LOCAL filenumber AS INTEGER
     FCreate (filenumber, 0, filename)
-    CALL DFWrite(filenumber, BYVAL VARPTR(TestStruc), 0)
+    CALL DFWriteStruc(filenumber, BYVAL VARPTR(TestStruc), 0)
+    CALL DFWriteArray( filenumber,BYVAL VARPTR(Stand_alone_array()) ,0)
     CALL FClose(filenumber)
 END FUNCTION
 
@@ -48,12 +54,27 @@ FUNCTION CalLoad(filename AS STRING) AS INTEGER
    CALL DFRead(filenumber, BYVAL VARPTR(TestStruc),0)
 END FUNCTION
 
-SUB DFRead (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
+SUB DFReadStruc (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
     GET filenum, offset ,PASSREC
 END SUB
 
-SUB DFWrite (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
+SUB DFWriteStruc (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
         PUT filenum,  offset ,PASSREC
+END SUB
+SUB DFReadStruc (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
+    GET filenum, offset ,PASSREC
+END SUB
+
+SUB DFWriteStruc (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)
+        PUT filenum,  offset ,PASSREC
+END SUB
+
+SUB DFWriteArray (filenum AS INTEGER,  passrec() AS EXT , OFFSET AS INTEGER)
+        PUT filenum,  offset , PASSREC()
+END SUB
+
+SUB DFReadArray (filenum AS INTEGER, passrec() AS EXT , OFFSET AS INTEGER)
+    GET filenum, offset ,PASSREC()
 END SUB
 
 SUB FCreate (filenumber AS INTEGER, ATTR AS INTEGER, filename AS STRING)

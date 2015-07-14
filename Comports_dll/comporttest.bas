@@ -1,9 +1,8 @@
 #COMPILE EXE
 #DIM ALL
-
-DECLARE FUNCTION comportlist LIB "atcondt_lib.dll" _
-         ALIAS "comportlist" (BYREF parm1() AS STRING) AS LONG
-
+'atcondt_lib includes functions specific for atco. This includes getting the number of FTDI comm ports:
+'
+#INCLUDE "atcondt_lib.inc"
 
 FUNCTION PBMAIN () AS LONG
 DIM comports(10) AS STRING

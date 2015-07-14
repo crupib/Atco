@@ -29,8 +29,7 @@ FUNCTION PBMAIN () AS LONG
    LOCAL sfilename AS STRING
    LOCAL sPath AS STRING
 
-    sPath = CURDIR$
-    ? sFilename
+   sPath = CURDIR$
 
    ' Fill 1 dimension array in structure
    FOR I%=0 TO 9
@@ -55,8 +54,8 @@ FUNCTION PBMAIN () AS LONG
         "Save File To Folder", _
         sFilename, _
         sPath, _
-        "Atco Files (*.TXT, *.dat)|*.TXT;*.dat|", _
-        "", _
+        "Nozzle Scan Files (*.nsf)|*.nsf", _
+        "nsf", _
         %OFN_ALLOWMULTISELECT OR %OFN_EXPLORER OR _
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
     )
@@ -76,8 +75,8 @@ WAITKEY$
         "Open existing file", _
         sFilename, _
         sPath, _
-        "Atco Files (*.TXT, *.dat)|*.TXT;*.dat|", _
-        "", _
+        "Nozzle Scan Files (*.nsf)|*.nsf", _
+        "nsf", _
         %OFN_ALLOWMULTISELECT OR %OFN_EXPLORER OR _
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
     )

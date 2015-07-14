@@ -18,7 +18,7 @@
 '
 ' Set this to the desired comm port.
 '$COMPORT = "\\.\COM33"
-$COMPORT = "COM3"
+$COMPORT = "COM4"
 
 '------------------------------------------------------------------------------
 ' Main program entry point...
@@ -48,7 +48,7 @@ FUNCTION PBMAIN () AS LONG
     STDOUT "Communicating on " & $COMPORT & " ... Press <ESC> key to end."
     STDOUT
 
-    COMM SET #nComm, BAUD   = 9600  ' 9600 baud
+    COMM SET #nComm, BAUD   = 230400  ' 9600 baud
     COMM SET #nComm, BYTE   = 8     ' 8 bits
     COMM SET #nComm, PARITY = 0     ' No parity
     COMM SET #nComm, STOP   = 0     ' 1 stop bit
@@ -59,6 +59,7 @@ FUNCTION PBMAIN () AS LONG
 
         ' Handle data from the serial port.
         WAITKEY$
+        COMM SEND #ncomm,"W0000"
         ncbData = COMM(#nComm, RXQUE)
         IF ncbData THEN
             COMM RECV #nComm, ncbData, sData

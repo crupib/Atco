@@ -844,5 +844,19 @@ END FUNCTION
 
 
 CALLBACK FUNCTION DlgProc () AS LONG
-' Empty
+
+LOCAL i AS LONG
+   SELECT CASE CBMSG
+      CASE %WM_INITDIALOG
+          STATIC  hform AS LONG
+          CONTROL HANDLE CBHNDL, hDlg TO hform
+          gOldEditClassProc = SetWindowLong(hform, %GWL_WNDPROC, CODEPTR(hformsubclass))
+
+      CASE %WM_KEYDOWN
+           IF CBLPARAM = %VK_ESCAPE  THEN
+                MSGBOX "OKAY"
+          END IF
+      CASE %WM_DESTROY
+         SetWindowLong hform, %GWL_WNDPROC, gOldEditClassProc
+   END SELECT
 END FUNCTION

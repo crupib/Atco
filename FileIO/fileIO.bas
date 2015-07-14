@@ -24,6 +24,7 @@ GLOBAL Stand_alone_array() AS EXT
 
 FUNCTION PBMAIN () AS LONG
    DIM Stand_alone_array(1000) AS EXT
+   DIM retval AS LONG, hWnd AS LONG
    LOCAL I,J AS INTEGER
    LOCAL sfilename AS STRING
    LOCAL sPath AS STRING
@@ -54,7 +55,7 @@ FUNCTION PBMAIN () AS LONG
         "Save File To Folder", _
         sFilename, _
         sPath, _
-        "All Files (*.*)|*.*|Text Files (*.TXT, *.BAT)|*.TXT;*.BAT|", _
+        "Atco Files (*.TXT, *.dat)|*.TXT;*.dat|", _
         "", _
         %OFN_ALLOWMULTISELECT OR %OFN_EXPLORER OR _
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
@@ -66,8 +67,22 @@ FUNCTION PBMAIN () AS LONG
    CalSave(sFilename)
    'allow time to finish writing
    SLEEP 100
+
+PRINT retval
+WAITKEY$
    'Load files back into
-   CalLoad(sFilename)
+   sPath = CURDIR$
+    OpenFileDialog(BYVAL %HWND_DESKTOP, _
+        "Open existing file", _
+        sFilename, _
+        sPath, _
+        "Atco Files (*.TXT, *.dat)|*.TXT;*.dat|", _
+        "", _
+        %OFN_ALLOWMULTISELECT OR %OFN_EXPLORER OR _
+        %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
+    )
+    ? sFilename
+     CalLoad(sFilename)
    PRINT "Some values"
    PRINT STR$(TestStruc.MyMulti(5,5))
    PRINT TestStruc.header

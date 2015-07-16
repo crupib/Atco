@@ -8,8 +8,9 @@ LOCAL x AS INTEGER
 
 myarrayPtr = VARPTR(myarray%(0))
 myfunc(myarrayPtr)
-FOR x =1 TO 10
-    PRINT myarray(x)
+FOR x =0 TO 9
+    PRINT @myarrayPtr
+    myarrayPtr= myarrayPtr+4
 NEXT x
 
 WAITKEY$
@@ -18,7 +19,7 @@ END FUNCTION
 FUNCTION myfunc (BYVAL myarrayPtr AS INTEGER POINTER) AS BYTE
 REDIM myarray(10) AS INTEGER AT myarrayPtr
 LOCAL x AS INTEGER
-FOR x =1 TO 10
+FOR x =0 TO 9
     myarray(x) = 9999+x
 NEXT x
 

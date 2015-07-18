@@ -50,13 +50,13 @@ FUNCTION PBMAIN () AS LONG
       Stand_alone_array(I%) = I%*.022
    NEXT I%
    ' Windows Save file '
-   SaveFileDialog(BYVAL %HWND_DESKTOP, _
+   retval = SaveFileDialog(BYVAL %HWND_DESKTOP, _
         "Save File To Folder", _
         sFilename, _
         sPath, _
         "Nozzle Scan Files (*.nsf)|*.nsf", _
         "nsf", _
-        %OFN_ALLOWMULTISELECT OR %OFN_EXPLORER OR _
+        %OFN_CREATEPROMPT OR %OFN_EXPLORER OR _
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
     )
     CLS
@@ -66,8 +66,6 @@ FUNCTION PBMAIN () AS LONG
    CalSave(sFilename)
    'allow time to finish writing
    SLEEP 100
-
-PRINT retval
 WAITKEY$
    'Load files back into
    sPath = CURDIR$
@@ -81,7 +79,7 @@ WAITKEY$
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
     )
     ? sFilename
-     CalLoad(sFilename)
+   CalLoad(sFilename)
    PRINT "Some values"
    PRINT STR$(TestStruc.MyMulti(5,5))
    PRINT TestStruc.header
@@ -101,7 +99,7 @@ FUNCTION CalLoad(filename AS STRING) AS INTEGER
    LOCAL filenumber AS INTEGER
    CALL FOpen (filenumber, 0,0, filename)
    CALL DFReadStruc(filenumber, BYVAL VARPTR(TestStruc),0)
-   'CALL DFReadArray(filenumber, BYVAL VARPTR(Stand_alone_array()) ,0)
+   CALL DFReadArray(filenumber, BYVAL VARPTR(Stand_alone_array()) ,SIZEOF(TestStruc))
 END FUNCTION
 
 SUB DFReadStruc (filenum AS INTEGER, passrec AS TestRecord , OFFSET AS INTEGER)

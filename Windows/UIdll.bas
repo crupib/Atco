@@ -57,7 +57,7 @@ END FUNCTION
 
 
 '-------------------------------------------------------------------------------
-' Examples of exported Subs and functions...
+'
 '
 FUNCTION KLJMessageBox ALIAS "KLJMessageBox" (BYREF Message AS STRING , BYREF title AS STRING, BYVAL typebox AS LONG) EXPORT AS LONG
 
@@ -72,9 +72,3 @@ FUNCTION KLJInput ALIAS "KLJInput" (BYREF prompt AS STRING , BYREF title AS STRI
 
 
 END FUNCTION
-
-SUB MySub1 ALIAS "MySub1" (BYVAL Param1 AS LONG) EXPORT
-
-    ' code goes here
-
-END SUB

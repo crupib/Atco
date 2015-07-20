@@ -72,9 +72,3 @@ FUNCTION KLJInput ALIAS "KLJInput" (BYREF prompt AS STRING , BYREF title AS STRI
 
 
 END FUNCTION
-
-SUB MySub1 ALIAS "MySub1" (BYVAL Param1 AS LONG) EXPORT
-
-    ' code goes here
-
-END SUB

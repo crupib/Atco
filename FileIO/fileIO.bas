@@ -79,6 +79,10 @@ WAITKEY$
         %OFN_FILEMUSTEXIST OR %OFN_NODEREFERENCELINKS _
     )
     ? sFilename
+   REDIM  stand_alone_array(1000) AS EXT
+   PRINT "Stand_alone after redim"
+   PRINT Stand_alone_array(500)
+   WAITKEY$
    CalLoad(sFilename)
    PRINT "Some values"
    PRINT STR$(TestStruc.MyMulti(5,5))

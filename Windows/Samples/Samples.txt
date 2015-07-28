@@ -1,0 +1,110 @@
+                     PowerBASIC Forms 1.51 Example Code
+
+
+  You are given permission to use any of the code in these sample programs in
+  your own programming projects with no royalty requirements. Any code you use
+  should include a PowerBASIC copyright notice in your source code comments to
+  indicate that the code is the property of PowerBASIC, Inc. You are not
+  required to provide the end user any PowerBASIC copyright information in
+  either your executable application or documentation.
+
+
+Samples\About
+-------------
+About.bas      - Example project to create an "About" box
+About.exe      - Example project to create an "About" box (compiled)
+About.pbr      - PowerBASIC compiled resource script
+About.rc       - Resource script
+PB01.ico       - Application Icon
+
+
+Samples\AutoSize
+----------------
+AutoSize.bas   - Example project: auto-size a control to dialog size
+AutoSize.exe   - Example project: auto-size a control to dialog size (compiled)
+AutoSize.pbr   - PowerBASIC compiled resource script
+AutoSize.rc    - Resource script
+
+
+Samples\CSV_Edit
+----------------
+CSV_Doc.ico    - Application Icon
+CSV_Edit.bas   - Example project for editing CSV (comma separated) files
+CSV_Edit.exe   - Example project for editing CSV files (compiled)
+CSV_Edit.pbr   - PowerBASIC compiled resource script
+CSV_Edit.rc    - Resource script
+PowerBASIC.csv - Example CSV data file
+
+
+Samples\Graphic
+---------------
+Graphic.bas    - Example project for the Graphic control
+Graphic.exe    - Example project for the Graphic control (compiled)
+Graphic.pbr    - PowerBASIC compiled resource script
+Graphic.rc     - Resource script
+
+
+Samples\Interface Explorer
+--------------------------
+AppIcon.ico            - Application Icon
+Interface Explorer.bas - Raw generated PowerBASIC Forms project code
+Interface Explorer.exe - Raw PowerBASIC Forms project (compiled)
+Interface Explorer.pbr - PowerBASIC compiled resource script
+Interface Explorer.rc  - Resource script
+
+
+Samples\Interface Explorer (Final)
+----------------------------------
+AppIcon.ico            - Application Icon
+Interface Explorer.bas - Finished (main) source code for the PB/IE project
+Interface Explorer.exe - Interface Explorer final version (compiled)
+Interface Explorer.inc - Include file containing core processing code
+Interface Explorer.pbr - PowerBASIC compiled resource script
+Interface Explorer.rc  - Resource script
+Interface.ico          - Icon for use as a TreeView control "node"
+Method.ico             - Icon for use as a TreeView control "node"
+Object.ico             - Icon for use as a TreeView control "node"
+TestFile.inc           - Example Interface definition file to test PB/IE
+
+
+Samples\PopupDlg
+----------------
+PopupDlg.bas   - Example project: main + popup dialog
+PopupDlg.exe   - Example project: main + popup dialog (compiled)
+PopupDlg.pbr   - PowerBASIC compiled resource script
+PopupDlg.rc    - Resource script
+
+
+Samples\PopUpMenu
+-----------------
+HowTo.txt      - Instructions for adding a PopUp menu into a template
+PopupMenu.bas  - PopUp menu example project source code
+PopupMenu.exe  - PopUp menu example project (compiled)
+
+
+Samples\TabControl
+------------------
+AppIcon.ico    - Application Icon
+HowTo.txt      - Instructions for adding TabControl code into a template
+TabControl.bas - TabControl example project source code
+TabControl.exe - TabControl example project (compiled)
+TabControl.pbr - PowerBASIC compiled resource script
+TabControl.rc  - Resource script
+
+
+Samples\ToolBar
+---------------
+AppIcon.ico    - Application Icon
+HowTo.txt      - Instructions for adding ToolBar code into a template
+Toolbar.bas    - The ToolBar example project source code
+Toolbar.bmp    - ToolBar button images
+Toolbar.exe    - ToolBar example project (compiled)
+Toolbar.pbr    - PowerBASIC compiled resource script
+Toolbar.rc     - Resource script
+
+Samples\TrackBar
+----------------
+TrackBar.bas   - TrackBar example source code
+TrackBar.exe   - TrackBar example (compiled)
+TrackBar.pbr   - PowerBASIC compiled resource script
+TrackBar.rc    - Resource script

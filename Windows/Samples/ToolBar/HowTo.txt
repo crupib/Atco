@@ -1,0 +1,91 @@
+How to construct a Toolbar using PBForms to create the foundation code.
+=======================================================================
+
+1. Create a dialog with the following styles:
+
+    %WS_POPUP
+    %WS_BORDER
+    %WS_DLGFRAME
+    %WS_THICKFRAME
+    %WS_CAPTION
+    %WS_SYSMENU
+    %WS_MINIMIZEBOX
+    %WS_MAXIMIZEBOX
+    %WS_CLIPSIBLINGS
+    %DS_CENTER
+
+2. Add a custom control to the dialog, and position at the top of the dialog,
+   25 dialog units high, and as wide as the dialog. Note the absolute size of
+   the control is not important, as it is resized and located automatically at
+   runtime.
+
+3. Set the Class Name of the custom control to "ToolbarWindow32" (without the
+   quotes). Do not set any primary styles.
+
+4. Add menus if required.
+
+5. Save the project and open it the IDE.
+
+6. Just below the #PBForms End Includes line, add the following lines:
+
+    #INCLUDE "CommCtrl.inc"
+    #INCLUDE "PBForms.inc"
+
+7. Below the #PBForms End Constants line, define the following equates:
+
+    %ToolButtons = 9
+    %ID_Btn1     = 1001
+    %ID_Btn2     = 1002
+    %ID_Btn3     = 1003
+    %ID_Btn4     = 1004
+    %ID_Btn5     = 1005
+    %ID_Btn6     = 1006
+    %IDR_IMGFILE2 = 104
+
+8. Below the #PBForms Declarations line, add the following declare:
+
+    DECLARE FUNCTION SetToolbarButtons (BYVAL hDlg AS DWORD) AS LONG
+
+9. Add the following line of code into PBMAIN, before the ShowDIALOG1 call:
+
+    PBFormsInitComCtls(%ICC_WIN95_CLASSES)
+
+10. In the ShowDIALOG1Proc function, add the following handlers:
+
+    CASE %WM_INITDIALOG
+        ' Force TB to initially resize before we display the dialog
+        DIALOG POST CBHNDL, %WM_SIZE, 0, 0
+
+    CASE %WM_SIZE
+        ' Resize the status bar as the dialog is resized
+        CONTROL POST CBHNDL, %IDC_TOOLBAR, CBMSG, 0, 0
+        FUNCTION = 1
+
+11. Set the Primary and Extended styles for the toolbar custom control as
+    follows:
+
+    %WS_CHILD OR %WS_VISIBLE OR %WS_BORDER OR %CCS_TOP OR _
+    %TBSTYLE_TOOLTIPS OR %TB_AUTOSIZE, %WS_EX_LEFT OR _
+    %WS_EX_LTRREADING OR %WS_EX_RIGHTSCROLLBAR
+
+12. Just below the #PBForms End Dialog statement, add the following line:
+
+    CALL SetToolbarButtons(hDlg)
+
+13. Finally, append the SetToolbarButtons function as shown in the example,
+    and save the file.
+
+14. Open the ToolBar.rc file in the IDE. Immediately below the line
+    #define IDR_IMGFILE1 103
+    add the following line:
+
+    #define IDR_IMGFILE2 104
+
+15. Just below the line that reads
+    IDR_IMGFILE1 ICON DISCARDABLE "APPICON.ICO"
+    add the following line:
+
+    IDR_IMGFILE2    BITMAP DISCARDABLE "TOOLBAR.BMP"
+
+16. Save the RC file and compile it. Switch back to the Toolbar.bas file and
+    run it!

@@ -1,0 +1,129 @@
+How to construct a Tabbed Dialog using PBForms to create the foundation code.
+=================================================================================
+
+1. Create a "Parent" dialog %WS_EX_CONTROLPARENT style, and add a tab control
+   (with the %WS_TABSTOP style) at the desired position and size. Note down
+   the position and size of the tab control as shown in the Tab Control
+   Properties dialog (we'll call these tx, ty, txx, and tyy).
+
+2. Create a %WS_CHILD style dialog for each dialog that will appear as a tab
+   page on the tab control. The dialog must also have the %DS_CONTROL style
+   (but should have no other primary styles or the edges of the dialog will be
+   visible on the tab control). Ideally, the tab page dialogs should be 5
+   dialog units narrower and 32 dialog units shorter than the tab control
+   dimensions. The positions of the tab control "page" dialogs is of no
+   concern at this point.
+
+3. Save the project and open the project in the IDE.
+
+4. After the #PBFORMS Declarations metastatement, add the following line:
+
+    GLOBAL gPage() AS DWORD
+
+5. Cut the ShowDIALOGx calls in PBMAIN (leaving just the one that launches the
+   Parent dialog "ShowDIALOG1"), and paste them to just above the DIALOG SHOW
+   MODAL statement in the main dialog's creation function (ie, FUNCTION
+   ShowDIALOG1(...)).
+
+6. Add a DIM statement for the global array just ahead of the calls to
+   ShowDIALOGx, and convert the ShowDIALOGx calls to assign the function
+   result value to the array subscripts. This section of code should now look
+   like this (a Tab Control with five Page dialogs):
+
+    DIM gPage(0:5) AS GLOBAL DWORD
+    gPage(0) = ShowDIALOG2(hDlg)
+    gPage(1) = ShowDIALOG3(hDlg)
+    gPage(2) = ShowDIALOG4(hDlg)
+    gPage(3) = ShowDIALOG5(hDlg)
+    gPage(4) = ShowDIALOG6(hDlg)
+
+    DIALOG SHOW MODAL hDlg, CALL ShowDIALOG1Proc TO lRslt ' <- existing line
+
+7. Insert the following code just after the gPage(4) = ShowDIALOG6(hDlg) and
+   DIALOG SHOW MODAL lines above:
+
+    LOCAL z AS LONG
+    FOR z = 0 TO 4
+        DIALOG SET LOC gPage(z), 6 + 1, 10 + 14
+        DIALOG SHOW STATE gPage(z), IIF&(z = 0, %SW_SHOW, %SW_HIDE)
+    NEXT
+
+8. In each of the ShowDIALOGx functions for the Page dialogs, change the
+   "FUNCTION = lRslt" line to "FUNCTION = hDlg".
+
+9. Next, change the DIALOG SHOW MODAL statements in these functions into
+   DIALOG SHOW MODELESS statements. Unless required, the lRslt variable is now
+   surplus to requirements in the Page dialog functions, and can be removed.
+   For example, the statement:
+
+    DIALOG SHOW MODAL hDlg, CALL ShowDIALOG4Proc TO lRslt
+
+   will become:
+
+    DIALOG SHOW MODELESS hDlg, CALL ShowDIALOG4Proc
+
+10. In the Callback function for the Parent dialog (ShowDIALOG1Proc), add the
+    following handler:
+
+    CASE %WM_NOTIFY
+        LOCAL pNMHDR AS NMHDR PTR
+        LOCAL Result AS LONG
+        pNMHDR = CBLPARAM
+
+        SELECT CASE @pNMHDR.idFrom
+            CASE %IDC_SYSTABCONTROL32_1
+                ' Get the current tab page number (zero based)
+                CONTROL SEND CBHNDL, %IDC_SYSTABCONTROL32_1, %TCM_GETCURSEL, 0, 0 TO Result
+
+                SELECT CASE @pNMHDR.code
+                    CASE %TCN_SELCHANGING
+                        DIALOG SHOW STATE gPage(Result), %SW_HIDE
+                    CASE %TCN_SELCHANGE
+                        DIALOG SHOW STATE gPage(Result), %SW_SHOW
+                END SELECT
+        END SELECT
+
+11. If the Parent dialog has OK and CANCEL buttons, these need to be created
+    *after* the Page dialogs, or the tab order between the controls on the
+    Page dialogs and the Controls on the Parent dialog will be out of order.
+    The solution is to modify the ShowDIALOG1 function so that these final
+    buttons are created after the Page dialogs. A typical Parent dialog
+    creation function will then look like this:
+
+    DIALOG NEW hParent, "Dialog1", 131, 90, 247, 172, %WS_POPUP OR %WS_BORDER _
+        OR %WS_DLGFRAME OR %WS_CAPTION OR %WS_SYSMENU OR %WS_MINIMIZEBOX _
+        OR %WS_VISIBLE OR %DS_3DLOOK OR %DS_NOFAILCREATE OR %DS_SETFONT, _
+        %WS_EX_WINDOWEDGE OR %WS_EX_CONTROLPARENT OR %WS_EX_LEFT OR _
+        %WS_EX_LTRREADING OR %WS_EX_RIGHTSCROLLBAR, TO hDlg
+    DIALOG SET ICON hDlg, "#" + FORMAT$(%IDR_IMGFILE1)
+    CONTROL ADD IMAGEX, hDlg, %IDC_IMAGEX1, "#" + FORMAT$(%IDR_IMGFILE1), 6, _
+        148, 20, 20, %WS_CHILD OR %WS_VISIBLE OR %SS_ICON
+    CONTROL ADD "SysTabControl32", hDlg, %IDC_SYSTABCONTROL32_1, _
+        "SysTabControl321", 6, 10, 234, 135, %WS_CHILD OR %WS_VISIBLE OR _
+        %WS_TABSTOP OR %TCS_SINGLELINE OR %TCS_RIGHTJUSTIFY, %WS_EX_LEFT OR _
+        %WS_EX_LTRREADING
+
+    #PBFORMS END DIALOG
+
+    SampleTabCtrl hDlg, %IDC_SYSTABCONTROL32_1, 5
+
+    DIM gPage(0:5) AS GLOBAL DWORD
+    gPage(0) = ShowDIALOG2(hDlg)
+    gPage(1) = ShowDIALOG3(hDlg)
+    gPage(2) = ShowDIALOG4(hDlg)
+    gPage(3) = ShowDIALOG5(hDlg)
+    gPage(4) = ShowDIALOG6(hDlg)
+
+    LOCAL z AS LONG
+    FOR z = 0 TO 4
+        DIALOG SET LOC gPage(z), 6 + 1, 10 + 14
+        DIALOG SHOW STATE gPage(z), IIF&(z = 0, %SW_SHOW, %SW_HIDE)
+    NEXT x
+
+    CONTROL ADD BUTTON, hDlg, %IDOK, "OK", 135, 151, 50, 15
+    CONTROL ADD BUTTON, hDlg, %IDCANCEL, "Cancel", 190, 151, 50, 15
+
+    DIALOG SHOW MODAL hDlg, CALL ShowDIALOG1Proc TO lRslt
+
+12. Finished! Please be sure to examine the "finished" Tab Control example
+    supplied!

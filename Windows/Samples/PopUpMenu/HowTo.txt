@@ -1,0 +1,100 @@
+How to create a Pop-up menu using PBForms
+=========================================
+
+This sample shows two different ways of using PBForms to create a pop-up menu:
+
+1. By displaying a pop-up from the current dialog
+
+2. By displaying a pop-up that is not attached to a dialog
+
+The steps listed here are not precise steps for duplicating the sample, but
+are generic steps for doing creating your own. The PopupMenu.bas sample
+demonstrates a combination of both ways of creating a pop-up menu.
+
+
+Steps for displaying a pop-up from the current dialog:
+======================================================
+
+1. Create a new dialog. Create a menu using the Menu Editor in PBForms. Make
+   sure you have at least one Menu Item type under each Pop-up type. The
+   sample contains three Pop-up types.
+
+2. Save the project and open it in the PB/WIN IDE.
+
+3. In the CallBack Function for the dialog (typically ShowDIALOG1Proc if you
+   used default project ID Names, etc), add the following variables:
+
+    LOCAL hPopUp1   AS DWORD
+    LOCAL pt        AS POINTAPI
+
+4. Within the Select Case of the same CallBack Function add the following:
+
+        CASE %WM_RBUTTONUP
+            hPopUp1 = GetSubMenu(GetMenu(CBHNDL), 0)
+            GetCursorPos pt
+            TrackPopupMenu _
+                hPopUp1, %TPM_LEFTALIGN OR %TPM_LEFTBUTTON, _
+                pt.x, pt.y, 0, CBHNDL, BYVAL %NULL
+
+   Note: You can change the value of the second parameter of GetSubMenu to
+   determine which menu pop-up to display. It is zero-based, so 0 is the first
+   pop-up menu.
+
+5. Compile and run. Right-click within the client area of the dialog to
+   display your pop-up menu.
+
+
+Steps for displaying a pop-up that is not attached to a dialog:
+===============================================================
+
+1. Create a new dialog. Create a menu using the Menu Editor in PBForms. Make
+   sure you have one Pop-up type and at least one Menu Item type under the
+   Pop-up.
+
+2. Save the project and open it in the PB/WIN IDE.
+
+3. In the CallBack Function for the dialog (typically ShowDIALOG1Proc if you
+   used default project ID Names, etc), add the following variables:
+
+    LOCAL hPopUp1   AS DWORD
+    LOCAL pt        AS POINTAPI
+
+4. Within the Select Case of the same CallBack Function add the following:
+
+        CASE %WM_RBUTTONUP
+            MENU NEW POPUP TO hPopUp1
+
+5. Find your menu function that was created by PBForms. For default project
+   settings, this is usually AttachMENU1. From that function, copy the MENU
+   ADD STRING lines to the clipboard. Paste these lines in the CallBack
+   Function so that the %WM_RBUTTONUP handler becomes something like this:
+
+        CASE %WM_RBUTTONUP
+            MENU NEW POPUP TO hPopUp1
+            MENU ADD STRING, hPopUp1, "&Properties...", %IDM_POPUP_PROPERTIES, _
+                %MF_ENABLED
+            MENU ADD STRING, hPopUp1, "&Insert...", %IDM_POPUP_INSERT, %MF_ENABLED
+            MENU ADD STRING, hPopUp1, "&Clear", %IDM_POPUP_CLEAR, %MF_ENABLED
+
+6. Add the following code immediately below the last MENU ADD STRING statement
+   shown above:
+
+            GetCursorPos pt
+            TrackPopupMenu _
+                hPopUp1, %TPM_LEFTALIGN OR %TPM_LEFTBUTTON, _
+                pt.x, pt.y, 0, CBHNDL, BYVAL %NULL
+            DestroyMenu hPopUp1
+
+   Note: The DestroyMenu is necessary here, but not with the previous example,
+   because Windows automatically destroys menus that are attached to dialogs
+   upon destroying the dialog. Since this menu is not attached to a dialog,
+   you must destroy it after use or it will cause a memory leak.
+
+7. Since the dialog does not need to attach the menu to the dialog, you can
+   delete the respective declaration, function and call for the menu
+   attachment. As mentioned above, a project with default settings will have
+   this function named AttachMENU1. The sample program has the code left in
+   for the purposes of illustration only.
+
+8. Compile and run. Right click within the client area of the dialog to
+   display your pop-up menu. Done!

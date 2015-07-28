@@ -1,0 +1,30 @@
+//#PBForms Created v1.51
+//--------------------------------------------------------------------------------
+// The first line in this file is a PBForms comment. It    
+// should ALWAYS be the first line of the file. Other      
+// PBForms comments are placed at the beginning and        
+// ending of blocks of code that should be edited using    
+// PBForms only. Do not edit or delete these comments or   
+// PBForms will not be able to reread the file correctly.  
+// See the PBForms documentation for more information.     
+// Beginning blocks begin like this: //#PBForms Begin ...  
+// Ending blocks begin like this:    //#PBForms End ...    
+// Feel free to make changes anywhere else in the file.    
+//--------------------------------------------------------------------------------
+
+#include "Resource.h"
+
+//--------------------------------------------------------------------------------
+//  ** Constants **
+//--------------------------------------------------------------------------------
+//#PBForms Begin Constants
+#define IDR_IMGFILE2    107
+//#PBForms End Constants
+
+//--------------------------------------------------------------------------------
+//  ** RC Data **
+//--------------------------------------------------------------------------------
+//#PBForms Begin RCData
+IDR_IMGFILE2    ICON   DISCARDABLE "APPICON.ICO"
+//#PBForms End RCData
+

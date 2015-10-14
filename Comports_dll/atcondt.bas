@@ -339,7 +339,7 @@ FUNCTION PBMAIN () AS LONG
      'The next function will return an hardware description array based on the device string
      DeviceCount = GetDeviceInfo(Device, InfoArray())
      comlistidx = 0
-     'msgbox  str$(DeviceCount)
+     MSGBOX  STR$(DeviceCount)
      FOR Looper = 1 TO DeviceCount
        zClassName = InfoArray(%ClassName, Looper)
        Retval = SetupDiClassGuidsFromName(zClassName, GuidInfo, SIZEOF(GuidInfo) , RequiredSize)

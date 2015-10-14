@@ -52,7 +52,7 @@ DO
 
     iMenuPosition = 3                      'initial start positon in the menu.
     iColPos       = 5
-    CALL DrawFrame (2, 9, 4, 13, 0, 3, 0)  'draws a frame around the menu items.
+          ' CALL DrawFrame (2, 9, 4, 13, 0, 3, 0)  'draws a frame around the menu items.
 
     DO
         FOR i = 3 TO 8
@@ -148,7 +148,7 @@ SUB DrawScreen()
     LOCAL i AS LONG
     LOCAL j AS LONG
 
-    CALL DrawFrame (2, 24, 1, 79, 15, 0, 15)
+   ' CALL DrawFrame (2, 24, 1, 79, 15, 0, 15)
 
     LOCATE 1, 1
     COLOR 3, 3
@@ -159,10 +159,10 @@ SUB DrawScreen()
     '
     '
     COLOR 8, 0             'this will just print some jibberish to the window area
-    FOR i = 3 TO 23
-       LOCATE i, 2
-       PRINT STRING$(78, CHR$(178))
-    NEXT
+  '  FOR i = 3 TO 23
+  '     LOCATE i, 2
+  '     PRINT STRING$(78, CHR$(178))
+  '  NEXT
     '
     '
 END SUB

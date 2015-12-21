@@ -1,9 +1,9 @@
-<<<<<<< HEAD
+'<<<<<<< HEAD
 'AtcoNDT Library - written by Bill Crupi
 'comportlist - returns FTDI comm ports
 
-DECLARE FUNCTION comportlist LIB "atcondt_lib.dll" _
-=======
+'DECLARE FUNCTION comportlist LIB "atcondt_lib.dll"
+'=======
 #INCLUDE "Win32Api.Inc"
 'USB4
 %USB4_SUCCESS    =            0
@@ -717,5 +717,4 @@ DECLARE FUNCTION SetupDiOpenDeviceInterfaceRegKey LIB "SetupApi.DLL" ALIAS "Setu
   BYVAL samDesired                    AS DWORD) AS LONG
 '____________
  DECLARE FUNCTION comportlist LIB "atcondt_lib.dll" _
->>>>>>> b2cb08ee7962d6e68f5072d0943eb0a966ad16a5
          ALIAS "comportlist" (BYREF parm1() AS STRING) AS LONG

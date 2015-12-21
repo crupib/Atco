@@ -1,13 +1,13 @@
 #COMPILE EXE
 #DIM ALL
-<<<<<<< HEAD
+'<<<<<<< HEAD
 'atcondt_lib includes functions specific for atco. This includes getting the number of FTDI comm ports:
 '
 #INCLUDE "atcondt_lib.inc"
 
-=======
-#INCLUDE "atcondt_lib.inc"
->>>>>>> b2cb08ee7962d6e68f5072d0943eb0a966ad16a5
+'=======
+'#INCLUDE "atcondt_lib.inc"
+'>>>>>>> b2cb08ee7962d6e68f5072d0943eb0a966ad16a5
 FUNCTION PBMAIN () AS LONG
 DIM comports(10) AS STRING
 LOCAL num_comports AS LONG

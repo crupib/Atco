@@ -8,28 +8,50 @@ DECLARE SUB DISPLAY(BYVAL sData AS STRING)
 FUNCTION PBMAIN
 GLOBAL hComm AS LONG
 LOCAL IOVALA AS LONG
+LOCAL FLAG AS STRING
 LOCAL IOVALB AS LONG
 LOCAL IOVALC AS LONG
 LOCAL MyInput AS STRING
+LOCAL MyOutput AS STRING
 LOCAL Commport AS STRING
+LOCAL ncbData AS LONG    ' bytes of data waiting
+LOCAL sData   AS STRING  ' data received or to send
 hComm = FREEFILE
 CommPort = "COM4"
 IF NOT OpenCommPort(hComm,Commport) THEN
    PRINT "Open CommPort failed"
    EXIT FUNCTION
 END IF
-IOVALA = 0
-myinput =   "!A" + CHR$(IOVALA) ' Write to Port A Direction Register
-SendData(hComm,myinput)
-IOVALA = 7
-myinput = "A" + CHR$(IOVALA)
-SendData(hComm,myinput)
+'IOVALA = 0
+'MyOutput =   "!A" + CHR$(IOVALA) ' Write to Port A Direction Register
+'SendData(hComm,MyOutput)
+'IOVALA = 7
+'MyOutput = "A" + CHR$(IOVALA)
+'SendData(hComm,MyOutput)
+'WAITSTAT
+'DO
+'    FLAG = INKEY$ ' get them
+'    IF FLAG = $ESC THEN Terminate
+'LOOP
+
+'Terminate:
+
+IOVALA = 1
+MyInput =  "!A" + CHR$(IOVALA) ' Write to Port A Direction Register
+SendData(hComm,MyInput)
+MyInput =  "a" ' Read to Port A Direction Register
+SendData(hComm,MyInput)
+SLEEP 400
+ncbData = COMM(hComm, RXQUE)
+IF ncbData THEN
+   COMM RECV hComm, ncbData, sData
+   DISPLAY sData
+END IF
 WAITSTAT
 DO
-    MyInput = INKEY$ ' get them
-    IF MyInput = $ESC THEN Terminate
+    FLAG = INKEY$ ' get them
+    IF FLAG = $ESC THEN Terminate
 LOOP
-
 Terminate:
 CloseCommport(hComm)
 END FUNCTION
@@ -68,6 +90,6 @@ SUB DISPLAY(BYVAL sData AS STRING) ' handles embedded CR/LF bytes
         PRINT ' force new line on CR
         ITERATE FOR
         END IF
-        PRINT CHR$(@sDataPtr[y]); ' display current char
+        PRINT HEX$(@sDataPtr[y]); ' display current char
     NEXT y
 END SUB

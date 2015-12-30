@@ -36,7 +36,7 @@ DECLARE SUB PortWrite(myport AS STRING,value AS INTEGER)
 DECLARE SUB PortRead(myport AS STRING, reval AS STRING)
 DECLARE SUB DISPLAYHEX(BYVAL sData AS STRING)
 DECLARE SUB DISPLAYCHAR(BYVAL sData AS STRING)
-
+DECLARE SUB GETDEVICEID(id AS STRING, retval AS STRING)
 FUNCTION PBMAIN
 
 GLOBAL hComm AS LONG
@@ -52,14 +52,12 @@ IF NOT OpenCommPort(hComm,Commport) THEN
 END IF
 
 'Identify Device - Responds 'USB I/O 24'
-PortRead("?",retval)
-DISPLAYCHAR retval
-
+'GetDeviceID("?",retval)
 'Set A to all outputs
 'Then write to pin 9,8,7
-PortDirection("!A",0)
+''PortDirection("!A",0)
 'Then write to pin 9,8,7  0000111 4+2+1 = 7
-PortWrite("A",7)
+''PortWrite("A",7)
 'Set A to Input 00000001
 PortDirection("!A",1)
 'Read 1 byte from Port A
@@ -95,6 +93,7 @@ FUNCTION RecvData(hcomm AS LONG, Qty AS LONG, Stuf AS STRING) AS INTEGER
     IF ISTRUE Qty THEN
         COMM RECV #hComm, Qty, Stuf ' read incoming characters
     END IF
+    RecvData = Qty
 END FUNCTION
 
 SUB DISPLAYHEX(BYVAL sData AS STRING) ' handles embedded CR/LF bytes
@@ -121,16 +120,24 @@ SUB DISPLAYCHAR(BYVAL sData AS STRING) ' handles embedded CR/LF bytes
         PRINT ' force new line on CR
         ITERATE FOR
         END IF
-        PRINT @sDataPtr[y]; ' display current char
+        PRINT CHR$(@sDataPtr[y]); ' display current char
     NEXT y
 END SUB
-
+SUB GETDEVICEID(id AS STRING, retval AS STRING)
+    LOCAL Qty AS LONG
+    LOCAL stuf AS STRING
+    SendData(hComm,id)
+    SLEEP 400
+    DO WHILE  RecvData(hComm , Qty, Stuf)
+        DISPLAYCHAR stuf
+    LOOP
+END SUB
 SUB PortDirection(myport AS STRING,value AS INTEGER)
     LOCAL PortDir AS INTEGER
     LOCAL Portchanged AS STRING
 
     PortDir = value
-    Portchanged = Portchanged+CHR$(Portdir)
+    Portchanged = myport+CHR$(Portdir)
     SendData(hComm,Portchanged)
 END SUB
 
@@ -146,9 +153,9 @@ SUB PortRead(myport AS STRING,retvalue AS STRING)
     LOCAL PortIn AS STRING
     LOCAL Qty AS LONG
     LOCAL stuf AS STRING
-
     PortIn = myport
     SendData(hComm,PortIn)
+    SLEEP 9
     DO WHILE  RecvData(hComm , Qty, Stuf)
         DISPLAYHEX Stuf
     LOOP

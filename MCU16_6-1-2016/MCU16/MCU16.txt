@@ -1,0 +1,110 @@
+Configuration	MCU16
+STM32CubeMX 	4.13.1
+Date	05/20/2016
+MCU	STM32F746ZGTx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+ADC1	IN6	ADC1_IN6	PA6
+RCC	BYPASS Clock Source	RCC_OSC_IN	PH0/OSC_IN
+RCC	BYPASS Clock Source	RCC_OSC_OUT	PH1/OSC_OUT
+RCC	Crystal/Ceramic Resonator	RCC_OSC32_IN	PC14/OSC32_IN
+RCC	Crystal/Ceramic Resonator	RCC_OSC32_OUT	PC15/OSC32_OUT
+SYS	SWD and Asynchronous Trace	SYS_JTMS-SWDIO	PA13
+SYS	SWD and Asynchronous Trace	SYS_JTCK-SWCLK	PA14
+SYS	SWD and Asynchronous Trace	SYS_JTDO-SWO	PB3
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM2	Encoder Mode	TIM2_CH1	PA0/WKUP
+TIM2	Encoder Mode	TIM2_CH2	PA1
+TIM3	Encoder Mode	TIM3_CH1	PC6
+TIM3	Encoder Mode	TIM3_CH2	PC7
+TIM4	Encoder Mode	TIM4_CH1	PB6
+TIM4	Encoder Mode	TIM4_CH2	PB7
+TIM5	Internal Clock	TIM5_VS_ClockSourceINT	VP_TIM5_VS_ClockSourceINT
+TIM9	Internal Clock	TIM9_VS_ClockSourceINT	VP_TIM9_VS_ClockSourceINT
+TIM10	Enable_Timer	TIM10_VS_ClockSourceINT	VP_TIM10_VS_ClockSourceINT
+TIM11	Enable_Timer	TIM11_VS_ClockSourceINT	VP_TIM11_VS_ClockSourceINT
+TIM12	Internal Clock	TIM12_VS_ClockSourceINT	VP_TIM12_VS_ClockSourceINT
+TIM13	Enable_Timer	TIM13_VS_ClockSourceINT	VP_TIM13_VS_ClockSourceINT
+TIM14	Enable_Timer	TIM14_VS_ClockSourceINT	VP_TIM14_VS_ClockSourceINT
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PA9
+USART3	Asynchronous	USART3_RX	PD9
+USART3	Asynchronous	USART3_TX	PD8
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+7	PC13	GPIO_Input	BLUE_BUTTON1
+8	PC14/OSC32_IN	RCC_OSC32_IN	
+9	PC15/OSC32_OUT	RCC_OSC32_OUT	
+23	PH0/OSC_IN	RCC_OSC_IN	RCC_OSC_IN
+24	PH1/OSC_OUT	RCC_OSC_OUT	RCC_OSC_OUT
+26	PC0	GPIO_Input	MTR1_FLT_i
+27	PC1	GPIO_Input	MTR2_FLT_i
+28	PC2	GPIO_Input	MTR3_FLT_i
+29	PC3	GPIO_Input	ESTOP_i
+34	PA0/WKUP	TIM2_CH1	ENC1A_i
+35	PA1	TIM2_CH2	ENC1B_i
+40	PA4	GPIO_Input	REMOTE_Y_i
+41	PA5	GPIO_Input	REMOTE_X_i
+42	PA6	ADC1_IN6	
+43	PA7	GPIO_Input	REMOTE_ON_i
+44	PC4	GPIO_Output	IMAGE_EN_o
+45	PC5	GPIO_Output	MTR3_EN_o
+46	PB0	GPIO_Output	QUAD4A_o
+47	PB1	GPIO_Output	QUAD4B_o
+73	PB12	GPIO_Input	REMOTE_Z_i
+75	PB14	GPIO_Output	QUAD5A_o
+76	PB15	GPIO_Output	QUAD5B_o
+77	PD8	USART3_TX	STLK_TX
+78	PD9	USART3_RX	STLK_RX
+96	PC6	TIM3_CH1	ENC2A_i
+97	PC7	TIM3_CH2	ENC2B_i
+98	PC8	GPIO_Output	MTR1_EN_o
+99	PC9	GPIO_Output	MTR2_EN_o
+100	PA8	GPIO_Output	TX_EN_o
+101	PA9	USART1_TX	TX_o
+102	PA10	USART1_RX	RX_i
+103	PA11	GPIO_Output	QUAD1A_o
+104	PA12	GPIO_Output	QUAD1B_o
+105	PA13	SYS_JTMS-SWDIO	TMS
+109	PA14	SYS_JTCK-SWCLK	TCK
+111	PC10	GPIO_Output	QUAD2A_o
+112	PC11	GPIO_Output	QUAD2B_o
+113	PC12	GPIO_Output	QUAD3A_o
+116	PD2	GPIO_Output	QUAD3B_o
+133	PB3	SYS_JTDO-SWO	SWO
+136	PB6	TIM4_CH1	ENC3A_i
+137	PB7	TIM4_CH2	ENC3B_i
+139	PB8	GPIO_Input	ADDR_i
+140	PB9	GPIO_Output	ADDR_o
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : MCU16
+Project Folder : C:\Users\atcop\OneDrive\Documents\0KL MCU16\MCU16_SW\MCU16
+Toolchain / IDE : EWARM
+Firmware Package Name and Version : STM32Cube FW_F7 V1.3.1
+
+
+Code Generation Settings : 
+STM32Cube Firmware Library Package : Add necessary library files as reference in the toolchain project configuration file
+Generate peripheral initialization as a pair of '.c/.h' files per IP : Yes
+Backup previously generated files when re-generating : Yes
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : Balanced Size/Speed
+
+
+
+
+
+

@@ -1,0 +1,215 @@
+#include "stm32f7xx_hal.h"
+#include "math.h"
+#include "mcu16.h"
+#include "mcu16_extrn.h"
+#include "tim.h"
+
+
+// **********************************************************
+// initialize encoders
+// **********************************************************
+
+void InitEncoders() {
+
+    step_rate=1;                // initialize step rate multiplier
+    enc_error_band1=0;          // initialize encoder error band, 0=off
+    enc_error_band2=0;          // initialize encoder error band, 0=off 
+    enc_error_band3=0;          // initialize encoder error band, 0=off
+    
+    ZeroEncoder1();             // zero encoder 1
+    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);  // start encoder 1
+
+    ZeroEncoder2();             // zero encoder 2
+    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);  // start encoder 2
+    UpperWord2=0;               // 16 to 32 bit encoder upper word   
+
+    ZeroEncoder3();             // zero encoder 3
+    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);  // start encoder 3
+    UpperWord3=0;               // 16 to 32 bit encoder upper word   
+}
+
+
+// Encoder 1 control
+// **********************************************************
+// Zero Encoder 1
+// **********************************************************
+void ZeroEncoder1() {
+    TIM2->CNT=0x80000000;           //reset count to zero, offset 0x80000000 = 0
+    scount1=0;                       // reset internal step counter
+}
+
+// **********************************************************
+// Read Encoder 1, subtract offset
+// **********************************************************
+int32_t ReadEncoder1() {
+    int value=EncPos1-0x80000000;      // get encoder 1, subtract offset
+    return(value);
+}
+
+// **********************************************************
+// Set Encoder 1, add offset
+// **********************************************************
+void SetEncoder1(int32_t value) {
+    TIM2->CNT=value+0x80000000;      // set timer 2, encoder 1, add offset
+}
+
+// **********************************************************
+// Enable Encoder 1
+// **********************************************************
+void EnableEncoder1() {
+    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);  // start encoder 1
+}
+
+// **********************************************************
+// Disable Encoder 1
+// **********************************************************
+void DisableEncoder1() {
+    HAL_TIM_Encoder_Stop(&htim2, TIM_CHANNEL_ALL);  // stop encoder 1
+}
+
+
+
+// Encoder 2 control
+// **********************************************************
+// Zero Encoder 2
+// **********************************************************
+void ZeroEncoder2() {
+    UpperWord2=0;
+    pos2_last = 0;                  // initialize last encoder 2 position
+    TIM3->CNT=0x0000;               // reset count to zero
+    scount2=0;                       // reset internal step counter
+}
+
+// **********************************************************
+// Read Encoder 2
+// **********************************************************
+int32_t ReadEncoder2() {
+    return(EncPos2);                  // read timer 3, encoder 2
+
+}
+
+// **********************************************************
+// Set Encoder 2
+// **********************************************************
+void SetEncoder2(int32_t value) {
+    UpperWord2 = value>>16;         // get upper word
+    pos2_last = value & 0xC000;     // initialize last encoder 2 position
+    TIM3->CNT=value;                // set timer 3, encoder 2, add offset
+}
+
+// **********************************************************
+// Enable Encoder 2
+// **********************************************************
+void EnableEncoder2() {
+    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);  // start encoder 2
+}
+
+// **********************************************************
+// Disable Encoder 2
+// **********************************************************
+void DisableEncoder2() {
+    HAL_TIM_Encoder_Stop(&htim3, TIM_CHANNEL_ALL);  // stop encoder 2
+}
+
+
+
+// Encoder 3 control
+// **********************************************************
+// Zero Encoder 3
+// **********************************************************
+void ZeroEncoder3() {
+    UpperWord3=0;
+    pos3_last = 0;                  // initialize last encoder 2 position 
+    TIM4->CNT=0x0000;               // reset count to zero
+    scount3=0;                       // reset internal step counter
+}
+
+// **********************************************************
+// Read Encoder 3
+// **********************************************************
+int32_t ReadEncoder3() {
+    return(EncPos3);                  // read timer 4, encoder 3
+}
+
+// **********************************************************
+// Set Encoder 3
+// **********************************************************
+void SetEncoder3(int32_t value) {
+    UpperWord3 = value>>16;         // get upper word
+    pos3_last = value & 0xC000;     // initialize last encoder 3 position 
+    TIM4->CNT=value;                // set timer 4, encoder 3, add offset
+}
+
+// **********************************************************
+// Enable Encoder 3
+// **********************************************************
+void EnableEncoder3() {
+    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);  // start encoder 3
+}
+
+// **********************************************************
+// Disable Encoder 3
+// **********************************************************
+void DisableEncoder3() {
+    HAL_TIM_Encoder_Stop(&htim4, TIM_CHANNEL_ALL);  // stop encoder 3
+}
+
+// **********************************************************
+// Encoder motion error
+// **********************************************************
+void EncoderMotionError() {
+
+      
+    if(enc_error_band1) {           // test for encoder 1 error, 0=OFF        
+        if(abs(ReadEncoder1()-(scount1*step_rate)) > enc_error_band1) {
+            if(enc_error_flg==0) enc_error_flg=1; // latch error
+        }
+    }        
+    if(enc_error_band2) {           // test for encoder 2 error
+        if(abs(ReadEncoder2()-(scount2*step_rate)) > enc_error_band2) {
+            if(enc_error_flg==0) enc_error_flg=1; // latch error      
+        } 
+    }        
+    if(enc_error_band3) {           // test for encoder 3 error
+        if(abs(ReadEncoder3()-(scount3*step_rate)) > enc_error_band3) {
+            if(enc_error_flg==0) enc_error_flg=1; // latch error  
+        }
+     }
+              
+      
+}
+
+
+// **********************************************************
+// Read Encoder 1, 2 and 3
+// extend Encoder 2 and 3 to 32 bits
+// **********************************************************
+void EncUpdate() {
+uint16_t temp2,temp3;
+
+
+    EncPos1=TIM2->CNT;                  // get encoder 1 value, 32 bits
+    temp2=TIM3->CNT;                    // get encoder 2 value, 16 bits
+    temp3=TIM4->CNT;                    // get encoder 3 value, 16 bits
+
+    pos2_now = temp2&0xC000;            // get quadrant of position now
+    pos3_now = temp3&0xC000;            // get quadrant of position now
+    
+    if(pos2_now==0  &&  pos2_last==0xC000) UpperWord2++;
+    if(pos2_now==0xC000  &&  pos2_last==0) UpperWord2--;    
+    pos2_last=pos2_now;
+
+    if(pos3_now==0  &&  pos3_last==0xC000) UpperWord3++;
+    if(pos3_now==0xC000  &&  pos3_last==0) UpperWord3--;   
+    pos3_last=pos3_now;
+
+    EncPos2= (UpperWord2<<16)  | temp2;  // Combine upper and lower words
+    EncPos3= (UpperWord3<<16)  | temp3;  // Combine upper and lower words
+    
+// check for encoder motion error here to avoid interrupt issues 
+
+    EncoderMotionError();                   // test for encoder motion error
+//        StopMotion();                    // stop motion if fault is detected  
+
+    
+}

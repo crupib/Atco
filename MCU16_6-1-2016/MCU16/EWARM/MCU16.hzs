@@ -58,7 +58,7 @@
   <Watches active="0" update="Never" />
  </Watch4>
  <Files>
-  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="19" debugPath="../Src/main.c" y="82" path="../Src/main.c" left="0" selected="1" name="unnamed" top="100" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/main.c" y="82" path="../Src/main.c" left="0" selected="1" name="unnamed" top="74" />
  </Files>
  <ARMCrossStudioWindow activeProject="MCU16" autoConnectTarget="ARM Simulator" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/atcop/OneDrive/Documents/0KL MCU16/MCU16_SW/MCU16/Src" fileDialogDefaultFilter="*.c" autoConnectCapabilities="268735" debugSearchPath="" buildConfiguration="ARM Debug" />
 </session>

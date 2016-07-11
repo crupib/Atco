@@ -1,9 +1,10 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
- <Bookmarks/>
+ <Bookmarks>
+  <BookmarkItem column="-1" line="14" path="C:/Users/crupi/OneDrive/Documents/GitHub/Atco/MCU16_6-1-2016/MCU16/Inc/mcu_global.h" number="1" extra="uint8_t cmd_ready; // command ready" name="unnamed" color="5" />
+ </Bookmarks>
  <Breakpoints>
   <BreakpointListItem line="43" action="" hardwareBreakpoint="" trigger="" useHWbreakpoint="false" group="Breakpoints" type="Breakpoint" state="3" counter="0" isFunctionBreakpoint="false" filename="../Inc/mcu_global.h" expression="" />
-  <BreakpointListItem line="433" action="" hardwareBreakpoint="" trigger="" useHWbreakpoint="false" group="Breakpoints" type="Breakpoint" state="3" counter="0" isFunctionBreakpoint="false" filename="../Src/mcu_serial_cmd.c" expression="" />
   <BreakpointListItem line="43" action="" hardwareBreakpoint="" trigger="" useHWbreakpoint="false" group="Breakpoints" type="Breakpoint" state="3" counter="0" isFunctionBreakpoint="false" filename="../Inc/stm32f7xx_hal_conf.h" expression="" />
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -58,7 +59,13 @@
   <Watches active="0" update="Never" />
  </Watch4>
  <Files>
-  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/main.c" y="82" path="../Src/main.c" left="0" selected="1" name="unnamed" top="74" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="32" debugPath="../Src/main.c" y="96" path="../Src/main.c" left="0" selected="0" name="unnamed" top="95" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/usart.c" y="178" path="../Src/usart.c" left="0" selected="0" name="unnamed" top="178" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/mcu_serial_cmd.c" y="32" path="../Src/mcu_serial_cmd.c" left="0" selected="0" name="unnamed" top="21" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Inc/mcu_global.h" y="14" path="../Inc/mcu_global.h" left="0" selected="0" name="unnamed" top="0" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/tim.c" y="0" path="../Src/tim.c" left="0" selected="0" name="unnamed" top="594" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/mcu_pathcontrol.c" y="0" path="../Src/mcu_pathcontrol.c" left="0" selected="0" name="unnamed" top="162" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/mcu_gpio.c" y="0" path="../Src/mcu_gpio.c" left="0" selected="1" name="unnamed" top="30" />
  </Files>
  <ARMCrossStudioWindow activeProject="MCU16" autoConnectTarget="ARM Simulator" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/atcop/OneDrive/Documents/0KL MCU16/MCU16_SW/MCU16/Src" fileDialogDefaultFilter="*.c" autoConnectCapabilities="268735" debugSearchPath="" buildConfiguration="ARM Debug" />
 </session>

@@ -42,45 +42,44 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 // ****************************************************************************
 void BuildCmd(void) {
 
-static uint8_t c_in=0;
-uint8_t c, pathcount;
+    static uint8_t c_in=0;
+    uint8_t c, pathcount;
 
     c=rbuf[0];                       // get character
 
     if(AddrIn() && (module_addr==0)) // check network address in
        return;                    // return if module is disabled
 
-     switch(c_in) {
+    switch(c_in) {
 
-     case 0:                       // first byte must be BOM 
-        if(c==BOM) 
-          cmd[c_in++]=c;           // place BOM in buffer               
-     break;
+       case 0:                       // first byte must be BOM 
+          if(c==BOM) 
+            cmd[c_in++]=c;           // place BOM in buffer               
+       break;
 
 
-     case 1:                       // second byte must be module address
-        if((c==module_addr)||(c==group_addr))
-           cmd[c_in++]=c;          // place module address in buffer
-        else 
-           c_in=0;                 // clear index, not for this module 
-     break;
+       case 1:                       // second byte must be module address
+          if((c==module_addr)||(c==group_addr))
+             cmd[c_in++]=c;          // place module address in buffer
+          else 
+             c_in=0;                 // clear index, not for this module 
+       break;
 
-     case 2:                       // third byte is data length and command 
-        cmd[c_in++]=c;             // place data length and command in buffer 
-        cmdlen=((c>>4)&0x0F)+4;    // calculate command length
-        if(cmdlen>CMD_SIZE)        // check for max size
-           c_in=0;
-     break;
+       case 2:                       // third byte is data length and command 
+          cmd[c_in++]=c;             // place data length and command in buffer 
+          cmdlen=((c>>4)&0x0F)+4;    // calculate command length
+          if(cmdlen>CMD_SIZE)        // check for max size
+             c_in=0;
+       break;
 
-     default:
-        cmd[c_in++]=c;             // place data in buffer
-        if(c_in==cmdlen) {
-           cmd_ready=1;            // set command ready flag  
-           c_in=0;                 // reset command buffer index 
-        }
-     break;
-     }
-        
+       default:
+          cmd[c_in++]=c;             // place data in buffer
+          if(c_in==cmdlen) {
+             cmd_ready=1;            // set command ready flag  
+             c_in=0;                 // reset command buffer index 
+          }
+       break;
+       } 
 }
 
 // ****************************************************************************

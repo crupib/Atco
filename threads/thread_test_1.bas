@@ -1,8 +1,5 @@
 '=============================================================================
 '
-'  Multi-threading example for the PowerBASIC Console Compiler
-'  Copyright (c) 1998-2011 PowerBASIC, Inc.
-'  All Rights Reserved.
 '
 '=============================================================================
 #COMPILER PBCC 6

@@ -1,6 +1,6 @@
 '=============================================================================
-'
-'
+'Written for Atco by Bill Crupi for test purposes.
+'Examples of threads being used.
 '=============================================================================
 #COMPILER PBCC 6
 #COMPILE EXE

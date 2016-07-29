@@ -13,6 +13,7 @@ THREAD FUNCTION MyThread (BYVAL nThread AS LONG) AS LONG
     PRINT "Start thread"; nThread
     t = TIMER
     FOR ix = 1 TO 100
+        mysafethread(ix)
         SLEEP 100
     NEXT
     t = TIMER - t
@@ -39,6 +40,11 @@ LOCAL escape_count AS INTEGER
    FUNCTION = -1
 END FUNCTION
 
+FASTPROC mysafethread (BYVAL printsem AS LONG) THREADSAFE AS LONG
+ CON.LOC = 100, 100
+ PRINT "In FastProc"
+END FASTPROC = -1
+
 THREAD FUNCTION MyStartStopThread (BYVAL Filler AS LONG) AS LONG
    DO
         PRINT "Running!"
@@ -53,7 +59,6 @@ FUNCTION PBMAIN () AS LONG
     GLOBAL Resumestartthread AS LONG
     LOCAL escape_passed AS INTEGER
     DIM idThread(1 TO 10) AS LONG
-
     PRINT "Let's start some threads!"
     FOR ix = LBOUND(idThread) TO UBOUND(idThread)
         THREAD CREATE MyThread(ix) TO idThread(ix)

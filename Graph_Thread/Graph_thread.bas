@@ -14,32 +14,33 @@
 DEFLNG a-z
 #INCLUDE "WIN32API.INC"
 
-THREAD FUNCTION MyThread (BYVAL nThread AS LONG) AS LONG
-    LOCAL ix AS LONG
-    LOCAL t  AS SINGLE
-    PRINT "Start thread"; nThread
-    t = TIMER
-    FOR ix = 1 TO 100
-        mysafethread(ix)
-        SLEEP 100
-    NEXT
-    t = TIMER - t
-    PRINT "End thread"; nThread
-    PRINT "Elapsed time (100*100 ms) =" + STR$(t, 5)
-    FUNCTION = -1   ' signal the monitor loop this thread is done.
-END FUNCTION
-
-THREAD FUNCTION MyInputThread (BYVAL escape_passed AS LONG) AS LONG
+THREAD FUNCTION MyMouseThread (BYVAL escape_passed AS LONG) AS LONG
+    DIM MousePoint AS POINTAPI
+    GRAPHIC ATTACH hGWin, 0
     DO
-        GRAPHIC INKEY$ TO sKey
         SLEEP 1
-        SELECT CASE LEN(sKey)
+        GetCursorPos Mousepoint
+        ScreenToClient hGwin, mousepoint
+        GRAPHIC SET POS (0,0): GRAPHIC PRINT "X:";Mousepoint.x;"   Y:";Mousepoint.y;"    ": GRAPHIC REDRAW
+    LOOP
+END FUNCTION
+THREAD FUNCTION MyInputThread (BYVAL escape_passed AS LONG) AS LONG
+    GRAPHIC ATTACH hGWin, 0
+    DO
+        GRAPHIC INKEY$ TO sKey$
+        SLEEP 1
+        SELECT CASE LEN(sKey$)
           CASE 1
-          IF ASC(sKey) = 27 THEN EXIT LOOP    ' Esc to quit
+              IF ASC(sKey$) = 27 THEN
+                  EXIT LOOP    ' Esc to quit
+              ELSEIF sKey$ = "r" THEN
+                    THREAD RESUME Resumestartthread TO lResult&
+                 ELSEIF sKey$ = "p" THEN
+                       THREAD SUSPEND Resumestartthread TO lResult&
+                 END IF
         END SELECT
     LOOP
 FUNCTION = -1
-
 END FUNCTION
 
 FASTPROC mysafethread (BYVAL printsem AS LONG) THREADSAFE AS LONG
@@ -48,12 +49,17 @@ FASTPROC mysafethread (BYVAL printsem AS LONG) THREADSAFE AS LONG
 END FASTPROC = -1
 
 THREAD FUNCTION MyStartStopThread (BYVAL Filler AS LONG) AS LONG
+   GRAPHIC ATTACH hGWin, 0
    DO
-        PRINT "Running!"
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "|": GRAPHIC REDRAW
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "/": GRAPHIC REDRAW
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "-": GRAPHIC REDRAW
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "|": GRAPHIC REDRAW
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "\": GRAPHIC REDRAW
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT "-": GRAPHIC REDRAW
    LOOP
    FUNCTION = -1
 END FUNCTION
-
 FUNCTION PBMAIN () AS LONG
  'Variables
  DIM MousePoint AS POINTAPI
@@ -61,10 +67,10 @@ FUNCTION PBMAIN () AS LONG
  DIM YVar AS INTEGER
  DIM idThread(1 TO 10) AS LONG
 
- GLOBAL inthread AS LONG
+ GLOBAL inthread_input, inthread_mouse AS LONG
  GLOBAL Resumestartthread AS LONG
 
- LOCAL hGWin???, sKey$
+ GLOBAL hGWin???, sKey$
  LOCAL ix AS LONG
  LOCAL nStatus AS LONG
  LOCAL escape_passed AS INTEGER
@@ -74,98 +80,18 @@ FUNCTION PBMAIN () AS LONG
      FONT NEW "Lucida Console",12,0,0,0,0 TO F1
      GRAPHIC SET FONT F1: GRAPHIC CHR SIZE TO W1,H1 ' Find pixel width and height of fnt1 graphic font
      escape_passed = 0
-     THREAD CREATE MyInputThread(escape_passed) TO inthread
-
+     THREAD CREATE MyInputThread(escape_passed) TO inthread_input
+     THREAD CREATE MyMouseThread(escape_passed) TO inthread_mouse
+     THREAD CREATE MyStartStopThread(0) TO Resumestartthread
      DO WHILE GRAPHIC(DC)
         GRAPHIC GET DC TO hGwin: IF hGwin=0 THEN EXIT DO
-        THREAD STATUS inthread TO nStatus
+        THREAD STATUS inthread_input TO nStatus
         IF nStatus = -1 THEN
-            THREAD CLOSE inthread TO nStatus
+            THREAD CLOSE inthread_input TO nStatus
+            THREAD CLOSE inthread_mouse TO nStatus
+            THREAD CLOSE Resumestartthread TO nStatus
         END IF
         GRAPHIC REDRAW
      LOOP
-        GetCursorPos Mousepoint
-        ScreenToClient hGwin, mousepoint
-        GRAPHIC SET POS (0,0): GRAPHIC PRINT "X:";Mousepoint.x;"   Y:";Mousepoint.y;"    ": GRAPHIC REDRAW
-
-        GRAPHIC WINDOW END
-     LOOP
+     GRAPHIC WINDOW END
 END FUNCTION
-
- PRINT "Let's start some threads!"
- FOR ix = LBOUND(idThread) TO UBOUND(idThread)
-        THREAD CREATE MyThread(ix) TO idThread(ix)
-        SLEEP 750
- NEXT
- PRINT "10 threads started."
- PRINT "Wait for them to finish!"
-
-    ' Here, we simply loop until all threads return -1.
-    ' A running thread returns a status of &H103.
-    ' In a real program, you might prefer the WaitForMultipleObjects API call,
-    ' which doesn't eat up CPU time the way this loop does.
- DO
-      SLEEP 500
-      FOR ix = LBOUND(idThread) TO UBOUND(idThread)
-            THREAD STATUS idThread(ix) TO nStatus
-            IF nStatus <> -1 THEN EXIT FOR
-      NEXT
- LOOP WHILE nStatus <> -1
- PRINT "Finished! Hit anykey to continue"
- CON.WAITKEY$
-    ' Here we set nStatus to > -1 (99)
-    ' We create a thread for input and pass a value to escape_passed
-    ' The thread runs for escape_count < escape_passed
-    ' Then sends a status of -1 to have the pbmain close thread.
- nStatus = 99
- INPUT "Input escape_passed > " escape_passed
- PRINT "Input thread started"
- PRINT "Press escape "+STR$(escape_passed)+" times"
-
-PRINT "Input routine finished"
-PRINT "Hit anykey to continue"
-CON.WAITKEY$
-PRINT "Pause and Resume"
-PRINT "Type p to pause thread"
-PRINT "Type r to resume thread"
-PRINT "Hit escape to close thread"
-CON.WAITKEY$
-THREAD CREATE MyStartStopThread(0) TO Resumestartthread
-DO
-    CON.INKEY$ TO sKey$
-    SLEEP 1
-    SELECT CASE LEN(sKey$)
-      CASE 1
-      IF ASC(sKey$) = 27 THEN
-        PRINT "Pressed escape key"
-        EXIT LOOP
-      END IF
-      IF sKey$ = "r" THEN
-        CON.CLS
-        PRINT "Resume"
-        THREAD RESUME Resumestartthread TO lResult&
-      END IF
-      IF sKey$ = "p" THEN
-        CON.CLS
-        PRINT "Pause"
-        THREAD SUSPEND Resumestartthread TO lResult&
-      END IF
-    END SELECT
-LOOP
-PRINT "Program ended, press any key to continue (end program)"
-CON.WAITKEY$
-
-'------------------/GWProc
-    CON.CELL = 50,50
-           CON.PRINT "|"
-           CON.CELL = 50,50
-           CON.PRINT "/"
-           CON.CELL = 50,50
-           CON.PRINT "-"
-           CON.CELL = 50,50
-           CON.PRINT "|"
-           CON.CELL = 50,50
-           CON.PRINT "\"
-           CON.CELL = 50,50
-           CON.PRINT "-"
-           CON.CELL = 50,50

@@ -59,7 +59,7 @@
   <Watches active="0" update="Never" />
  </Watch4>
  <Files>
-  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="32" debugPath="../Src/main.c" y="96" path="../Src/main.c" left="0" selected="0" name="unnamed" top="95" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/main.c" y="96" path="../Src/main.c" left="0" selected="0" name="unnamed" top="95" />
   <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/usart.c" y="178" path="../Src/usart.c" left="0" selected="0" name="unnamed" top="178" />
   <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Src/mcu_serial_cmd.c" y="32" path="../Src/mcu_serial_cmd.c" left="0" selected="0" name="unnamed" top="21" />
   <SessionOpenFile useTextEdit="1" useBinaryEdit="0" codecName="Default" x="0" debugPath="../Inc/mcu_global.h" y="14" path="../Inc/mcu_global.h" left="0" selected="0" name="unnamed" top="0" />

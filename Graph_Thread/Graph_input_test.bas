@@ -7,11 +7,12 @@
 
 FUNCTION PBMAIN
     GLOBAL MAIN_WINDOW                    AS DWORD
-    GLOBAL Resumestartthread AS LONG
+    GLOBAL Resumestartthread            AS LONG
+    GLOBAL thrdid                       AS LONG
     DIM KNAPPVARDE                      AS GLOBAL STRING
     DIM KNAPPBEHANDLING_TRADNR          AS LONG
     LOCAL nStatus AS LONG
-FONSTEROPPNING:
+
     GRAPHIC WINDOW "TEST OF GRAPHIC INKEY$", 0, 0, 300, 300 TO MAIN_WINDOW
     GRAPHIC ATTACH MAIN_WINDOW, 0&
     GRAPHIC CLEAR %LIGHTGRAY
@@ -21,8 +22,7 @@ START_OF_THREAD:
     THREAD CREATE KEY_HANDLING (0) TO KNAPPBEHANDLING_TRADNR
     THREAD CREATE MyStartStopThread(0) TO Resumestartthread
 SHOW_TIME:
-    mytimesafethread(0)
-    SLEEP 500
+    SLEEP 700
     THREAD STATUS KNAPPBEHANDLING_TRADNR TO nStatus
     IF nStatus = -1 THEN
       THREAD CLOSE KNAPPBEHANDLING_TRADNR TO nStatus
@@ -32,26 +32,35 @@ SHOW_TIME:
     GOTO SHOW_TIME
 END_MAIN:
 END FUNCTION
+
 FASTPROC mytimesafethread (BYVAL printsem AS LONG) THREADSAFE AS LONG
-    GRAPHIC ATTACH MAIN_WINDOW, 0&
+    GRAPHIC ATTACH MAIN_WINDOW, 0&, REDRAW
     GRAPHIC SET POS (100, 100)
     GRAPHIC PRINT TIME$
 END FASTPROC = -1
-FASTPROC mysafethread (BYVAL printsem AS LONG) THREADSAFE AS LONG
-         GRAPHIC ATTACH MAIN_WINDOW, 0&
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "|": GRAPHIC REDRAW
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "/": GRAPHIC REDRAW
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "-": GRAPHIC REDRAW
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "\": GRAPHIC REDRAW
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "|": GRAPHIC REDRAW
-         GRAPHIC SET POS (50,50): GRAPHIC PRINT "-": GRAPHIC REDRAW
-END FASTPROC = -1
 
 THREAD FUNCTION MyStartStopThread (BYVAL Filler AS LONG) AS LONG
-   GRAPHIC ATTACH MAIN_WINDOW, 0&
+
    DO
-         SLEEP 50
-         mysafethread(0)
+         SLEEP 15
+         GRAPHIC ATTACH MAIN_WINDOW, 0& , REDRAW
+         GRAPHIC SET POS (0,50): GRAPHIC PRINT "Running" : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " / "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " - "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " \ "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " | "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " / "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " - "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " \ "  : GRAPHIC REDRAW
+         SLEEP 15
+         GRAPHIC SET POS (50,50): GRAPHIC PRINT " | "  :   GRAPHIC REDRAW
    LOOP
    FUNCTION = -1
 END FUNCTION
@@ -60,24 +69,25 @@ THREAD FUNCTION KEY_HANDLING (BYVAL SLASK AS LONG) AS LONG
 '==========================================================
 '
 LOCAL lResult AS DWORD
+
 KEY_CHECK:
-    GRAPHIC ATTACH MAIN_WINDOW, 0&
+    GRAPHIC ATTACH MAIN_WINDOW, 0& , REDRAW
     GRAPHIC INKEY$ TO KNAPPVARDE
     IF LEN(KNAPPVARDE) > 0 THEN
         IF ASC(KNAPPVARDE) = 27 THEN
            FUNCTION = -1 : EXIT FUNCTION
+        ELSEIF KNAPPVARDE = "r" THEN
+                    GRAPHIC SET POS (0,0): GRAPHIC PRINT "Resume   "
+                    GRAPHIC REDRAW
+                    THREAD RESUME Resumestartthread TO lResult
+                    GRAPHIC INPUT FLUSH
+        ELSEIF KNAPPVARDE = "p" THEN
+                    GRAPHIC SET POS (0,0): GRAPHIC PRINT "Pause    "
+                    GRAPHIC REDRAW
+                    THREAD SUSPEND Resumestartthread TO lResult
+                    GRAPHIC INPUT FLUSH
         END IF
     END IF
     SLEEP 100
     GOTO KEY_CHECK
 END FUNCTION
- '   SELECT CASE LEN(KNAPPVARDE)
- '         CASE 1
- '             IF ASC(KNAPPVARDE) = 27 THEN
- '                 function = -1 :  exit function    ' Esc to quit
- '             ELSEIF KNAPPVARDE = "r" THEN
- '                   THREAD RESUME Resumestartthread TO lResult
- '                ELSEIF KNAPPVARDE = "p" THEN
- '                      THREAD SUSPEND Resumestartthread TO lResult
- '                END IF
- '   END SELECT

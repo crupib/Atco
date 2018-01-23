@@ -1,0 +1,31 @@
+SET WATCOM=C:\WATCOM
+SET PATH=%WATCOM%\BINNT;%WATCOM%\BINW;%PATH%
+SET EDPATH=%WATCOM%\EDDAT
+SET INCLUDE=%WATCOM%\H;%WATCOM%\H\NT;..\MMBASIC;DOS_Source
+
+DEL /q *.err
+DEL /q *.obj
+DEL /q MMBasic.exe
+
+WCC386 /mf /3s "DOS_Source\Main.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "DOS_Source\DOS_IO.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "DOS_Source\Memory.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "..\MMBASIC\Commands.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "..\MMBASIC\Custom.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "..\MMBASIC\Functions.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "..\MMBASIC\MMBasic.c"
+IF %ERRORLEVEL% NEQ 0 pause
+WCC386 /mf /3s /dDOS "..\MMBASIC\Operators.c"
+IF %ERRORLEVEL% NEQ 0 pause
+
+WLINK system nt name MMBasic.exe file Commands.obj file Custom.obj file DOS_IO.obj file Functions.obj file Main.obj file MMBasic.obj file Operators.obj file Memory.obj library CLIB3S.LIB library MATH387S.LIB
+IF %ERRORLEVEL% NEQ 0 pause
+
+DEL /q *.obj
+

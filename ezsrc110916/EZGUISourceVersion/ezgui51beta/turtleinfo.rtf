@@ -1,0 +1,290 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss Arial;}{\f1\fswiss\fprq2\fcharset0 Arial;}{\f2\fswiss Courier New;}{\f3\fswiss\fcharset0 Arial;}}
+{\colortbl ;\red0\green0\blue255;\red128\green0\blue0;}
+{\*\generator Msftedit 5.41.15.1507;}\viewkind4\uc1\pard\tx360\lang1024\f0\fs22\par
+\pard\qc\tx360\cf1\lang1033\b\f1\fs18 A - Animate Frame Macro\b0\par
+\cf0\b\f0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab A n ;\b0\tab\tab\tab\tab\par
+\cf0\par
+\tab\tab Animate Frame command. This command should usually be the first command in your Turtle command string. The parameter n is the frame number (from 1 to 100, a value of 0 (zero) turns the animation feature off). By changing the frame number for each frame the Turtle engine will automatically calculate all offsets for each zone which will affect every command in that zone.\par
+\par
+\par
+\pard\qc\tx360\cf1\b B - BG Pen Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab B p ;\b0\tab\tab\tab\tab\par
+\cf0\par
+\tab\tab Background color command. The background color (pen 0) can be changed with this command. Rather than define it with the \b C\b0  command, this command just changes the background color to the pen color defined in the pen number ( \b p \b0 ) parameter.\par
+\b\par
+\pard\ri2100\tx360\par
+\pard\qc\tx360\cf1 C - Color Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab     C r,g,b ;\par
+\cf0\par
+\tab\tab\b0 Set Color for current pen. The \b r,g,b\b0  values (Red,Green,Blue) are 0 to 255 \par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 D - Draw Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab D x,y ;\tab\tab\par
+\cf0\b0\par
+\tab\tab Draw a single pixel at \b x,y\b0  coordinates using current pen color.\par
+\b\par
+\pard\ri2100\tx360\par
+\pard\qc\tx360\cf1 E - Ellipse Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab E w,h ;\b0\tab\tab\par
+\cf0\par
+\tab\tab Draw an ellipse. Top left corner is at current pen position. \b w\b0  and \b h\b0  are the width and  height in pixels. The current pen color is used for the border. The Pen color 0 is used for the inside of the ellipse. And the hatch, style and width values that are current affect the ellipse.\par
+\par
+\cf2\b Macro Syntax:\tab\tab\tab\tab E w,h, mode ;\b0\tab\tab\par
+\cf0\par
+\tab\tab Alternate draw an ellipse command. The mode parameter controls how the ellipse is drawn. \par
+\par
+\tab\tab The available modes are:\par
+\tab\tab 0 - Normal Ellipse\par
+\tab\tab 1 - Half Ellipse (left half) (filled)\par
+\tab\tab 2 - Half Ellipse (right half) (filled)\par
+\tab\tab 3 - Half Ellipse (top half) (filled)\par
+\tab\tab 4 - Half Ellipse (bottom half) (filled)\par
+\tab\tab 5 - Quarter Ellipse (left top corner) (filled)\par
+\tab\tab 6 - Quarter Ellipse (right top corner) (filled)\par
+\tab\tab 7 - Quarter Ellipse (right bottom corner) (filled)\par
+\tab\tab 8 - Quarter Ellipse (left bottom corner) (filled)\par
+\tab\tab 9 to 16 Same as 1 to 8, but it draws an arc (line) only.\par
+\tab\tab 17 Draws an complete 360 degree arc (unfilled circle)\par
+\par
+\b\par
+\pard\qc\tx360\cf1 F - Fill Screen Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab F n;\tab\tab\par
+\cf0\b0\par
+\tab\tab Fill Screen command. This command fills the entire object with the current pen color. The \b n\b0  parameter selects the Raster operation style (0-15). Style 0 is solid color and style 1 will invert the existing image. Styles 2 to 15 are various raster combinations.\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 G - Gradient Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab G p1,p1,s;\tab\tab\par
+\cf0\b0\par
+\tab\tab Gradient command fills the entire object with a gradient starting with the first pen color (\b p1\b0 ) to the second pen color (\b p2\b0 ). The style (\b s\b0 ) is as follows.\par
+\tab\tab\par
+The style (\b  s \b0 ) is a value from 0 to 7.\par
+\par
+\tab\tab 0 - Left to right\par
+\tab\tab 1 - Right to left\par
+\tab\tab 2 - Top to Bottom\par
+\tab\tab 3 - Bottom to top\par
+\tab\tab 4 - 3D affect - Left to right/right to left\par
+\tab\tab 5 - 3D affect - right to left/left to right\par
+\tab\tab 6 - 3D affect - top to bottom/bottom to top\par
+\tab\tab 7 - 3D affect - bottom to top/top to bottom\par
+\par
+\tab\tab The 3D affects split the object in half and uses opposite directions for the gradient in each half. I think it is a neat affect.\par
+\b\par
+\cf2 Macro Syntax:\tab\tab\tab\tab G p1,p1,s, w, h;\tab\tab\par
+\cf0\b0\par
+\tab\tab Alternate Gradient command works just like the Gradient command above, except that rather than fill the entire object it fills a defined rectangle with a gradient starting with the first pen color (\b p1\b0 ) to the second pen color (\b p2\b0 ). The style (\b s\b0 ) is as the same as above. The rectangle is defined by the last pen position (use the \b M\b0  command) as the top left corner and by the width (\b w\b0 ) and the height (\b h\b0 ) parameters.\par
+\par
+\par
+\pard\qc\tx360\cf1\b H - Hatch Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab H n ;\tab\tab\tab\tab\par
+\cf0\b0\par
+\tab\tab Select Hatch value for fills when drawing Rectangles and Ellipses and Fill. \b n=\b0 0 (solid color), hatches 1 to 6 are patterns with a solid background color (pen 0). hatches 8 to 13 are the same patterns with a transparent background.\par
+\b\par
+\pard\ri2100\tx360\par
+\pard\qc\tx360\cf1 I - Image Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab I r,g,b ;\tab\tab\par
+\cf0\b0\par
+\tab\tab Image command. Modifies the entire object by adding or subtracting \b r,g,b \b0 values from each pixel. r,g,b is a value from -255 to 255 .\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 L - Line Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax: \tab\tab\tab\tab L x,y ;\par
+\cf0\par
+ \tab\tab\b0 Draw line using current pen color, current pen width and current pen style from current pen position to the \b x,y \b0 coordinates in the command. The current pen position moves to end of line.\par
+\par
+\cf2\b Macro Syntax:  \tab\tab\tab\tab L len, deg, ideg, rep ;\b0\tab\tab\par
+\cf0\par
+\tab\tab Alternate Draw line command. Starting from the current pen position (using M command) and using the current pen color, current pen width and current pen style it draws a line based on the next parameters:  \b len =\b0  length of line in pixels\b , deg= \b0 using 360 degrees in a circle (1 to 360) this value selects the starting direction for the line and \b ideg=\b0  the number of degrees to increment for the next drawing of the line and \b rep= \b0 the number of times to repeat drawing the line. Using this form of the line command you can draw a triangle, square, octagon,etc., even a circle with just one command.\par
+\par
+\tab\tab The degrees for directions are based on the directions below:\par
+\par
+\b\f2       360\par
+       |\par
+  270-----90\par
+       |\par
+      180\par
+\b0\f0\fs20\par
+\cf2\b\fs18 Macro Syntax :\tab\tab\tab\tab L len, deg, ideg, rep, mode ;\par
+\cf0\par
+\b0\tab\tab Another alternate Draw line command. This command is the same as above, but it adds one more parameter. The \b mode\b0  parameter selects how the line rotates. The modes are as follows:\par
+\par
+\tab\tab 0 - Normal rotatation (adds the \b ideg\b0  value to each rotation)\par
+\tab\tab 1 - Toggle Rotation (add \b ideg\b0  value, then subtracts \b ideg\b0  value)\par
+\tab\tab 2 - Spin (rotate around first pen position). You can make flowers with this.\par
+\par
+\par
+\pard\qc\tx360\cf1\b M - Move Pen Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab   M x,y ;\par
+\cf0\b0\par
+\tab\tab Move Current Pen Position to \b x, y \b0 coordinates. This will be in Pixels if the Viewport mode is OFF. If the Viewport mode is ON then the coordinates will be in Turtle Units. The Turtle DLL calculates the actual number of pixels based on the size of the viewport compared to the actual size of the Turtle object.\par
+\par
+\cf2\b Macro Syntax:     M x,y,r,deg ;\par
+\cf0\par
+\b0\tab\tab Alternate Move pen position command. The command uses the \b x \b0 , \b y\b0  coordinates as a starting point. Then it calculates the position of the actual pen position by treaing the \b x, y \b0 coordinates as the center of a circle, then using the degrees (\b deg\b0 ) parameter (value from 1 to 360 degrees) and the radius (\b r\b0 ) parameter it calculates a point on the defined circle. This point becomes the actual pen position (not the x,y coordinates). \par
+\pard\ri2100\tx360\par
+\pard\tx360\par
+\pard\qc\tx360\cf1\b O - Offset Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab O a, v ;\b0\tab\tab\par
+\cf0\par
+\tab\tab This is the Offset command . The command must come after a Zone ( Z ) command. The offsets are applied to the active zone only.  \b a\b0  is the aspect for that zone and \b v\b0  is the offset value for that aspect. The zone number ( z ) can only be a value of 1 to 8. The aspect value ( a ) can only be 1 to 6.\par
+\par
+\tab\tab There are 6 aspects for any zone as follows:\par
+\par
+\tab\tab 1 = x coordinate offset (affects M, L, D commands)\par
+\tab\tab 2 = y coordinate offset (affects M, L, D commands)\par
+\tab\tab 3 = width (w) offset (affects E, R, G commands)\par
+\tab\tab 4 = height (h) offset (affects E, R, G commands)\par
+\tab\tab 5 = length (l) offset (affects L , M  (when using using r, deg) commands)\par
+\tab\tab 6 = starting degree (deg) offset (affects L , M  (using r, deg) commands)\par
+\par
+\tab\tab The offset value ( v ) can be a positive or negative number. If a zone is active (using the Z command) then all the commands listed after it (until a new zone is defined or zone 0 is used which turns off zones) are affected by the offset values. The offset value is added (subtracted it negative number) to the appropriate aspect for these commands, based on the Frame number (see A command). Lets say we select a pen position x coordinate of say 10 (using the M command) . If the offset for the x coordinate is +15 and the frame number is say 12 then the pen position is offset by the follwing formula.\par
+\par
+\tab\tab offset = (frame_num - 1)   X     x_offset\par
+\tab\tab new_x =  old_x + offset\par
+\par
+\tab\tab or\par
+\par
+\tab\tab 165 = (12 - 1)   X  15\par
+\tab\tab new_x = 175 = 10 + 165\par
+\par
+\tab\tab The purpose of this command is that with it you can easily create animation frames and move objects (zones) around. You only have to define the Turtle commands the animation one time . Then to move each frame, you simply create a text string for each frame in your animation by prefacing the one animation sequence with an animation frame number using the following command:\par
+\b\par
+\b0\par
+\pard\qc\tx360\cf1\b P - Pen Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:   \tab\tab P n ;\par
+\cf0\par
+\b0\tab\tab Select Pen number ( \b n \b0 ) ( pens 0-32) Pen 0 is also used as the background pen for the fills (both solid and hatch) for ellipses and rectangles and fills.\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 R - Rectangle Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab R w,h ;\tab\tab\par
+\cf0\b0\tab\tab\par
+\tab\tab Draw a rectangle. Top left corner is at current pen position\b . w\b0  and \b h\b0  are the width and height in pixels. The current pen color is used for the border. The Pen color 0 is used for the inside of the rectangle. And the hatch, style and width values that are current affect the rectangle. The current pen position doesn't change after this command.\par
+\par
+\cf2\b Macro Syntax:\tab\tab\tab\tab R w,h, cw,ch ;\tab\tab\par
+\cf0\b0\par
+\tab\tab Alternate draw rectangle command. It is the same as above except that it rounds the corners of the rectangle. The parameters \b cw\b0  and \b ch\b0  are the width and height of the corner.\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 S - Style Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab S n ;\tab\tab\tab\tab\par
+\cf0\b0\par
+\tab\tab Select Pen style number ( \b n\b0  ) (0 to 5).\par
+\tab\tab  0 is solid, 1-5 are different dotted line styles (only for width of 1)\par
+\par
+\par
+\pard\qc\tx360\cf1\b T - Text Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2\f1 Macro Syntax:\tab\tab\tab\tab\b0  \b fontname, props | text string ;\b0\tab\tab\tab\tab\par
+\cf0\par
+\tab\tab This macro is for defining text that will be displayed by the next R (rectangle) macro.\par
+\par
+\tab\tab\tab example:\tab\tab T Arial , BI | This is some text to draw ;\par
+\par
+\pard\tab To draw the text, first position the pen using the M (move) macro.This will be the top/left corner of a rectangle where the text will bedrawn. Then define the text using the T (Text) macro. You can define not only the text but also the font using the same properties used in the EZ_DefFont command. Lastly, you draw the text by using the R (rectangle) macro. The Turtle control will check the size of the rectangle and the use the largest font possible to fill the rectangle with the text. There is no need to worry about font sizes this way. \par
+\par
+\pard\tx360\lang1024\f0\par
+\pard\qc\tx360\cf1\b U - Update Palette Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab U n ;\b0\tab\tab\tab\tab\par
+\cf0\par
+\tab\tab Update Color palette command. This command creates a new palette of colors to work with, rather than having to redefine every pen color. The background color (pen 0) is left alone, while the other pens (1 to 32) are changed to match the new palette. \par
+\par
+\tab\tab The available palette numbers (\b n\b0 )are as follows:\par
+\par
+\tab\tab 0 - Standard Palette (uses QuickBasic 16 colors and 16 gray scale colors)\par
+\tab\tab 1 - Gray Scale Palette\par
+\tab\tab 2 - Red Palette\par
+\tab\tab 3 - Green Palette\par
+\tab\tab 4 - Blue Palette\par
+\tab\tab 5 - Yellow Palette\par
+\tab\tab 6 - Cyan Palette\par
+\tab\tab 7 - Purple Palette\par
+\tab\tab 8 - Dark Red Palette\par
+\tab\tab 9 - Dark Green Palette\par
+\tab\tab 10- Dark Blue Palette\par
+\tab\tab 11- Dark Yellow Palette\par
+\tab\tab 12- Dark Cyan Palette\par
+\tab\tab 13- Dark Purple Palette\par
+\tab\tab 14- Brown Palette\par
+\par
+\par
+\cf2\b Macro Syntax:\tab\tab\tab\tab U n, p1, p2 ;  \b0\tab\tab\par
+\cf0\par
+\tab\tab If the palette number is 15 then two more parameters are needed. This command will ramp (spread) the colors in pens \b p1\b0  to \b p2\b0 . All you need to do is define the \b p1\b0  and \b p2\b0  pen colors with the \b C\b0  command and then this command will fill in between them.\par
+\par
+\tab\tab 15- Custom Palette\par
+\b\par
+\b0\par
+\pard\qc\tx360\cf1\b V - Viewport Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab V m;\par
+\cf0\par
+\b0\tab\tab Sets Viewport to OFF if \b m\b0  is 0 (zero).\par
+\b\par
+\cf2 Macro Syntax:\tab\tab V m,w,h ;\par
+\cf0\par
+\b0\tab\tab Set Viewport to ON if \b m\b0  is >= 1. The values \b w\b0  (width or X axis) and \b h\b0  (height or Y axis) are number of Turtle Units in the entire Turtle object. For example, if the width is set to 100 turtle units and the actual width is say 200 pixels, then each turtle unit is actually two pixels in size. If the Viewport is OFF, then the image will not resize correctly if you move it on a sprite path (changing sizes at different nodes). If the Viewport is ON the image will resize itself automatically. Also by using a viewport it makes it easier to work with the Turtle graphics. The viewport affects not only x,y coordinates but also the width of objects and the pen width as well.\par
+\b\par
+\pard\ri2100\tx360\par
+\pard\qc\tx360\cf1 W - Width Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab W n ;\tab\tab\tab\tab\par
+\cf0\b0\par
+\tab\tab Select Pen Width. \b n=\b0 1 or more pixels. (n=1 to 50)\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 X - Center Mode Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab X mode;\par
+\cf0\par
+\b0\tab\tab The X command is used to toggle on and off the center mode for ellipses, rectangles and gradients (with defined width and height). If the \b mode\b0  value is 0 (zero) then the center mode is OFF. The named shapes will use the pen position as the top left corner. If the \b mode\b0  value is 1 then the center mode is ON . The named shapes (ellipse, rectangle, gradient) will use the pen position as the center of the object.\par
+\par
+\pard\ri2100\tx360\b\par
+\pard\qc\tx360\cf1 Z - Zone Macro\par
+\cf0 ____________________________\par
+\par
+\pard\tx360\cf2 Macro Syntax:\tab\tab\tab\tab Z n ;\b0\tab\tab\tab\tab\par
+\cf0\par
+\tab\tab This is the Zone command. When you create your turtle graphics text string with commands, you can preface certain groups of commands with the Zone command to group those commands as if it were a single object. Then when the turtle graphics engine creates an animation frame those objects that are in a certain Zone will be affected only by the Offset commands for that zone. The \b n\b0  parameter is the zone number (1-8). If you use a value of 0 (zero) this will turn off the zone affect. There are 8 zones you can work with.\par
+\pard\ri2100\tx360\b\par
+\pard\lang1033\b0\f3\par
+}
+ 

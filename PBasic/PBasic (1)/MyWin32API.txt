@@ -1,0 +1,15 @@
+CoInitialize 4
+CoUninitialize 0
+ScrollConsoleScreenBufferW 20
+PeekConsoleInputW 16
+ClearCommError 12
+EscapeCommFunction 8
+GetCommModemStatus 8
+GetCommProperties 8
+GetCommState 8
+SetCommState 8
+SetCommTimeouts 8
+SetupComm 12
+MessageBeep 4
+closesocket 4
+WSACleanup 0

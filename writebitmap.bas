@@ -284,7 +284,7 @@ FUNCTION fp_peak_find_asm (BYVAL buff AS STRING POINTER, length AS INTEGER, thre
     ! jz  L14
     ! jmp L18
 !L2:
-    ! cmp	word ptr threshold_sense,+001
+    ! cmp   word ptr threshold_sense,001
     ! jnz L19
     ! mov eax,&h0FFFF
     ! mov dh,byte ptr threshold
@@ -295,139 +295,139 @@ FUNCTION fp_peak_find_asm (BYVAL buff AS STRING POINTER, length AS INTEGER, thre
     ! and ecx,-004
     ! jz  L20
 !L25:
-    ! mov dl,[edi+001h]
+    ! mov dl,[edi+001]
     ! cmp dl,dh
-    ! jng $L21
+    ! jng L21
     ! mov dh,dl
     ! mov eax,edi
     ! inc eax
-    ! mov dl,[edi+002h]
+    ! mov dl,[edi+002]
     ! cmp dl,dh
-    ! jng $L22
+    ! jng L22
     ! mov dh,dl
     ! inc eax
-    ! mov dl,[edi+003h]
+    ! mov dl,[edi+003]
     ! cmp dl,dh
-    ! jng $L23
+    ! jng L23
     ! mov dh,dl
     ! inc eax
-    ! mov dl,[edi+004h]
+    ! mov dl,[edi+004]
     ! cmp dl,dh
-    ! jng $L24
+    ! jng L24
     ! mov dh,dl
     ! inc eax
-$L24:
-    ! add edi,+004h
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L23:
-    ! mov dl,[edi+004h]
+!L24:
+    ! add edi,+004
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L23:
+    ! mov dl,[edi+004]
     ! cmp dl,dh
-    ! jnle    $L27
-    ! add edi,+004h
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L22:
-    ! mov dl,[edi+003h]
+    ! jnle    L27
+    ! add edi,+004
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L22:
+    ! mov dl,[edi+003]
     ! cmp dl,dh
-    ! jg  $L28
-    ! mov dl,[edi+004h]
+    ! jg  L28
+    ! mov dl,[edi+004]
     ! cmp dl,dh
-    ! jg  $L27
-    ! add edi,+004h
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L21:
-    ! mov dl,[edi+002h]
+    ! jg  L27
+    ! add edi,+004
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L21:
+    ! mov dl,[edi+002]
     ! cmp dl,dh
-    ! jg  $L29
-    ! mov dl,[edi+003h]
+    ! jg  L29
+    ! mov dl,[edi+003]
     ! cmp dl,dh
-    ! jg  $L28
-    ! mov dl,[edi+004h]
+    ! jg  L28
+    ! mov dl,[edi+004]
     ! cmp dl,dh
-    ! jg  $L27
-    ! add edi,+004h
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L20:
+    ! jg  L27
+    ! add edi,+004
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L20:
     ! inc edi
-$L33:
+!L33:
     ! or  esi,esi
-    ! jz  $L30
-$L32:
+    ! jz  L30
+!L32:
     ! mov dl,[edi]
     ! cmp dl,dh
-    ! jg  $L31
+    ! jg  L31
     ! inc edi
     ! dec esi
-    ! jnz $L32
-$L30:
+    ! jnz L32
+!L30:
     ! mov edi,dword ptr time_of_flight
     ! sub eax,tof
     ! mov [edi],ax
     ! mov al,dh
     ! xor ah,ah
     ! ret
-$L29:
+!L29:
     ! mov dh,dl
-    ! add edi,+002h
+    ! add edi,+002
     ! mov eax,edi
-    ! add esi,+002h
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L28:
+    ! add esi,+002
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L28:
     ! mov dh,dl
-    ! add edi,+003h
+    ! add edi,+003
     ! mov eax,edi
     ! inc esi
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L27:
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L27:
     ! mov dh,dl
-    ! add edi,+004h
+    ! add edi,+004
     ! mov eax,edi
-    ! sub ecx,+004h
-    ! jnz $L25
-    ! jz  $L26
-$L31:
+    ! sub ecx,+004
+    ! jnz L25
+    ! jz  L26
+!L31:
     ! mov dh,dl
     ! mov eax,edi
     ! inc edi
     ! dec esi
-    ! jnz $L33
-    ! jz  $L30
-    ! jmp $L34
-$L19:
-    ! mov eax,0FFFFh
+    ! jnz L33
+    ! jz  L30
+    ! jmp L34
+!L19:
+    ! mov eax,&H0FFFF
     ! mov dh,byte ptr threshold
     ! dec edi
-$L41:
+!L41:
     ! mov ecx,esi
-    ! and esi,+003h
-    ! and ecx,-004h
-    ! jz  $L35
-$L40:
-    ! mov dl,[edi+001h]
+    ! and esi,+003
+    ! and ecx,-004
+    ! jz  L35
+!L40:
+    ! mov dl,[edi+001]
     ! cmp dl,dh
-    ! jnl $L36
+    ! jnl L36
     ! mov dh,dl
     ! mov eax,edi
     ! inc eax
-    ! mov dl,[edi+002h]
+    ! mov dl,[edi+002]
     ! cmp dl,dh
-    ! jnl $L37
+    ! jnl L37
     ! mov dh,dl
     ! inc eax
     ! mov dl,[edi+003h]
     ! cmp dl,dh
-    ! jnl $L38
+    ! jnl L38
     ! mov dh,dl
     ! inc eax
     ! mov dl,[edi+004h]
@@ -435,32 +435,32 @@ $L40:
     ! jnl $L39
     ! mov dh,dl
     ! inc eax
-$L39:
-    ! add edi,+004h
-    ! sub ecx,+004h
+!L39:
+    ! add edi,+004
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L38:
+!L38:
     ! mov dl,[edi+004h]
     ! cmp dl,dh
     ! jl  $L42
-    ! add edi,+004h
-    ! sub ecx,+004h
+    ! add edi,+004
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L37:
+!L37:
     ! mov dl,[edi+003h]
     ! cmp dl,dh
     ! jl  $L43
     ! mov dl,[edi+004h]
     ! cmp dl,dh
     ! jl  $L42
-    ! add edi,+004h
-    ! sub ecx,+004h
+    ! add edi,+004
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L36:
-    ! mov dl,[edi+002h]
+!L36:
+    ! mov dl,[edi+002]
     ! cmp dl,dh
     ! jl  $L44
     ! mov dl,[edi+003h]
@@ -469,62 +469,62 @@ $L36:
     ! mov dl,[edi+004h]
     ! cmp dl,dh
     ! jl  $L42
-    ! add edi,+004h
-    ! sub ecx,+004h
+    ! add edi,+004
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L35:
+!L35:
     ! inc edi
-$L48:
+!L48:
     ! or  esi,esi
     ! jz  $L45
-$L47:
+!L47:
     ! mov dl,[edi]
     ! cmp dl,dh
     ! jl  $L46
     ! inc edi
     ! dec esi
     ! jnz $L47
-$L45:
-    ! mov	edi, time_of_flight
+!L45:
+    ! mov   edi, time_of_flight
     ! sub eax,tof
     ! mov [edi],ax
     ! mov al,dh
     ! xor ah,ah
     ! ret
-$L44:
+!L44:
     ! mov dh,dl
-    ! add edi,+002h
+    ! add edi,+002
     ! mov eax,edi
-    ! add esi,+002h
-    ! sub ecx,+004h
+    ! add esi,+002
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L43:
+!L43:
     ! mov dh,dl
-    ! add edi,+003h
+    ! add edi,+003
     ! mov eax,edi
     ! inc esi
-    ! sub ecx,+004h
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L42:
+!L42:
     ! mov dh,dl
-    ! add edi,+004h
+    ! add edi,+004
     ! mov eax,edi
-    ! sub ecx,+004h
+    ! sub ecx,+004
     ! jnz $L40
     ! jz  $L41
-$L46:
+!L46:
     ! mov dh,dl
     ! mov eax,edi
     ! inc edi
     ! dec esi
     ! jnz $L48
     ! jz  $L45
-$L34:
+!L34:
     ! jmp $L18
-$L1:
+!L1:
     ! cmp word ptr absolute_value,+000h
     ! jz  $L49
     ! mov dh, byte ptr threshold
@@ -533,16 +533,16 @@ $L1:
     ! and esi,+007h
     ! and ecx,-008h
     ! jz  $L50
-$L59:
+!L59:
     ! mov bl,[edi]
     ! mov al,[ebx+$S4]
     ! cmp al,dh
     ! jnle    $L51
-    ! mov bl,[edi+001h]
+    ! mov bl,[edi+001]
     ! mov al,[ebx+$S4]
     ! cmp al,dh
     ! jnle    $L52
-    ! mov bl,[edi+002h]
+    ! mov bl,[edi+002]
     ! mov al,[ebx+$S4]
     ! cmp al,dh
     ! jnle    $L53
@@ -569,320 +569,320 @@ $L59:
     ! add edi,+008h
     ! sub ecx,+008h
     ! jnz $L59
-$L50:
+!L50:
     ! or  esi,esi
     ! jz  $L60
-$L62:
+!L62:
     ! mov al,[edi]
     ! cmp al,dh
     ! jnle    $L61
     ! inc edi
     ! dec esi
     ! jnz $L62
-$L60:
+!L60:
     ! xor eax,eax
     ! ret
-$L51:
+!L51:
     ! sub edi,tof
     ! mov ebx,time_of_flight
     ! mov [ebx],di
     ! xor eax,eax
-    ! mov eax,0001h
+    ! mov eax,0001
     ! ret
-$L52:
+!L52:
     ! inc edi
     ! sub edi,tof
     ! mov ebx,time_of_flight
     ! mov [ebx],di
     ! xor eax,eax
-    ! mov eax,0001h
+    ! mov eax,0001
     ! ret
-$L53:
-    ! add edi,+002h
+!L53:
+    ! add edi,+002
     ! sub edi,tof
     ! mov ebx,time_of_flight
     ! mov [ebx],di
     ! xor eax,eax
-    ! mov eax,0001h
+    ! mov eax,0001
     ! ret
-$L54:
-    ! add edi,+003h
+!L54:
+    ! add edi,+003
     ! sub edi,tof
     ! mov ebx,time_of_flight
     ! mov [ebx],di
     ! xor eax,eax
-    ! mov eax,0001h
+    ! mov eax,0001
     ! ret
-$L55:
-    ! add edi,+004h
+!L55:
+    ! add edi,+004
     ! sub edi,tof
     ! mov ebx,time_of_flight
     ! mov [ebx],di
     ! xor eax,eax
-    ! mov eax,0001h
+    ! mov eax,0001
     ! ret
-$L56:
+!L56:
     ! add edi,+005h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L57:
-    ADD edi,+006h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L58:
-    ADD edi,+007h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L61:
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-    jmp $L18
-$L49:
-    cmp WORD PTR threshold_sense,+001h
-    jnz $L63
-    mov dh, BYTE PTR threshold
-    mov ecx,esi
-    AND esi,+007h
-    AND ecx,-008h
-    jz  $L64
-$L73:
-    mov eax,[edi]
-    cmp al,dh
-    jg  $L65
-    cmp ah,dh
-    jg  $L66
-    mov eax,[edi+002h]
-    cmp al,dh
-    jg  $L67
-    cmp ah,dh
-    jnle    $L68
-    mov eax,[edi+004h]
-    cmp al,dh
-    jnle    $L69
-    cmp ah,dh
-    jnle    $L70
-    mov eax,[edi+006h]
-    cmp al,dh
-    jnle    $L71
-    cmp ah,dh
-    jnle    $L72
-    ADD edi,+008h
-    SUB ecx,+008h
-    jnz $L73
-$L64:
-    OR  esi,esi
-    jz  $L74
-$L76:
-    mov al,[edi]
-    cmp al,dh
-    jnle    $L75
-    inc edi
-    dec esi
-    jnz $L76
-$L74:
-    XOR eax,eax
-    ret
-$L65:
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L66:
-    inc edi
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L67:
-    ADD edi,+002h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L68:
-    ADD edi,+003h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L69:
-    ADD edi,+004h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L70:
-    ADD edi,+005h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L71:
-    ADD edi,+006h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L72:
-    ADD edi,+007h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L75:
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-    jmp $L18
-$L63:
-    mov dh, BYTE PTR threshold
-    mov ecx,esi
-    AND esi,+007h
-    AND ecx,-008h
-    jz  $L77
-$L86:
-    mov eax,[edi]
-    cmp al,dh
-    jl  $L78
-    cmp ah,dh
-    jl  $L79
-    mov eax,[edi+002h]
-    cmp al,dh
-    jl  $L80
-    cmp ah,dh
-    jl  $L81
-    mov eax,[edi+004h]
-    cmp al,dh
-    jl  $L82
-    cmp ah,dh
-    jl  $L83
-    mov eax,[edi+006h]
-    cmp al,dh
-    jl  $L84
-    cmp ah,dh
-    jl  $L85
-    ADD edi,+008h
-    SUB ecx,+008h
-    jnz $L86
-$L77:
-    OR  esi,esi
-    jz  $L87
-$L89:
-    mov al,[edi]
-    cmp al,dh
-    jl  $L88
-    inc edi
-    dec esi
-    jnz $L89
-$L87:
-    XOR eax,eax
-    ret
-$L78:
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L79:
-    inc edi
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L80:
-    ADD edi,+002h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L81:
-    ADD edi,+003h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L82:
-    ADD edi,+004h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L83:
-    ADD edi,+005h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L84:
-    ADD edi,+006h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L85:
-    ADD edi,+007h
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L88:
-    SUB edi,tof
-    mov ebx,time_of_flight
-    mov [ebx],di
-    XOR eax,eax
-    mov eax,0001h
-    ret
-$L18:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L57:
+    ! ADD edi,+006h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L58:
+    ! ADD edi,+007h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L61:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+    ! jmp $L18
+!L49:
+    ! cmp WORD PTR threshold_sense,001
+    ! jnz $L63
+    ! mov dh, BYTE PTR threshold
+    ! mov ecx,esi
+    ! AND esi,+007h
+    ! AND ecx,-008h
+    ! jz  $L64
+!L73:
+    ! mov eax,[edi]
+    ! cmp al,dh
+    ! jg  $L65
+    ! cmp ah,dh
+    ! jg  $L66
+    ! mov eax,[edi+002]
+    ! cmp al,dh
+    ! jg  $L67
+    ! cmp ah,dh
+    ! jnle    $L68
+    ! mov eax,[edi+004h]
+    ! cmp al,dh
+    ! jnle    $L69
+    ! cmp ah,dh
+    ! jnle    $L70
+    ! mov eax,[edi+006h]
+    ! cmp al,dh
+    ! jnle    $L71
+    ! cmp ah,dh
+    ! jnle    $L72
+    ! ADD edi,+008h
+    ! SUB ecx,+008h
+    ! jnz $L73
+!L64:
+    ! OR  esi,esi
+    ! jz  $L74
+!L76:
+    ! mov al,[edi]
+    ! cmp al,dh
+    ! jnle    $L75
+    ! inc edi
+    ! dec esi
+    ! jnz $L76
+!L74:
+    ! XOR eax,eax
+    ! ret
+!L65:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L66:
+    ! inc edi
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L67:
+    ! ADD edi,+002
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L68:
+    ! ADD edi,+003
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L69:
+    ! ADD edi,+004
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L70:
+    ! ADD edi,+005h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L71:
+    ! ADD edi,+006h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L72:
+    ! ADD edi,+007h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L75:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+    ! jmp $L18
+!L63:
+    ! mov dh, BYTE PTR threshold
+    ! mov ecx,esi
+    ! AND esi,+007h
+    ! AND ecx,-008h
+    ! jz  $L77
+!L86:
+    ! mov eax,[edi]
+    ! cmp al,dh
+    ! jl  $L78
+    ! cmp ah,dh
+    ! jl  $L79
+    ! mov eax,[edi+002]
+    ! cmp al,dh
+    ! jl  $L80
+    ! cmp ah,dh
+    ! jl  $L81
+    ! mov eax,[edi+004h]
+    ! cmp al,dh
+    ! jl  $L82
+    ! cmp ah,dh
+    ! jl  $L83
+    ! mov eax,[edi+006h]
+    ! cmp al,dh
+    ! jl  $L84
+    ! cmp ah,dh
+    ! jl  $L85
+    ! ADD edi,+008h
+    ! SUB ecx,+008h
+    ! jnz $L86
+!L77:
+    ! OR  esi,esi
+    ! jz  $L87
+!L89:
+    ! mov al,[edi]
+    ! cmp al,dh
+    ! jl  $L88
+    ! inc edi
+    ! dec esi
+    ! jnz $L89
+!L87:
+    ! XOR eax,eax
+    ! ret
+!L78:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L79:
+    ! inc edi
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L80:
+    ! ADD edi,+002
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L81:
+    ! ADD edi,+003
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L82:
+    ! ADD edi,+004
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L83:
+    ! ADD edi,+005h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L84:
+    ! ADD edi,+006h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L85:
+    ! ADD edi,+007h
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L88:
+    ! SUB edi,tof
+    ! mov ebx,time_of_flight
+    ! mov [ebx],di
+    ! XOR eax,eax
+    ! mov eax,0001
+    ! ret
+!L18:
 !   ret
 !   fp_peak_find_asm    endp
 

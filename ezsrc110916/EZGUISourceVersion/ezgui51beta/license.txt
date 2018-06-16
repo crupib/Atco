@@ -1,0 +1,88 @@
+
+EZGUI 5.0 License Agreement for binary version of software
+see addendum for Source Code version
+********************************
+In plain English !
+********************************
+
+
+		The EZGUI version 5.0 package of software (software) is owned and copyrighted by Christopher R. Boss (the Licensor).  EZGUI 5.0 is distributed by the Computer Workshop (owned and operated by Christopher R. Boss) .   All rights are reserved.
+
+		The Licensor grants the purchaser (Licensee) of the software a license to use this software on one computer system at a time.  It may be moved from one computer to another, so long as it is not used on two computer systems at the same time.  You may install the software on up to three computers, but it may only be used on one computer at a time (ie. You may have it installed on a computer at Work, on another at Home and on another such as a Laptop when traveling) Backup copies of the software can be made for archival purposes only (no limit on number of backups). If this software is installed on a network, only one user may access the software at a time. 
+
+		Parts of the software (runtime modules) can be reproduced and distributed on a royalty free basis, provided that they are accompanied by an actual application program which uses the runtime modules.  Runtime modules are the following files :
+
+
+	Main Runtime                   ezgui50.dll
+	BTree engine                  ezgui5bt.dll
+	Masked Edit control           ezgui5me.dll
+	GLCanvas control              ezgui5gl.dll
+	MCI control                   ezgui5mm.dll
+	Default Image Library         ezimglib.dll
+	Default Pattern Library       ezpatlib.dll
+	Default Component Library      cmplib1.dll
+
+		You MAY NOT distribute the runtime modules with an application or DLL that is simply a wrapper for the runtimes (ie. you create your own GUI engine that simply uses EZGUI as the core engine which you sell to others). An example of doing this is where you create a DLL to be used by other programmers which is just a wrapper for the EZGUI engine.
+
+		You MAY NOT use EZGUI to create a programming language where EZGUI is the core GUI engine of the language.
+
+		EZGUI was intended to be used by programmers who write programs other than a GUI engine itself. Any other type of application may be developed and distributed using EZGUI.
+
+		If you aren't sure whether your application is of the type that can not be created using EZGUI, simply ask yourself the question:
+
+		"Does my application compete directly with EZGUI itself ?"
+
+		If you answer yes to the above question, then your application can not be distributed royalty free.
+
+		You may use EZGUI to build any other type of application, including  Visual Designers for programmers or Visual Designers for end users royalty free. 
+
+		The runtime modules CAN NOT be freely distributed in any other manner. They are NOT Freeware, Shareware, or Public Domain. They must be distributed with an accompanying software program (EXE) that actually accesses the runtime. Distribution of the runtimes outside of the US can only be done if the Licensee has complied with all current US Export Controls.
+
+		It is suggested, but not required,  that any program created using EZGUI 5.0 that is distributed as Freeware should include the Copyright notice below in the about Dialog of your software or in any documentation that accompanies the program. The Licensee of the software may add the Copyright notice at their own discretion. The Licensor of the software is only asking this as a courtesy.
+
+"EZGUI version 5.0 Runtime
+Copyright © 2001 to 2011, Christopher R. Boss "
+
+		If the Licensee distributes any portion of the runtime modules (listed above) with an application, the Licensee agrees that the software was purchased "AS IS" and that the Licensee is solely responsible for the use of the software. The Licensee agrees to not hold the Licensor responsible for any damages that may occur by the use of the software or its distribution. The Licensee also accepts all liability that the distribution of the software may incur. In plain english, you can't sue the Licensor for any damages incurred by the use of the software and the distribution of the runtimes with your applications.
+
+		The three include files:
+
+		ezgui50.inc
+		ezwmain50.inc
+		ezgui5bt.inc
+
+, as well as the help file , printed documentation or any other include files that accompany the software must NOT be distributed to other parties or published in any form. The only exception is the publishing of short quotes (limited to a few paragraphs) from the Help file or printed documentation (but not the include files) for the purpose of training individuals in the use of the product (ie. posting messages on the Licensors Online support Forum) or for Reviews of the Software by third parties. The Include Files must never be published in any form whatsoever. 
+
+		The Help files may be printed in their entirety for the personal use of the Licensee (and the employees of the Licensee in a business). They CAN NOT be printed for use by Third parties though. Small portions of the documentation though may be posted on the EZGUI forums for the benefit of other users during discussions on how to use the product.
+
+		The Licensee can distribute the source code to any applications that they have written to use the software, so long as the EZ_Reg command with the purchaser's Customer ID and Registration Number are NOT left in the source code with the actual ID and Registration number of the user.  The Customer ID and Registration numbers must NOT be divulged to any Third Party except where necessary , such as in a business that uses the software (more than one employee may have access to this information). The Licensee is responsible to make sure the software is not used illegally. 
+
+	Any Copyright remarks generated in source code by the Visual Designer should not be removed. Distribution of such generated source code to third parties without the Copyright statements is not allowed. 
+
+		The Visual Designer and other EZGUI Utility programs can NOT be distributed to Third Parties in any form.
+
+		All source code generated by the Visual Designer and Forms created with the Visual Designer by the Licensee may be used Royalty Free by the Licensee and may be distributed in any manner (with the exceptions listed above pertaining to the Customer ID,  Registration number and Copyright notices). The designer generates a "Portions" Copyright statement which must not be removed. The purpose of this Copyright is so that NO EZGUI user may copyright specific portions of code that all EZGUI users applications may have in common and any library code generated by the Visual Designer.
+
+		The Licensee may not rent or sublicense in any way the software to another party. The Licensee agrees to not reverse engineer the software in any way. The software may only be transferred to another party by the Licensee by getting a written release by the Licensor of the software. In plain english, if you sell the software to another party (ie. you sell your business), contact the Licensor and inform him that you are doing so and he will give you the necessary release information.
+
+		This software license is governed by the laws of the state of Virginia, USA !
+
+		The Licensee of the software agrees to abide by the US export laws that apply to this software. In plain english, don't buy the software if the country of your origin is embargoed or restricted by the USA as far as exports of this type of software. Also do not redistribute the runtimes to any country that is also embargoed or restricted by the USA as far as exports of software of this type.
+
+		The software may not be used in any way or fashion that may seriously hurt other individuals physically, emotionally or otherwise, on purpose (ie. in a virus program that damages other computers, in military use meant to harm others such as a terrorist or to control a weapon).  While it is not possible for this license to regulate every possible situation that this may cover, obvious , blatant and serious violations of this clause may be cause for revoking the licensees right to use this software. This software was written for the benefit of people and not their harm. At the minimum, if the licensor (author of this software) finds the licensees (you the purchaser) use of the software violating the "spirit of this clause" the Licensor (author) may limit his technical support to the Licensee (purchaser) for any project which the Licensor (author) deems inappropriate according to this clause. 
+
+	The software may not be used for the development of software "primarily for military use"  [ this means software written specifically for (or only for) use by the military, rather than software which is designed for general use (ie. a wordprocessor, a database program) ].
+
+Software License addendum for International orders:
+
+I.		Legal differences between country of Licensee and Licensor (U.S.)
+
+		If the law of the country of the Licensee normally overrides any of the conditions of the software license, then the Licensee agrees to not challenge the software license agreement with respect to these differences (if it is legal to do so). If the Licensee can not legally accept the software license conditions because of local law, then the licensee must return the software to the Licensor and not use it. Reimbursement for returned software is at the discretion of the Licensor.
+
+II.		Destination Control Statement
+
+		"This software have been exported from the United States in accordance with the Export Administration Regulations (under the EAR99 category). Diversion contrary to U.S. law is prohibited. You may not reexport to Afghanistan, Cuba, Iraq, Iran, Libya and Sudan or any other country currently embargoed by the USA"
+
+		"The software may not be used for or by person or business involved in nuclear, chemical, biological weapons, and/or missile technology."
+
+		Note: The Embargoed countries list may change from time to time and may include other countries not listed here or may have some countries listed removed. In essence the product may not be reexported to any currently embargoed country of the U.S.

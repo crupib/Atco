@@ -1,0 +1,460 @@
+RTTarget-32 6.09 (c) 1996,2017 On Time Informatik GmbH
+Host OS: Windows 10  (10.0)
+
+Building program PBasic on Mon Sep 04 17:37:54 2017
+
+Command line: -Rd PBasic Demopc.cfg PBasic.cfg 
+
+[Configuration Report]
+
+// Processing config file Demopc.cfg
+Region  NullPage           0    4k  RAM     NoAccess   // Catch NULL pointer assignments
+Region  DOSMem            4k  248k  RAM     Assign     // Reserve for the case we boot from DOS
+Region  LowMem          256k  316k  RAM     Assign     // Used for boot code and Monitor
+Region  ColorGraphic  A0000h   64k  Device  SysRead    // EGA/VGA Graphics VideoRAM
+Region  MonoText      B0000h    4k  Device  ReadWrite  // Monochrome text video memory
+Region  ColorText     B8000h    4k  Device  ReadWrite  // Text mode video ram
+Region  BIOS          E0000h  128k  Device  ReadOnly   // Reserved for [PCI]BIOS
+COMPort  Ethernet  10.1.1.4 
+// Processing config file Demopc.cfg complete
+// Processing config file PBasic.cfg
+COMPort  Ethernet  10.1.1.4 
+Region  HighMem  1M  TOTAL_RAM-1M  RAM  Assign // Extended memory
+FillRAM HighMem
+ Reserve Monitor
+DLL     Rttdll.dll
+Locate  Header     Header          HighMem
+Locate  PageTable  PageTable       HighMem
+Locate  Stack      Stack           HighMem  1M
+Locate  Heap       Heap            HighMem
+Locate  NTSection  PEHeader        HighMem
+Locate  NTSection  .text           HighMem
+Locate  NTSection  .data           HighMem
+Locate  NTSection  .link           HighMem
+Locate  NTSection  Rttdll.dll.PEHeader HighMem
+Locate  NTSection  Rttdll.dll..textbss HighMem
+Locate  NTSection  Rttdll.dll..text    HighMem
+Locate  NTSection  Rttdll.dll..rdata   HighMem
+Locate  NTSection  Rttdll.dll..data    HighMem
+Locate  NTSection  Rttdll.dll..idata   HighMem
+Locate  NTSection  Rttdll.dll..bss     HighMem
+Locate  NTSection  Rttdll.dll..00cfg   HighMem
+Locate  DecompCode Expand              HighMem
+Locate  DecompData ExBuffer            HighMem
+Locate  Copy       PageTable           HighMem
+Locate  Copy       PEHeader            HighMem
+Locate  Copy       .text               HighMem
+Locate  Copy       .data               HighMem
+Locate  Copy       .link               HighMem
+Locate  Copy       Rttdll.dll.PEHeader HighMem
+Locate  Copy       Rttdll.dll..text    HighMem
+Locate  Copy       Rttdll.dll..rdata   HighMem
+Locate  Copy       Rttdll.dll..data    HighMem
+Locate  Copy       Rttdll.dll..idata   HighMem
+Link  WSOCK32.DLL.*                    Rttdll.dll.*
+Link  Ole32.dll.*                      Rttdll.dll.*
+Link  Oleaut32.dll.6                   Rttdll.dll.SysFreeString
+Link  Oleaut32.dll.9                   Rttdll.dll.VariantClear
+Link  Oleaut32.dll.150                 Rttdll.dll.SysAllocStringByteLen
+// Processing config file PBasic.cfg complete
+
+//
+// Preprocessor symbols:
+//
+// APPLICATION = PBasic
+// BF_BOOT_TYPE = 10000000h
+// BF_CPL_0 = 00010000h
+// BF_NO_A20 = 00040000h
+// BF_NO_FNESTED = 00800000h
+// BF_NO_FPU = 00020000h
+// BF_NO_KEYBRD = 00080000h
+// BF_NO_MASTER_PIC = 00400000h
+// BF_NO_PCI_BIOS = 02000000h
+// BF_NO_PCTIMER = 00100000h
+// BF_NO_SLAVE_PIC = 00200000h
+// BF_NO_SPUR_IRQ = 04000000h
+// BF_NO_VESA_LFB = 01000000h
+// BF_PROT_MODE = 00000100h
+// FALSE = 0
+// OUTNAME = PBasic
+// RTLOC = TRUE
+// RTT32_VER = 609
+// TOTAL_RAM = 16M
+// TRUE = 1
+// _BOOTFLAGS_ = 00000000h
+
+
+[EXE File Report for PBasic.exe]
+
+File Name                 : .\PBasic.exe
+Size of PE File Header    : 1024
+Number of Sections        : 4
+Size of Code              : 00005860
+Size of Initialized Data  : 00000E00
+Size of Uninitialized Data: 0000096C
+Address of Entry Point    : 00001BA0
+Base of Code              : 00001000
+Base of Data              : 00007000
+Image Base                : 00200000
+Section Alignment         : 00001000
+File Alignment            : 00000200
+Size of Image             : 0000A000
+
+Interesting Addresses       Offset    Size
+------------------------------------------
+Import Directory            00008000  000006EC
+Relocation Table            00009000  00000260
+
+Section Name  Offset    PhysSize  VirtSize  Flags
+-------------------------------------------------
+.text         00001000  00005A00  00005860  Code Execute Read
+.data         00007000  00000200  00000B6C  Ini.Data Read Write
+.link         00008000  00000800  000006EC  Ini.Data Read Write
+.rloc         00009000  00000400  00000260  Ini.Data Read
+
+Imported functions:
+   KERNEL32.DLL.ClearCommError
+   KERNEL32.DLL.CloseHandle
+   KERNEL32.DLL.CreateFileA
+   KERNEL32.DLL.CreateFileW
+   KERNEL32.DLL.EscapeCommFunction
+   KERNEL32.DLL.ExitProcess
+   KERNEL32.DLL.FindClose
+   KERNEL32.DLL.FlushConsoleInputBuffer
+   KERNEL32.DLL.FlushFileBuffers
+   KERNEL32.DLL.GetCommandLineW
+   KERNEL32.DLL.GetCommModemStatus
+   KERNEL32.DLL.GetCommProperties
+   KERNEL32.DLL.GetCommState
+   KERNEL32.DLL.GetConsoleCursorInfo
+   KERNEL32.DLL.GetConsoleMode
+   KERNEL32.DLL.GetConsoleScreenBufferInfo
+   KERNEL32.DLL.GetFileType
+   KERNEL32.DLL.GetLastError
+   KERNEL32.DLL.GetLocalTime
+   KERNEL32.DLL.GetModuleHandleW
+   KERNEL32.DLL.GetNumberOfConsoleMouseButtons
+   KERNEL32.DLL.GetStartupInfoA
+   KERNEL32.DLL.GetStdHandle
+   KERNEL32.DLL.GetVersionExA
+   KERNEL32.DLL.GlobalAlloc
+   KERNEL32.DLL.GlobalFree
+   KERNEL32.DLL.MultiByteToWideChar
+   KERNEL32.DLL.PeekConsoleInputW
+   KERNEL32.DLL.ReadConsoleInputW
+   KERNEL32.DLL.ReadFile
+   KERNEL32.DLL.ScrollConsoleScreenBufferW
+   KERNEL32.DLL.SetCommState
+   KERNEL32.DLL.SetCommTimeouts
+   KERNEL32.DLL.SetConsoleCtrlHandler
+   KERNEL32.DLL.SetConsoleCursorInfo
+   KERNEL32.DLL.SetConsoleCursorPosition
+   KERNEL32.DLL.SetConsoleMode
+   KERNEL32.DLL.SetEndOfFile
+   KERNEL32.DLL.SetErrorMode
+   KERNEL32.DLL.SetFilePointer
+   KERNEL32.DLL.SetLastError
+   KERNEL32.DLL.SetupComm
+   KERNEL32.DLL.Sleep
+   KERNEL32.DLL.TlsAlloc
+   KERNEL32.DLL.TlsFree
+   KERNEL32.DLL.TlsGetValue
+   KERNEL32.DLL.TlsSetValue
+   KERNEL32.DLL.WideCharToMultiByte
+   KERNEL32.DLL.WriteConsoleOutputW
+   KERNEL32.DLL.WriteFile
+   OLE32.DLL.CoInitialize
+   OLE32.DLL.CoUninitialize
+   OLEAUT32.DLL.SysAllocStringByteLen
+   OLEAUT32.DLL.SysAllocStringLen
+   OLEAUT32.DLL.SysFreeString
+   OLEAUT32.DLL.VariantClear
+   USER32.DLL.MessageBeep
+   USER32.DLL.MessageBoxA
+   WSOCK32.DLL.closesocket
+   WSOCK32.DLL.WSACleanup
+
+
+[EXE File Report for Rttdll.dll]
+
+File Name                 : .\Rttdll.dll
+Size of PE File Header    : 1024
+Number of Sections        : 5
+Size of Code              : 0005EA00
+Size of Initialized Data  : 00042000
+Size of Uninitialized Data: 00000000
+Address of Entry Point    : 00050C2B
+Base of Code              : 00001000
+Base of Data              : 00060000
+Image Base                : 10000000
+Section Alignment         : 00001000
+File Alignment            : 00000200
+Size of Image             : 000A5000
+
+Interesting Addresses       Offset    Size
+------------------------------------------
+Export Directory            0006AA00  00000643
+Relocation Table            000A0000  00004504
+Debug Directory             0006A3B0  0000001C
+Load Config Directory       0006A3D0  00000040
+
+Section Name  Offset    PhysSize  VirtSize  Flags
+-------------------------------------------------
+.text         00001000  0005EA00  0005E914  Code Execute Read
+.rdata        00060000  0000B200  0000B043  Ini.Data Read
+.data         0006C000  0000B000  000324E0  Ini.Data Read Write
+.gfids        0009F000  00000200  000000A4  Ini.Data Read
+.reloc        000A0000  00004600  00004504  Ini.Data Read
+
+Exported functions:
+   0004FEF0   1 ClearCommError
+   0002C420   2 CloseHandle
+   000500E0   3 CoInitialize
+   000500D0   4 CoUninitialize
+   00033000   5 CreateFileA
+   00034070   6 CreateFileW
+   0004FF30   7 EscapeCommFunction
+   00025A90   8 ExitProcess
+   00033080   9 FindClose
+   00026110  10 FlushConsoleInputBuffer
+   00033B80  11 FlushFileBuffers
+   0004FF70  12 GetCommModemStatus
+   0004FF50  13 GetCommProperties
+   0004FF90  14 GetCommState
+   00034410  15 GetCommandLineW
+   0002FA30  16 GetConsoleCursorInfo
+   0002F880  17 GetConsoleMode
+   0002FA60  18 GetConsoleScreenBufferInfo
+   00032E80  19 GetFileType
+   0002C5F0  20 GetLastError
+   0002E040  21 GetLocalTime
+   00034270  22 GetModuleHandleW
+   00026150  23 GetNumberOfConsoleMouseButtons
+   00025AF0  24 GetStartupInfoA
+   0002C440  25 GetStdHandle
+   00025B20  26 GetVersionExA
+   0004FDF0  27 GlobalAlloc
+   0004FE10  28 GlobalFree
+   0004FFF0  29 MessageBeep
+   00025B50  30 MessageBoxA
+   00033E30  31 MultiByteToWideChar
+   00050010  32 PeekConsoleInputW
+   0002C850  60 RTTarget32SystemInit
+   00025D10  33 ReadConsoleInputW
+   00033B60  34 ReadFile
+   00050030  35 ScrollConsoleScreenBufferW
+   0004FFB0  36 SetCommState
+   0004FFD0  37 SetCommTimeouts
+   00025B40  38 SetConsoleCtrlHandler
+   0002FAD0  39 SetConsoleCursorInfo
+   0002FB40  40 SetConsoleCursorPosition
+   0002F8C0  41 SetConsoleMode
+   00033B78  42 SetEndOfFile
+   00034700  43 SetErrorMode
+   00033B70  44 SetFilePointer
+   0002C5F7  45 SetLastError
+   0004FF10  46 SetupComm
+   00023CA0  47 Sleep
+   0004FE90  48 SysAllocStringByteLen
+   0004FE40  49 SysAllocStringLen
+   0004FED0  50 SysFreeString
+   0002EE12  51 TlsAlloc
+   0002EE68  52 TlsFree
+   0002EEE7  53 TlsGetValue
+   0002EEB4  54 TlsSetValue
+   0004FE30  55 VariantClear
+   00050110  56 WSACleanup
+   00033BD0  57 WideCharToMultiByte
+   0002FCD0  58 WriteConsoleOutputW
+   00033B68  59 WriteFile
+   000500F0  61 closesocket
+
+
+[Dynamic Link Report]
+
+In Module        DLL Import                             linked to -> DLL Export                                       Address
+--------------------------------------------------------------------------------------------------------------------------------
+PBasic.exe     : KERNEL32.DLL    ClearCommError                   -> Rttdll.dll      ClearCommError                   [0011217C]
+PBasic.exe     : KERNEL32.DLL    CloseHandle                      -> Rttdll.dll      CloseHandle                      [00112180]
+PBasic.exe     : KERNEL32.DLL    CreateFileA                      -> Rttdll.dll      CreateFileA                      [00112184]
+PBasic.exe     : KERNEL32.DLL    CreateFileW                      -> Rttdll.dll      CreateFileW                      [00112188]
+PBasic.exe     : KERNEL32.DLL    EscapeCommFunction               -> Rttdll.dll      EscapeCommFunction               [0011218C]
+PBasic.exe     : KERNEL32.DLL    ExitProcess                      -> Rttdll.dll      ExitProcess                      [00112190]
+PBasic.exe     : KERNEL32.DLL    FindClose                        -> Rttdll.dll      FindClose                        [00112194]
+PBasic.exe     : KERNEL32.DLL    FlushConsoleInputBuffer          -> Rttdll.dll      FlushConsoleInputBuffer          [00112198]
+PBasic.exe     : KERNEL32.DLL    FlushFileBuffers                 -> Rttdll.dll      FlushFileBuffers                 [0011219C]
+PBasic.exe     : KERNEL32.DLL    GetCommandLineW                  -> Rttdll.dll      GetCommandLineW                  [001121A0]
+PBasic.exe     : KERNEL32.DLL    GetCommModemStatus               -> Rttdll.dll      GetCommModemStatus               [001121A4]
+PBasic.exe     : KERNEL32.DLL    GetCommProperties                -> Rttdll.dll      GetCommProperties                [001121A8]
+PBasic.exe     : KERNEL32.DLL    GetCommState                     -> Rttdll.dll      GetCommState                     [001121AC]
+PBasic.exe     : KERNEL32.DLL    GetConsoleCursorInfo             -> Rttdll.dll      GetConsoleCursorInfo             [001121B0]
+PBasic.exe     : KERNEL32.DLL    GetConsoleMode                   -> Rttdll.dll      GetConsoleMode                   [001121B4]
+PBasic.exe     : KERNEL32.DLL    GetConsoleScreenBufferInfo       -> Rttdll.dll      GetConsoleScreenBufferInfo       [001121B8]
+PBasic.exe     : KERNEL32.DLL    GetFileType                      -> Rttdll.dll      GetFileType                      [001121BC]
+PBasic.exe     : KERNEL32.DLL    GetLastError                     -> Rttdll.dll      GetLastError                     [001121C0]
+PBasic.exe     : KERNEL32.DLL    GetLocalTime                     -> Rttdll.dll      GetLocalTime                     [001121C4]
+PBasic.exe     : KERNEL32.DLL    GetModuleHandleW                 -> Rttdll.dll      GetModuleHandleW                 [001121C8]
+PBasic.exe     : KERNEL32.DLL    GetNumberOfConsoleMouseButtons   -> Rttdll.dll      GetNumberOfConsoleMouseButtons   [001121CC]
+PBasic.exe     : KERNEL32.DLL    GetStartupInfoA                  -> Rttdll.dll      GetStartupInfoA                  [001121D0]
+PBasic.exe     : KERNEL32.DLL    GetStdHandle                     -> Rttdll.dll      GetStdHandle                     [001121D4]
+PBasic.exe     : KERNEL32.DLL    GetVersionExA                    -> Rttdll.dll      GetVersionExA                    [001121D8]
+PBasic.exe     : KERNEL32.DLL    GlobalAlloc                      -> Rttdll.dll      GlobalAlloc                      [001121DC]
+PBasic.exe     : KERNEL32.DLL    GlobalFree                       -> Rttdll.dll      GlobalFree                       [001121E0]
+PBasic.exe     : KERNEL32.DLL    MultiByteToWideChar              -> Rttdll.dll      MultiByteToWideChar              [001121E4]
+PBasic.exe     : KERNEL32.DLL    PeekConsoleInputW                -> Rttdll.dll      PeekConsoleInputW                [001121E8]
+PBasic.exe     : KERNEL32.DLL    ReadConsoleInputW                -> Rttdll.dll      ReadConsoleInputW                [001121EC]
+PBasic.exe     : KERNEL32.DLL    ReadFile                         -> Rttdll.dll      ReadFile                         [001121F0]
+PBasic.exe     : KERNEL32.DLL    ScrollConsoleScreenBufferW       -> Rttdll.dll      ScrollConsoleScreenBufferW       [001121F4]
+PBasic.exe     : KERNEL32.DLL    SetCommState                     -> Rttdll.dll      SetCommState                     [001121F8]
+PBasic.exe     : KERNEL32.DLL    SetCommTimeouts                  -> Rttdll.dll      SetCommTimeouts                  [001121FC]
+PBasic.exe     : KERNEL32.DLL    SetConsoleCtrlHandler            -> Rttdll.dll      SetConsoleCtrlHandler            [00112200]
+PBasic.exe     : KERNEL32.DLL    SetConsoleCursorInfo             -> Rttdll.dll      SetConsoleCursorInfo             [00112204]
+PBasic.exe     : KERNEL32.DLL    SetConsoleCursorPosition         -> Rttdll.dll      SetConsoleCursorPosition         [00112208]
+PBasic.exe     : KERNEL32.DLL    SetConsoleMode                   -> Rttdll.dll      SetConsoleMode                   [0011220C]
+PBasic.exe     : KERNEL32.DLL    SetEndOfFile                     -> Rttdll.dll      SetEndOfFile                     [00112210]
+PBasic.exe     : KERNEL32.DLL    SetErrorMode                     -> Rttdll.dll      SetErrorMode                     [00112214]
+PBasic.exe     : KERNEL32.DLL    SetFilePointer                   -> Rttdll.dll      SetFilePointer                   [00112218]
+PBasic.exe     : KERNEL32.DLL    SetLastError                     -> Rttdll.dll      SetLastError                     [0011221C]
+PBasic.exe     : KERNEL32.DLL    SetupComm                        -> Rttdll.dll      SetupComm                        [00112220]
+PBasic.exe     : KERNEL32.DLL    Sleep                            -> Rttdll.dll      Sleep                            [00112224]
+PBasic.exe     : KERNEL32.DLL    TlsAlloc                         -> Rttdll.dll      TlsAlloc                         [00112228]
+PBasic.exe     : KERNEL32.DLL    TlsFree                          -> Rttdll.dll      TlsFree                          [0011222C]
+PBasic.exe     : KERNEL32.DLL    TlsGetValue                      -> Rttdll.dll      TlsGetValue                      [00112230]
+PBasic.exe     : KERNEL32.DLL    TlsSetValue                      -> Rttdll.dll      TlsSetValue                      [00112234]
+PBasic.exe     : KERNEL32.DLL    WideCharToMultiByte              -> Rttdll.dll      WideCharToMultiByte              [00112238]
+PBasic.exe     : KERNEL32.DLL    WriteConsoleOutputW              -> Rttdll.dll      WriteConsoleOutputW              [0011223C]
+PBasic.exe     : KERNEL32.DLL    WriteFile                        -> Rttdll.dll      WriteFile                        [00112240]
+PBasic.exe     : OLE32.DLL       CoInitialize                     -> Rttdll.dll      CoInitialize                     [00112248]
+PBasic.exe     : OLE32.DLL       CoUninitialize                   -> Rttdll.dll      CoUninitialize                   [0011224C]
+PBasic.exe     : OLEAUT32.DLL    SysAllocStringByteLen            -> Rttdll.dll      SysAllocStringByteLen            [00112254]
+PBasic.exe     : OLEAUT32.DLL    SysAllocStringLen                -> Rttdll.dll      SysAllocStringLen                [00112258]
+PBasic.exe     : OLEAUT32.DLL    SysFreeString                    -> Rttdll.dll      SysFreeString                    [0011225C]
+PBasic.exe     : OLEAUT32.DLL    VariantClear                     -> Rttdll.dll      VariantClear                     [00112260]
+PBasic.exe     : USER32.DLL      MessageBeep                      -> Rttdll.dll      MessageBeep                      [00112268]
+PBasic.exe     : USER32.DLL      MessageBoxA                      -> Rttdll.dll      MessageBoxA                      [0011226C]
+PBasic.exe     : WSOCK32.DLL     closesocket                      -> Rttdll.dll      closesocket                      [00112274]
+PBasic.exe     : WSOCK32.DLL     WSACleanup                       -> Rttdll.dll      WSACleanup                       [00112278]
+
+
+Unreferenced entrypoints:
+
+
+
+[Compression Report]
+
+Section                       Size Compressed Ratio Comp. Time Decomp. Time
+---------------------------------------------------------------------------
+PEHeader                      1024        250 24.4%      0.119        0.037
+.text                        22624      13751 60.7%      2.275        0.230
+.data                          512        247 48.2%      0.068        0.011
+.link                         1772        881 49.7%      0.171        0.026
+Rttdll.dll.PEHeader           1024        374 36.5%      0.087        0.015
+Rttdll.dll..text            387348     232212 59.9%     53.032        4.003
+Rttdll.dll..rdata            45123      23134 51.2%      4.783        0.404
+Rttdll.dll..data             45056      14724 32.6%      5.442        0.299
+PageTable                    24576        262  1.0%      0.009        0.005
+---------------------------------------------------------------------------
+Sum:                        529059     285835 54.0%     65.986        5.030
+
+
+[Relocation Report]
+
+Name                           Address   Size      Image     Access
+-------------------------------------------------------------------
+LowMem                         00040000  0004F000  00046E38
+   RESERVED for Monitor        00040000  00046E38
+HighMem                        00100000  00F92000  01028000
+   Header                      00100000  00000431  00000431  ReadOnly
+   PageTable                   00101000  00009000  00006000  System
+   PEHeader                    0010A000  00000400  00000400  ReadOnly
+   .text                       0010B000  00005860  00005860  ReadOnly
+   .data                       00111000  00000B6C  00000200  ReadWrite
+   .link                       00112000  000006EC  000006EC  ReadWrite
+   Rttdll.dll.PEHeader         00113000  00000400  00000400  ReadOnly
+   Rttdll.dll..text            00114000  0005E914  0005E914  ReadOnly
+   Rttdll.dll..rdata           00173000  0000B043  0000B043  ReadOnly
+   Rttdll.dll..data            0017F000  000324E0  0000B000  ReadWrite
+  *Expand                      001B2000  0000051C  0000051C  NoAccess
+  *Copy of PageTable           001B3000  00001000  00000106  NoAccess
+  *Copy of PEHeader            001B4000  000000FA  000000FA  NoAccess
+  *Copy of .text               001B5000  000035B7  000035B7  NoAccess
+  *Copy of .data               001B9000  000000F7  000000F7  NoAccess
+  *Copy of .link               001BA000  00000371  00000371  NoAccess
+  *Copy of Rttdll.dll.PEHeader 001BB000  00000176  00000176  NoAccess
+  *Copy of Rttdll.dll..text    001BC000  00038B14  00038B14  NoAccess
+  *Copy of Rttdll.dll..rdata   001F5000  00005A5E  00005A5E  NoAccess
+  *Copy of Rttdll.dll..data    001FB000  00003984  00003984  NoAccess
+   Stack                       001FF000  00100000  00000000  ReadWrite
+   Heap                        002FF000  00D93000  00000000  NoAccess
+  *ExBuffer                    00FFC000  00003476  00000000  NoAccess
+
+
+[Page Table Summary Report]
+
+Hidden pages    :  4585
+System pages    :    30
+Read only pages :   186
+Read/write pages:   319
+Remapped pages  :   146
+Total pages     :  5120
+
+
+[Application Image File Report]
+
+Header Size       : 00000431
+Sys. Init Routine : 0013F850
+User Init Routine : 0010BBA0
+Program Entrypoint: 0010BBA0
+Stack Base        : 001FF000
+Initial ESP       : 002FF000
+Heap Base         : 002FF000
+Heap Limit        : 01092000
+Page Table        : 00101000
+TLS Directory     : 00000000
+Decompress Code   : 001B2000
+Decompress Data   : 00FFC000
+Number of Sections: 32
+Number of Modules : 2
+Command Line      : .\PBasic.exe
+Environment       : 
+
+
+Section Type  Address   Alloc.Size  Image Size  Name
+----------------------------------------------------
+App Header    00100000  00000431    00000431    Header
+Page Table    00101000  00009000    00000000    PageTable
+App Stack     001FF000  00100000    00000000    Stack
+App Heap      002FF000  00D93000    00000000    Heap
+App Data      0010A000  00000400    00000000    PEHeader
+App Code      0010B000  00005860    00000000    .text
+App Data      00111000  00000B6C    00000000    .data
+App Data      00112000  000006EC    00000000    .link
+App Data      00113000  00000400    00000000    Rttdll.dll.PEHeader
+App Code      00114000  0005E914    00000000    Rttdll.dll..text
+App Data      00173000  0000B043    00000000    Rttdll.dll..rdata
+App Data      0017F000  000324E0    00000000    Rttdll.dll..data
+Decomp. Code  001B2000  0000051C    0000051C    Expand
+Decomp. Data  00FFC000  00003476    00000000    ExBuffer
+Compressed    001B3000  00001000    00000106    Copy of PageTable
+Compressed    001B4000  000000FA    000000FA    Copy of PEHeader
+Compressed    001B5000  000035B7    000035B7    Copy of .text
+Compressed    001B9000  000000F7    000000F7    Copy of .data
+Compressed    001BA000  00000371    00000371    Copy of .link
+Compressed    001BB000  00000176    00000176    Copy of Rttdll.dll.PEHeader
+Compressed    001BC000  00038B14    00038B14    Copy of Rttdll.dll..text
+Compressed    001F5000  00005A5E    00005A5E    Copy of Rttdll.dll..rdata
+Compressed    001FB000  00003984    00003984    Copy of Rttdll.dll..data
+Region        00000000  00001000    00000000    NullPage
+Region        00001000  0003E000    00000000    DOSMem
+Region        00040000  0004F000    00000000    LowMem
+Region        000A0000  00010000    00000000    ColorGraphic
+Region        000B0000  00001000    00000000    MonoText
+Region        000B8000  00001000    00000000    ColorText
+Region        000E0000  00020000    00000000    BIOS
+Region        00100000  00F92000    00000000    HighMem
+Reserved      00040000  00046E38    00000000    RESERVED for Monitor
+
+Module    Image Base  Entrypoint  Exports   Imports   Resources  Name
+---------------------------------------------------------------------
+Program   0010A000    0010BBA0    00000000  00112000  00000000   .\PBasic.exe
+DLL       00113000    00163C2B    0017DA00  00000000  00000000   .\Rttdll.dll

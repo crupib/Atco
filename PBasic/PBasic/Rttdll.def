@@ -1,0 +1,76 @@
+; Library definition file for RTTDLL.DLL with Microsoft C/C++
+
+LIBRARY RTTDLL.DLL
+
+EXPORTS ; from file Rtt32api.txt
+   RTTarget32SystemInit
+
+EXPORTS ; from file Win32api.txt
+   CloseHandle=_CloseHandle@4
+   CreateFileA=_CreateFileA@28
+   CreateFileW=_CreateFileW@28
+   ExitProcess=_ExitProcess@4
+   FindClose=_FindClose@4
+   FlushConsoleInputBuffer=_FlushConsoleInputBuffer@4
+   FlushFileBuffers=_FlushFileBuffers@4
+   GetCommandLineW=_GetCommandLineW@0
+   GetConsoleCursorInfo=_GetConsoleCursorInfo@8
+   GetConsoleMode=_GetConsoleMode@8
+   GetConsoleScreenBufferInfo=_GetConsoleScreenBufferInfo@8
+   GetFileType=_GetFileType@4
+   GetLastError=_GetLastError@0
+   GetLocalTime=_GetLocalTime@4
+   GetModuleHandleW=_GetModuleHandleW@4
+   GetNumberOfConsoleMouseButtons=_GetNumberOfConsoleMouseButtons@4
+   GetStartupInfoA=_GetStartupInfoA@4
+   GetStdHandle=_GetStdHandle@4
+   GetVersionExA=_GetVersionExA@4
+   GlobalAlloc=_GlobalAlloc@8
+   GlobalFree=_GlobalFree@4
+   MessageBoxA=_MessageBoxA@16
+   MultiByteToWideChar=_MultiByteToWideChar@24
+   ReadConsoleInputW=_ReadConsoleInputW@16
+   ReadFile=_ReadFile@20
+   SetConsoleCtrlHandler=_SetConsoleCtrlHandler@8
+   SetConsoleCursorInfo=_SetConsoleCursorInfo@8
+   SetConsoleCursorPosition=_SetConsoleCursorPosition@8
+   SetConsoleMode=_SetConsoleMode@8
+   SetEndOfFile=_SetEndOfFile@4
+   SetErrorMode=_SetErrorMode@4
+   SetFilePointer=_SetFilePointer@16
+   SetLastError=_SetLastError@4
+   Sleep=_Sleep@4
+   SysAllocStringLen=_SysAllocStringLen@8
+   SysAllocStringByteLen=_SysAllocStringByteLen@8
+   SysFreeString=_SysFreeString@4
+   TlsAlloc=_TlsAlloc@0
+   TlsFree=_TlsFree@4
+   TlsGetValue=_TlsGetValue@4
+   TlsSetValue=_TlsSetValue@8
+   VariantClear=_VariantClear@4
+   WideCharToMultiByte=_WideCharToMultiByte@32
+   WriteConsoleOutputW=_WriteConsoleOutputW@20
+   WriteFile=_WriteFile@20
+
+EXPORTS ; from file W32apimt.txt
+
+EXPORTS ; from file Rtf32api.txt
+
+EXPORTS ; from file Rtu32api.txt
+
+EXPORTS ; from file MyWin32API.txt
+   CoInitialize=_CoInitialize@4
+   CoUninitialize=_CoUninitialize@0
+   ScrollConsoleScreenBufferW=_ScrollConsoleScreenBufferW@20
+   PeekConsoleInputW=_PeekConsoleInputW@16
+   ClearCommError=_ClearCommError@12
+   EscapeCommFunction=_EscapeCommFunction@8
+   GetCommModemStatus=_GetCommModemStatus@8
+   GetCommProperties=_GetCommProperties@8
+   GetCommState=_GetCommState@8
+   SetCommState=_SetCommState@8
+   SetCommTimeouts=_SetCommTimeouts@8
+   SetupComm=_SetupComm@12
+   MessageBeep=_MessageBeep@4
+   closesocket=_closesocket@4
+   WSACleanup=_WSACleanup@0

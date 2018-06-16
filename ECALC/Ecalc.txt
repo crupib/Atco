@@ -1,0 +1,31 @@
+UT Index Coordinates
+-----------------------
+Index Circ:  0.000"
+Index Axial: 0.000"
+Circ OverLap: 0.0000"
+Circ Length:  35.5829
+
+XDCR Polar Coordinates
+------------------------
+Azimuth: 224.7598°
+Skew: 44.7598°
+Radial: 7.5909"
+
+Scan Surface Curvature
+-------------------------
+OD Beam: 36.0000"
+OD Skew:  0.0000°
+OD Pipe: 36.0000"
+
+Cartesian Coordinates
+-----------------------
+XDCR X: -5.3900"
+XDCR Y: -5.3450"
+
+UT Index X: 0.0000"
+UT Index Y:-5.3450"
+
+Cursor X: -17.7169"
+Cursor Y: -11.0923"
+
+Pixel SR:0.0514"

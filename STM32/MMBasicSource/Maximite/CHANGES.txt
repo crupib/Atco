@@ -1,0 +1,184 @@
+Version 4.2
+
+1.  Implemented support for CAN on the DuiniMite and Colour Maximite builds.
+	This involves two new files;  CAN2.c  and  CAN2.h
+	To include CAN you should uncomment the #define at the start of Maximite.h
+    
+2.  Added support for the DE signal on COM1:
+
+Some other small changes (new commands, modified commands, etc)
+
+========================================================================================
+
+Version 4.0
+
+1.  Implemented support for the Colour Maximite - this code is surrounded by
+	#if defined(COLOUR).
+    
+2.  Added the ability to play MOD files.  This involved adding four files:
+	Audio.c  and  .h
+	mod32.c  and  .h
+    
+3.  Changed how I/O ports are addressed.  This system is faster and simpler.
+
+4.  USB polling is now done in program loops.  This freed timer 1 for use in Audio.c
+
+Some other small changes (new commands, modified commands, etc)
+
+========================================================================================
+
+Version 3.2
+
+1.  Completely rearranged the source code to split the interpreter from the hardware
+    aspects of the Maximite.  This will make it easier to create versions for other
+    hardware platforms like ARM.
+    
+2.  Added defined functions.  As part of this MMBasic now runs through the BASIC program
+    before executing it to build an index of defined subroutines and functions.  This
+    index makes executing a SUB of FUNCTION much faster.
+    
+3.  Created a version of MMBasic running in DOS on Windows XP, Vista or Win7.
+
+4.  The core timer is now used for timing short events, see the definitions in Maximite.h
+
+5.  Completely changed the memory management.  All memory management is in the file
+    memory.c and the C32 heap is not used.  Memory is now dynamically allocated from a
+    central pool.
+
+Many other small changes (new commands, modified commands, etc)
+
+========================================================================================
+
+Version 3.1
+
+1.  Added DefinedSubroutine() to handle defined subroutines.
+    
+2.  Changed the way I/O pins are labeled and manipulated (faster and easier to use).
+
+3.  Added Onewire support.
+
+4.  Added support for the DuinoMite. This included some #ifdef's in the code and a separate 
+	project file for the DuinoMite.
+
+Many other small changes (new commands, modified commands, etc)
+
+========================================================================================
+
+Version 3.0
+
+1.  Considerable changes to the MMBasic engine to remove the need for line numbers and
+    accomodate labels.
+    
+2.  Implemented the full screen editor
+
+3.  Removed the last dependencies on the core timer.  This is now completely free.
+
+4.  Replaced the MDD file system driver with version 1.3.4 from Microchip.  The library
+    seems to have issues with long file names and corrupts the SD card so only short file
+    names are used.  FSIO.c also causes corruption when compiled with optimisation levels
+    1, 2, s and 3 so this file is compiled with -O0.
+
+5.  Modified the linker script and some files to allow compilation with either 1.11B or
+    the latest C32 compiler 2.01
+    
+6.  Added the ability to report stack usage after running a command.
+
+7.  Many other changes (new commands, modified commands, etc)
+
+8.  Changed the source code license to a restricted licence for personal use only.
+
+========================================================================================
+
+Version 2.7
+
+1/  Moved all input/output port definitions to IOPorts.h.  It should now be possible
+	to port the firmware to a different platform with different port assignments simply by
+	editing this file.  The only exception is the SOUND output, video output and the horiz 
+	sync outputs which are tied to specific outputs.
+
+2/	Added support for the UBW32.  This included some #ifdef's in the code and a separate 
+	project file for the UBW32.
+
+3/  Changes to files.c and .h to accomodate the flash drive A:.  About 90K of flash is 
+	still free.
+
+4/  Added profiling support enabled by uncommenting #define PROFILE in Maximite.h
+	At the termination of a running program this will write a spreadsheet of 10uS tick 
+	counts and associated memory addresses to the SD card.
+
+7/  Many other changes (new commands, modified commands, etc)
+
+
+==========================================================================================
+
+
+Version 2.6 had a lot of changes:
+
+1/  The video DMA and SPI communication has been changed to 32 bit and the "kludge"
+	removed.  The video buffer is now an array of ints and corresponding changes have 
+	been made in plot() and scrolling routines.
+
+2/  USB polling has been moved from the video interrupt to its own timer and interrupt.
+	The USB transmit stream is now double buffered and the buffer size has been increased.
+
+3/  The keyboard is no longer polled, instead an interrupt is used to detect the
+	keyboard clock's leading edge.
+
+4/  The timing routines (internal clock, pause, etc) have been moved to the files
+	timers.c and .h.  They are serviced by a 1mS timer and interrupt.
+
+5/  The asynchronous serial interface is in the files serial.c and.h.  This uses
+	bit bashing and a fast timer/interrupt (17uS).  Also changes were made to files.c
+	and .h to accomodate opening of COM ports as files.
+
+6/  String handling within MMBasic has been changed to use Pascal style strings.  
+	See the README in the MMBasic folder for details.
+
+7/  Many other more minor changes (new commands, modified commands, etc)
+
+8/  The new interrupts are:
+	PRIORITY     DESCRIPTION                 MAX SPEED
+	   7         Video horizontal sync       every 66uS
+	   6         Serial interface            every 17uS when open
+	   5         I2C interface			  	    ?
+	   4		 USB polling			     every 100uS to 1mS
+	   3         PS2 keyboard clock          every 50 uS when sending
+	   2         Counting pins (11 to 14)    up to every 5uS
+	   1         MMBasic clocks and timers   every 1 mS
+	   
+	   
+9/   The new timers are:
+	TIMER NBR    DESCRIPTION                 INTERRUPT
+	  core       Not Used                       no
+	   1		 USB polling                    yes
+	   2		 Sound							no
+	   3		 Video horizontal sync			yes
+	   4		 MMBasic clocks and timers		yes
+	   5		 Serial interface				yes
+
+
+==========================================================================================
+
+
+The file layout was changed at ver 2.5.  This was because custom.c had become
+a miscellaneous holding file for lots of commands and was getting cluttered.
+
+The new file layout is more modular.  The key files are:
+	   Operators.c	Code for executing the BASIC operators (ie, *, -, +, etc)
+       Commands.c	Standard BASIC commands (GOTO, FOR...NEXT, etc)
+       Functions.c  Standard BASIC functions (INT, SIN, etc)
+       External.c	Contains the commands and code for dealing with the 10 external
+                    input/output pins on the Maximite (PIN, SETPIN, etc)
+       Files.c		File and console related commands (OPEN, CLOSE, etc)
+       Graphics.c	Graphics related commands (LINE, CIRCLE, etc)
+       I2C.c		The commands for handling the I2C protocol.
+       Misc.c		Miscellaneous commands that do not fit anywhere else (TIMER,
+                    SETTICK, etc)
+       Custom.c     This is empty and should be used for your special functions and
+                    commands.  In the standard distribution this file will never be
+                    changed, so your code should be safe here.
+
+Each file contains the BASIC commands and functions for accessing the functionality
+AND the supporting code.  For example the External.c file contains the MMBasic
+commands PIN and SETPIN as well as the internal functions for accessing the I/O pins,
+resetting them, etc.

@@ -1,0 +1,321 @@
+bmh...............chrplt            bml...............chrplt
+chesc.............dsplaf            clrcpl............chrplt
+disco.............chrplt            egainit...........chrplt
+enco..............chrplt            getpla............chrplt
+plbig.............lcplt             pmbig.............lcplt
+restor............chrplt            setvid............dsplaf
+_$a...............cems              _$b...............cems
+_$c...............cems              _$d...............cems
+_$f...............cems              _$ia..............cems
+_$ib..............cems              _$ic..............cems
+_$id..............cems              _$ie..............cems
+_$if..............cems              _accum............accum
+_accumx...........accum             _attrib...........attribkl
+_avb3.............vector            _bexpand..........bexpand
+_bfplt............bfplt             _blank............bios
+_blklin...........abios             _blnkln...........pntplt
+_border...........border            _btmsk............egadrv
+_bufems...........cems              _cfunct...........pntplt
+_cgapal...........bios              _chabs............abios
+_change_dir.......picfil            _chkey............abios
+_chkeye...........abios             _chkprn...........bios
+_chrplt...........chrplt            _clrdsp...........picfil
+_codoc............egadrv            _colco............egadrv
+_colrln...........linplt            _compsc...........vector
+_compsct..........vector            _compsl...........vector
+_compslt..........vector            _comp_date........picfil
+_comp_name........picfil            _comp_size........picfil
+_cursor...........bios              _cvtbin...........accum
+_c_cli............abios             _c_sti............abios
+_datico...........picfil            _decim............abios
+_difb3............vector            _disint...........hwints
+_dispage..........picfil            _dskems...........cems
+_dspchr...........bios              _dspla2...........dsplaf
+_dsplac...........bios              _dsplaf...........dsplaf
+_dsplay...........bios              _dsplin...........bios
+_ed...............ed                _edge.............vector
+_emalloc..........cems              _ems1.............emsdrv
+_ems2.............emsdrv            _ems3.............emsdrv
+_ems4.............emsdrv            _ems5.............emsdrv
+_ems6.............emsdrv            _ems7.............emsdrv
+_ems8.............emsdrv            _ems9.............emsdrv
+_emsdsk...........cems              _enaint...........hwints
+_enasr............egadrv            _fgln.............linplt
+_fgplt............bfplt             _filmem...........filmem
+_filscr...........filscr            _findth...........findth
+_fir..............fir               _four1............four1
+_fplot............fplotkl           _fplot_egainit....fplotkl
+_fplot_restor.....fplotkl           _fp_cpu_id........fpcpuid
+_fp_dsk_ems.......fpems             _fp_emsadd........fp_emsad
+_fp_ems_alloc.....fpems             _fp_ems_bufems....fpbuf
+_fp_ems_dsk.......fpems             _fp_ems_erase.....fpems
+_fp_ems_free......fpems             _fp_ems_init......fpems
+_fp_ems_read......fpems             _fp_ems_read_col..fpems
+_fp_ems_redemc....fpems             _fp_ems_seek......fpems
+_fp_ems_write.....fpems             _fp_ems_write_col..fpems
+_fp_peak_find.....fppkfind          _fp_video_filter..fpvfilt
+_fp_xfer32_align_source..fpxfer     _fp_xfer32_align_source_lace..fpxfer
+_funct............egadrv            _gbox.............gred
+_gdisp............bios              _getcregs.........bios
+_getkey...........getkeys           _getkeyc..........getkeys
+_getkeye..........bios              _getmode..........bios
+_getpix...........getpix            _getpix2..........getpix
+_getpixh..........getpix            _getpixv..........getpix
+_getpregs.........bios              _getvga...........getpix
+_getxsize.........bios              _get_ems..........cems
+_get_pfba.........cems              _get_unal.........cems
+_gred.............gred              _grid.............grid
+_handle...........cems              _hpjet............hpjetv8
+_hp_laser_screen_dump..vgahplj      _hp_laser_screen_dump_func..vgahplja
+_iemssw...........cems              _initems..........cems
+_init_pop_up......pop_up            _inter............inter
+_interb...........inter             _interl...........inter
+_interlb..........inter             _interlbklfp......fplotkl
+_interlib.........inter             _interlklfp.......fplotkl
+_intno............bios              _invert...........vector
+_in_port_60.......hwints            _iprfsw...........bios
+_ishift...........accum             _keyrate..........bios
+_keysta...........bios              _laccum...........accum
+_lcplt............lcplt             _ldivid...........accum
+_line.............line              _line2............line
+_line_abs.........line              _linpl1...........linplt
+_linpl2...........linplt            _linpl4...........linplt
+_linpl8...........linplt            _linpla...........linplt
+_linplc...........linplt            _mac..............macc
+_macc.............accum             _mcplt............lcplt
+_mode.............bios              _mpmsk............egadrv
+_nucol............vigen             _outit............ed
+_pfba.............cems              _pfclose..........bios
+_pfopen...........bios              _picfil...........picfil
+_pkamp............pkfind            _pkfind...........pkfind
+_pntplt...........pntplt            _pntplt2..........pntplt
+_pop_back.........pop_up            _pop_up...........pop_up
+_power............power             _printer_port_number..bios
+_prnbuf...........bios              _prnbufa..........getpix
+_prnchr...........bios              _prnstr...........bios
+_rdcurs...........bios              _rdmap............egadrv
+_rdmod............egadrv            _redcol...........cems
+_redemc...........cems              _redems...........cems
+_regs.............bios              _revvid...........egadrv
+_rgrid............rgrid             _rotat............egadrv
+_rowsca...........egadrv            _salb.............vector
+_scrdmp...........bios              _scroll...........bios
+_sdivid...........accum             _select_printer_port..bios
+_selseg...........egadrv            _setbor...........bios
+_setdac...........egadrv            _setint...........hwints
+_setpag...........bios              _setpal...........bios
+_setre............egadrv            _setvga...........bios
+_setvid...........abios             _shift............accum
+_shiftb...........accum             _shiftc...........accum
+_shiftx...........accum             _showcl...........picfil
+_stadd............egadrv            _strcvt...........picfil
+_tblank...........bios              _twocmp...........accum
+_unalloc..........cems              _vavb3............vector
+_vdifb3...........vector            _vectav...........vector
+_vertln...........pntplt            _vgaread..........getpix
+_vgawrite.........getpix            _video............abios
+_vidseg...........abios             _vigen............vigen
+_vlnpl2...........linplt            _vlnpl4...........linplt
+_vlnpl8...........linplt            _vlnplt...........linplt
+_vm...............abios             _vpread...........getpix
+_vpwrite..........getpix            _vxfer............xfer
+_wrmod............egadrv            _wrtcol...........cems
+_wrtemc...........cems              _wrtems...........cems
+_xfer.............xfer              _xferci...........xferc
+_xferco...........xferc             _xlate............vector
+_xlate16..........xlate16           _xnucol...........abios
+_xvideo...........vigen             _xvidseg..........vigen
+_xvm..............vigen             
+
+abios             Offset: 00000010H  Code and data size: 9beH
+  _blklin           _chabs            _chkey            _chkeye
+  _c_cli            _c_sti            _decim            _setvid
+  _video            _vidseg           _vm               _xnucol
+
+accum             Offset: 00000320H  Code and data size: 2cbH
+  _accum            _accumx           _cvtbin           _ishift
+  _laccum           _ldivid           _macc             _sdivid
+  _shift            _shiftb           _shiftc           _shiftx
+  _twocmp         
+
+bios              Offset: 00000720H  Code and data size: d33H
+  _blank            _cgapal           _chkprn           _cursor
+  _dspchr           _dsplac           _dsplay           _dsplin
+  _gdisp            _getcregs         _getkeye          _getmode
+  _getpregs         _getxsize         _intno            _iprfsw
+  _keyrate          _keysta           _mode             _pfclose
+  _pfopen           _printer_port_number                _prnbuf
+  _prnchr           _prnstr           _rdcurs           _regs
+  _scrdmp           _scroll           _select_printer_port
+  _setbor           _setpag           _setpal           _setvga
+  _tblank         
+
+border            Offset: 00001cb0H  Code and data size: 185H
+  _border         
+
+dsplaf            Offset: 00001fb0H  Code and data size: 126H
+  chesc             setvid            _dspla2           _dsplaf
+
+ed                Offset: 00002160H  Code and data size: 710H
+  _ed               _outit          
+
+egadrv            Offset: 00002a00H  Code and data size: 172H
+  _btmsk            _codoc            _colco            _enasr
+  _funct            _mpmsk            _rdmap            _rdmod
+  _revvid           _rotat            _rowsca           _selseg
+  _setdac           _setre            _stadd            _wrmod
+
+filmem            Offset: 00002c70H  Code and data size: 17H
+  _filmem         
+
+filscr            Offset: 00002cf0H  Code and data size: 72H
+  _filscr         
+
+findth            Offset: 00002dc0H  Code and data size: 3cH
+  _findth         
+
+getkeys           Offset: 00002e60H  Code and data size: 103H
+  _getkey           _getkeyc        
+
+inter             Offset: 00003080H  Code and data size: 1d0H
+  _inter            _interb           _interl           _interlb
+  _interlib       
+
+pkfind            Offset: 000032e0H  Code and data size: 8cH
+  _pkamp            _pkfind         
+
+xfer              Offset: 000033d0H  Code and data size: 3cH
+  _vxfer            _xfer           
+
+bfplt             Offset: 00003470H  Code and data size: 229H
+  _bfplt            _fgplt          
+
+chrplt            Offset: 00003890H  Code and data size: 37aH
+  bmh               bml               clrcpl            disco
+  egainit           enco              getpla            restor
+  _chrplt         
+
+getpix            Offset: 00003ed0H  Code and data size: 32bH
+  _getpix           _getpix2          _getpixh          _getpixv
+  _getvga           _prnbufa          _vgaread          _vgawrite
+  _vpread           _vpwrite        
+
+gred              Offset: 00004370H  Code and data size: 503H
+  _gbox             _gred           
+
+grid              Offset: 00004a30H  Code and data size: 2aeH
+  _grid           
+
+lcplt             Offset: 00004de0H  Code and data size: 204H
+  plbig             pmbig             _lcplt            _mcplt
+
+line              Offset: 000051c0H  Code and data size: 211H
+  _line             _line2            _line_abs       
+
+pntplt            Offset: 00005500H  Code and data size: 1c0H
+  _blnkln           _cfunct           _pntplt           _pntplt2
+  _vertln         
+
+vigen             Offset: 00005820H  Code and data size: a28H
+  _nucol            _vigen            _xvideo           _xvidseg
+  _xvm            
+
+bexpand           Offset: 00005be0H  Code and data size: 27H
+  _bexpand        
+
+cems              Offset: 00005c70H  Code and data size: 181eH
+  _$a               _$b               _$c               _$d
+  _$f               _$ia              _$ib              _$ic
+  _$id              _$ie              _$if              _bufems
+  _dskems           _emalloc          _emsdsk           _get_ems
+  _get_pfba         _get_unal         _handle           _iemssw
+  _initems          _pfba             _redcol           _redemc
+  _redems           _unalloc          _wrtcol           _wrtemc
+  _wrtems         
+
+emsdrv            Offset: 00007d40H  Code and data size: bbH
+  _ems1             _ems2             _ems3             _ems4
+  _ems5             _ems6             _ems7             _ems8
+  _ems9           
+
+fpbuf             Offset: 00007ea0H  Code and data size: ddH
+  _fp_ems_bufems  
+
+fpcpuid           Offset: 000080b0H  Code and data size: 67H
+  _fp_cpu_id      
+
+fpems             Offset: 000081c0H  Code and data size: 926H
+  _fp_dsk_ems       _fp_ems_alloc     _fp_ems_dsk       _fp_ems_erase
+  _fp_ems_free      _fp_ems_init      _fp_ems_read      _fp_ems_read_col
+  _fp_ems_redemc    _fp_ems_seek      _fp_ems_write     _fp_ems_write_col
+
+fp_emsad          Offset: 00008ed0H  Code and data size: 39H
+  _fp_emsadd      
+
+fppkfind          Offset: 00008f70H  Code and data size: 891H
+  _fp_peak_find   
+
+fpxfer            Offset: 00009920H  Code and data size: 75bH
+  _fp_xfer32_align_source             _fp_xfer32_align_source_lace
+
+hpjetv8           Offset: 0000a180H  Code and data size: 38bH
+  _hpjet          
+
+pop_up            Offset: 0000a750H  Code and data size: 1bcH
+  _init_pop_up      _pop_back         _pop_up         
+
+hwints            Offset: 0000aaf0H  Code and data size: feH
+  _disint           _enaint           _in_port_60       _setint
+
+linplt            Offset: 0000ace0H  Code and data size: 652H
+  _colrln           _fgln             _linpl1           _linpl2
+  _linpl4           _linpl8           _linpla           _linplc
+  _vlnpl2           _vlnpl4           _vlnpl8           _vlnplt
+
+macc              Offset: 0000b5c0H  Code and data size: 4aH
+  _mac            
+
+picfil            Offset: 0000b690H  Code and data size: 1276H
+  _change_dir       _clrdsp           _comp_date        _comp_name
+  _comp_size        _datico           _dispage          _picfil
+  _showcl           _strcvt         
+
+rgrid             Offset: 0000ce90H  Code and data size: 35bH
+  _rgrid          
+
+vector            Offset: 0000d470H  Code and data size: 2d2H
+  _avb3             _compsc           _compsct          _compsl
+  _compslt          _difb3            _edge             _invert
+  _salb             _vavb3            _vdifb3           _vectav
+  _xlate          
+
+vgahplj           Offset: 0000d860H  Code and data size: 2cdH
+  _hp_laser_screen_dump             
+
+vgahplja          Offset: 0000dda0H  Code and data size: 371H
+  _hp_laser_screen_dump_func        
+
+xferc             Offset: 0000e320H  Code and data size: 48H
+  _xferci           _xferco         
+
+xlate16           Offset: 0000e3d0H  Code and data size: 2cH
+  _xlate16        
+
+attribkl          Offset: 0000e4a0H  Code and data size: 17fH
+  _attrib         
+
+fir               Offset: 0000e700H  Code and data size: 1d0H
+  _fir            
+
+four1             Offset: 0000e970H  Code and data size: 322H
+  _four1          
+
+fplotkl           Offset: 0000ef10H  Code and data size: 765H
+  _fplot            _fplot_egainit    _fplot_restor     _interlbklfp
+  _interlklfp     
+
+fpvfilt           Offset: 0000fb70H  Code and data size: 154H
+  _fp_video_filter
+
+power             Offset: 0000fd80H  Code and data size: 1f8H
+  _power          

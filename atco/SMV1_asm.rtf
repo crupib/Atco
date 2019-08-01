@@ -1,0 +1,554 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671
+{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs21 \cf2 \expnd0\expndtw0\kerning0
+; original File = SMV1.hex\
+\
+    processor 16F54                   // processor definition\
+    #include <P16F5x.INC>              // include file for processor\
+    __config _CP_ON & _WDT_OFF & _HS_OSC ; 0x0FE2 // configure processor\
+                                           //set oscillator to HS\
+                                           //turn off watch dog timer\
+                                           //code protect is on\
+;   __idlocs 0xFF, 0xFF, 0xFF, 0xFF    // this was commented out\
+\
+; RAM-Variable\
+LRAM_0x07 equ 0x07       // equates for LRAM Variable            \
+LRAM_0x08 equ 0x08\
+\
+; Program                  ; is a comment\
+\
+    Org 0x0000           // origin of code\
+//   W-reg is the accumulator must default to 00 or FF\
+;   Reset-Vector.        //\
+    MOVWF PORTA          //moves reg W -> PORTA (don\'92t know what W is?)                         \
+    MOVLW 0x80           ;   b'10000000'  d\'92128' //move 0x80 -> W \
+    OPTION               //moves reg W -> OPTION reg\
+    MOVLW 0x3B           ;   b'00111011'  d'059'  \'93;     //move 0x3B -> W\
+    TRIS PORTB           //move W -> PORTB (TRIS reg)\
+    BCF PORTB,2          //clear bit 2 of PORTB\
+    CLRF LRAM_0x07       //LRAM_0x07 is cleared to zero , zero bit (Z) is \
+                         //set to true\
+    BTFSC PORTB,5        //if bit 5 of PORT B is 0 skip following inst.\
+    BSF LRAM_0x07, 0     //set 0 bit in LRAM_0x07 to 1\
+    MOVLW 0x1B           ;   b'00011011'  d\'92027' //move 0x1b -> W\
+    TRIS PORTB           // mov reg W -> PORTB\
+    CLRF LRAM_0x08       /LRAM_0x08 is cleared to zero , zero bit (Z) is \
+                         //set to true\
+    BTFSC PORTB,3        // if bit 3 of PORTB is 0 skip following inst.\
+    BSF LRAM_0x08,0      //set 0 bit in LRAM_0x08 to 1\
+    BTFSC PORTB,4        //if bit 4 of PORTB is 0 skip following inst. \
+    BSF LRAM_0x08,1      //set bit 1 of LRAM_0x08 to 1\
+    MOVF LRAM_0x08,F     //move LRAM_0x08 -> W reg (Z=1)\
+    BTFSC STATUS,Z       //if status is zero skip next instruction\
+    GOTO LADR_0x001E     //jump to LADR_0x001E\
+    BSF LRAM_0x07,1      //set bit 1 of LRAM_0x07 to 1\
+    DECF LRAM_0x08,F     //LRAM_0x08 is decremented by one \
+    MOVF LRAM_0x08,F     // test back    \
+    BTFSC STATUS,Z       //if status is zero skip next instruction\
+    GOTO LADR_0x001E     //jump to LADR_0x001D\
+    BSF LRAM_0x07,2      //set bit 2 of LRAM_0x07 to 1  \
+    DECF LRAM_0x08,F     // LRAM_0x08 is decremented by one\
+    MOVF LRAM_0x08,F     //move LRAM_0x08 -> W reg (Z=1)\
+    BTFSC STATUS,Z       //if status is zero skip next instruction\
+    GOTO LADR_0x001E.    //jump to LADR_0x001E\
+    BSF LRAM_0x07,3      //set 3 bit in LRAM_0x07 to 1\
+LADR_0x001E\
+    BTFSS LRAM_0x07,0    //if bit 0 in LRAM_0x07 is 1 skip next instr\
+                         //forces 2 cycle instruction if b is 1(2nd var) \
+    GOTO LADR_0x0029      //jump to LADR_0x0029\
+LADR_0x0020               \
+    BTFSC PORTB,0       // if bit 0 of PORTB is 0 skip following instr.  \
+    GOTO LADR_0x0020    // jump to LADR_0x0020\
+    BTFSC PORTB,0       // if bit 0 of PORTB is 0 skip following instr.\
+    GOTO LADR_0x0020    // jump to LADR_0x0020\
+LADR_0x0024\
+    BTFSS PORTB,0       // if bit 0 of PORTB is 1 then skip next instr.\
+    GOTO LADR_0x0024    // jump to LADR_0x0024\
+    BTFSS PORTB,0       // if bit 0 of PORTB is 1 then skip next insrt.\
+    GOTO LADR_0x0024    // jump to LADR_0x0024\
+    GOTO LADR_0x0031    // jump to LADR_0x0031\
+LADR_0x0029\
+    BTFSS PORTB,0       // if bit 0 of PORTB is 1 then skip next instr.     \
+    GOTO LADR_0x0029    // jump to LADR_0x0029\
+    BTFSS PORTB,0       // if bit 0 of PORTB is 1 then skip next instr.\
+    GOTO LADR_0x0029    // jump to LADR_0x0029\
+LADR_0x002D\
+    BTFSC PORTB,0       // if bit 0 of PORTB is 0 skip following instr.\
+    GOTO LADR_0x002D    // jump to LADR_0x002D\
+    BTFSC PORTB,0       // if bit 0 of PORTB is 0 skip following instr.\
+    GOTO LADR_0x002D    // jump to LADR_0x002D\
+LADR_0x0031\
+    CLRF LRAM_0x08      // set LRAM_0x08 to zero\
+    BTFSC PORTB,1       // if bit 1 of PORTB is 0 skip following instr.\
+    INCF LRAM_0x08,F    // increment LRAM_0x08 by 1\
+    BTFSC PORTB,1       // if bit 1 of PORTB is 0 skip following instr.\
+    INCF LRAM_0x08,F    // increment LRAM_0x08 by 1\
+    BTFSC PORTB,1.      // if bit 1 of PORTB is 0 skip following instr.\
+    INCF LRAM_0x08,F    // increment LRAM_0x08 by 1 \
+    BCF PORTB,5         // bit 5 of PORTB is cleared to 0\
+    BTFSC LRAM_0x08,1   // if bit 1 of LRAM_0x08 is 0 skip following inst\
+    BSF PORTB,5         // set PORTB bit 5 to 1\
+    BSF PORTB,2         // set PORTB bit 2 to 1\
+    BCF PORTB,2
+\f1          
+\f0 // set PORTB bit 2 to 1\
+    NOP                 // alignment \
+    NOP                 // alignment\
+    NOP                 // alignment \
+    BTFSS LRAM_0x07,1\
+    GOTO LADR_0x001E\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BTFSS LRAM_0x07,2\
+    GOTO LADR_0x001E\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BTFSS LRAM_0x07,3\
+    GOTO LADR_0x001E\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    BSF PORTB,2\
+    BCF PORTB,2\
+    CALL LADR_0x0080\
+    GOTO LADR_0x001E\
+LADR_0x0080\
+    NOP\
+    RETLW 0x00           ;   b'00000000'  d\'92000' // 0x00 -> W Reg then \
+                                                 // return \
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+    XORLW 0xFF           ;   b'11111111'  d'255'\
+\
+    End}

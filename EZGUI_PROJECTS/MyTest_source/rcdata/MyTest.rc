@@ -1,0 +1,22 @@
+#include "resource.h"
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "My Company\0"
+      VALUE "FileDescription",  "My Program\0"
+      VALUE "FileVersion",      "1.0\0"
+      VALUE "InternalName",     "Program 1\0"
+      VALUE "OriginalFilename", "myprog1.exe\0"
+      VALUE "LegalCopyright",   "©©My Name 2005\0"
+      VALUE "LegalTrademarks",  "My Trademark\0"
+      VALUE "ProductName",      "My Product\0"
+      VALUE "ProductVersion",   "1.0\0"
+    END
+  END
+END
+1 24 "MyTest.exe.manifest"
+ATCO ICON DISCARDABLE "atco.ico"

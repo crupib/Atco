@@ -1,0 +1,19 @@
+#include "c:\pbdll60\winapi\resource.h"
+VS_VERSION_INFO VERSIONINFO
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "Computer Workshop, a Software Development Co.\0"
+      VALUE "FileDescription",  "EZGUI 5.0 MCI Custom Control\0"
+      VALUE "FileVersion",      "5.0\0"
+      VALUE "InternalName",     "ezgui5mm.dll\0"
+      VALUE "OriginalFilename", "ezgui5mm.dll\0"
+      VALUE "LegalCopyright",   "© 2011 Christopher R. Boss All Rights Reserved\0"
+      VALUE "LegalTrademarks",  "EZGUI is an Unregistered Trademark\0"
+      VALUE "ProductName",      "EZGUI 5.0 MCI Custom Control\0"
+      VALUE "ProductVersion",   "5.0\0"
+    END
+  END
+END
